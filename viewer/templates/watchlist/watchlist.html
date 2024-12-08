@@ -1,0 +1,30 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+<h2>Watchlist</h2>
+
+<table class="table table-bordered">
+    <thead>
+    <tr>
+<!--        <th>Title</th>-->
+<!--        <th>Genre</th>-->
+<!--        <th>Description</th>-->
+<!--        <th>Rating</th>-->
+<!--        <th>Year</th>-->
+<!--        <th>Delete</th>-->
+    </tr>
+    </thead>
+    {% for item in object_list %}
+    <tbody>
+        <td>{{ item.auction.title }}</td>
+        <td>{{ item.auction.genre }}</td>
+        <td><a href="{% url 'watchlist_delete' item.pk %}" class="btn btn-danger">x</a>
+            </tbody>
+        {% endfor %}
+    </table>
+    {% if not object_list %}
+        <p>No auctions on watch</p>
+    {% endif %}
+</div>
+{% endblock %}

@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+{% load static %}
+{% load active_link_tags %}
+
+<html {% if LANGUAGE_CODE %}lang="{{ LANGUAGE_CODE }}" {% endif %}>
+
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Auctions {% block nadpis %}{% endblock %}</title>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.2.1/css/bootstrap.min.css"
+          integrity="sha384-GJzZqFGwb1QTTN6wy59ffF1BuGJpLSa9DkKMp0DgiMDm4iYMj70gZWKYbI706tWS" crossorigin="anonymous">
+    <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js"
+            integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo"
+            crossorigin="anonymous"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.6/umd/popper.min.js"
+            integrity="sha384-wHAiFfRlMFy6i5SRaxvfOCifBUQy1xHdJ/yoi7FRNXMRBu5WHdZYu1hA6ZOblgut"
+            crossorigin="anonymous"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.2.1/js/bootstrap.min.js"
+            integrity="sha384-B0UglyR+jN6CkvvICOB2joaf5I4l3gm9GU6Hc1og6Ls7i6U/mkkaduKaBhlAXv9k"
+            crossorigin="anonymous"></script>
+</head>
+
+<body>
+<nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+    <div class="container fixed">
+        <a class="navbar-brand" href="{% url 'index' %}">Auctions</a>
+        <button
+                class="navbar-toggler" type="button"
+                data-toggle="collapse" data-target="#navbarNavAltMarkup"
+        >
+            <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarNavAltMarkup">
+            <ul class="navbar-nav mr-auto">
+                <li class="nav-item">
+                    <a class="nav-link {% active_link 'index' strict=True %}" href="{% url 'index' %}">
+                        Home
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link {% active_link 'movies' strict=True %}" href="{% url 'auctions' %}">
+                        auctions
+                    </a>
+                </li>
+
+                {% if user.is_authenticated %}
+                {% endif %}
+            </ul>
+            <ul class="navbar-nav">
+                {% if user.is_authenticated %}
+                    <li class="nav-item dropdown">
+                        <a class="nav-link dropdown-toggle" href="#" id="navbarDropdownMenuLink" role="button"
+                           data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                            {{ user.username }}
+                        </a>
+                        <div class="dropdown-menu" aria-labelledby="navbarDropdownMenuLink">
+                            <a class="dropdown-item" href="{% url 'profile' %}">Profile</a>
+                            <form action="{% url 'logout' %}" method="POST" style="display: inline;">
+                                {% csrf_token %}
+                                <button class="dropdown-item" type="submit">Logout</button>
+                            </form>
+                            <a class="dropdown-item" href="{% url 'watchlist' %}">Watchlist</a>
+                        </div>
+                    </li>
+                {% else %}
+                    <li class="nav-item">
+                        <a class="nav-link {% active_link 'login' strict=True %}" href="{% url 'login' %}">
+                            Login
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link {% active_link '' strict=True %}" href="{% url 'register' %}">
+                            Register
+                        </a>
+                    </li>
+            </ul>
+        </div>
+        {% endif %}
+    </div>
+</nav>
+
+<div class="container">
+    <div class="jumbotron">
+        {% block content %}{% endblock %}
+    </div>
+</div>
+
+<div class="footer bg-dark text-white text-center p-3">
+        {% block footer %}<p>&copy; 2024 Team-6. All rights reserved.</p>{% endblock %}
+    </div>
+</body>
+
+</html>
