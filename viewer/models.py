@@ -10,3 +10,9 @@ class Category(Model):
 
     def __str__(self):
         return self.name
+
+class Auction(Model):
+    pass
+
+class Watchlist(Model):
+  pass
