@@ -1,7 +1,12 @@
 {% extends 'base.html' %}
 
-{% block nadpis %}
-    Auctions
-{% endblock %}
+{% block nadpis %}-Auctions{% endblock %}
 
 {% block content %}
+    <h1>Auctions</h1>
+    <ul>
+        {% for auction in auctions %}
+            <li>{{ auction.name }}</li>
+        {% endfor %}
+    </ul>
+{% endblock %}

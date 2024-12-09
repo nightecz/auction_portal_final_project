@@ -12,7 +12,6 @@ class Category(Model):
     def __str__(self):
         return self.name
 
-
 class Profile(Model):
     user = OneToOneField(User, on_delete=CASCADE, related_name='profile')
     phone = CharField(max_length=20)

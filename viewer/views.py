@@ -7,7 +7,7 @@ from django.db.models import CharField, TextField, DateTimeField, ForeignKey
 from django.views.generic import FormView, ListView, TemplateView, UpdateView, DeleteView
 from viewer.forms import SignUpForm
 from django.urls import reverse_lazy
-from viewer.models import Watchlist
+from viewer.models import Auction, Watchlist
 
 # from .models import Auction
 
@@ -51,7 +51,9 @@ class RegisterView(FormView):
 
 
 class AuctionView(ListView):
+    model = Auction
     template_name = 'auctions.html'
+    context_object_name = 'auctions'
 
 class WatchlistView(ListView):
     template_name = "watchlist.html"
