@@ -20,3 +20,7 @@ urlpatterns = [
 
     path('watchlist/', WatchlistView.as_view(), name='watchlist'),
 ]
+
+
+if settings.DEBUG:
+    urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
