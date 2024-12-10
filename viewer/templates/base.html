@@ -39,8 +39,13 @@
                     </a>
                 </li>
                 <li class="nav-item">
-                    <a class="nav-link {% active_link 'movies' strict=True %}" href="{% url 'auctions' %}">
+                    <a class="nav-link {% active_link 'auctions' strict=True %}" href="{% url 'auctions' %}">
                         auctions
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link {% active_link 'auction_create' strict=True %}" href="{% url 'auction_create' %}">
+                        create auction
                     </a>
                 </li>
 
