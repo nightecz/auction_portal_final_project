@@ -4,15 +4,11 @@ from django.contrib.auth import logout, login
 from django.contrib.auth.views import LoginView
 from django.shortcuts import render, redirect
 from django.db.models import CharField, TextField, DateTimeField, ForeignKey
-from django.views.generic import FormView, ListView, TemplateView, UpdateView, DeleteView
-from viewer.forms import SignUpForm, AuctionCreateForm
+from django.views.generic import FormView, ListView, TemplateView, UpdateView, DeleteView, View
+from viewer.forms import SignUpForm, AuctionCreateForm, UserCreationForm, ModelForm, ProfileEditForm
 from django.urls import reverse_lazy
-from viewer.models import Watchlist, Auction
-
-
-# from .models import Auction
-
-
+from viewer.models import Watchlist, Auction, User, Profile
+from django.contrib.auth.forms import UserChangeForm
 
 def index(request):
     value = request.GET.get('value', '')
@@ -24,7 +20,7 @@ class CustomLoginView(LoginView):
     def form_invalid(self, form):
         messages.error(self.request, "Wrong username or password")
         # messages.success(self.request, "Přihlášení se podařilo")
-        print("Error: wrong login")  # Přidej log pro kontrolu
+        print("Error: wrong login")
         return super().form_invalid(form)
 
     def dispatch(self, request, *args, **kwargs):
@@ -35,6 +31,29 @@ class CustomLoginView(LoginView):
 class ProfileView(TemplateView):
     template_name = 'profile.html'
 
+
+class ProfileEditView(View):
+    template_name = 'profile_edit.html'
+    form_class = ProfileEditForm
+    success_url = reverse_lazy('profile')
+
+    def get(self, request, *args, **kwargs):
+        form = self.form_class(instance=request.user.profile)
+        return render(request, self.template_name, {'form': form})  # Použijte render místo render_to_response
+
+    def post(self, request, *args, **kwargs):
+        form = self.form_class(request.POST, request.FILES, instance=request.user.profile)
+        if form.is_valid():
+            form.save()
+            return redirect(self.success_url)
+        return render(request, self.template_name, {'form': form})  # Opět použijte render
+
+    def dispatch(self, request, *args, **kwargs):
+        if not request.user.is_authenticated:
+            return redirect('/login')  # Přesměrování na login, pokud není uživatel přihlášen
+        return super().dispatch(request, *args, **kwargs)
+
+
 class RegisterView(FormView):
     template_name = 'registration/register.html'
     form_class = SignUpForm
@@ -43,6 +62,7 @@ class RegisterView(FormView):
     # @login_required
     def form_valid(self, form):
         user = form.save()
+        Profile.objects.create(user=user)
         login(self.request, user)
         return redirect(self.success_url)
 
