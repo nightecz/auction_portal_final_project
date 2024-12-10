@@ -5,9 +5,10 @@ from django.contrib.auth.views import LoginView
 from django.shortcuts import render, redirect
 from django.db.models import CharField, TextField, DateTimeField, ForeignKey
 from django.views.generic import FormView, ListView, TemplateView, UpdateView, DeleteView
-from viewer.forms import SignUpForm
+from viewer.forms import SignUpForm, AuctionCreateForm
 from django.urls import reverse_lazy
-from viewer.models import Auction, Watchlist
+from viewer.models import Watchlist, Auction
+
 
 # from .models import Auction
 
@@ -51,9 +52,30 @@ class RegisterView(FormView):
 
 
 class AuctionView(ListView):
-    model = Auction
     template_name = 'auctions.html'
-    context_object_name = 'auctions'
+    model = Auction
+
+
+class AuctionCreateView(FormView):
+    template_name = 'auction_create.html'
+    form_class = AuctionCreateForm
+    success_url = reverse_lazy('auctions')
+
+    def form_valid(self, form):
+        result = super().form_valid(form)
+        cleaned_data = form.cleaned_data
+        auction = Auction.objects.create(
+            name=cleaned_data['name'],
+            description=cleaned_data['description'],
+            starting_price=cleaned_data['starting_price'],
+            start_time=cleaned_data['start_time'],
+            end_time=cleaned_data['end_time'],
+        )
+        categories = form.cleaned_data['categories']
+        auction.categories.set(categories)
+
+        return super().form_valid(form)
+
 
 class WatchlistView(ListView):
     template_name = "watchlist.html"

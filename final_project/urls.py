@@ -4,7 +4,8 @@ from django.contrib import admin
 from django.contrib.auth import views
 from django.urls import path
 # from viewer.models import Auction
-from viewer.views import (index, CustomLoginView, ProfileView, RegisterView, AuctionView, WatchlistView)
+from viewer.views import (index, CustomLoginView, ProfileView, RegisterView, AuctionView, WatchlistView,
+                          AuctionCreateView)
 
 
 urlpatterns = [
@@ -17,6 +18,7 @@ urlpatterns = [
     path('profile/', ProfileView.as_view(), name='profile'),
 
     path('auctions/', AuctionView.as_view(), name='auctions'),
+    path('auction_create/', AuctionCreateView.as_view(), name='auction_create'),
 
     path('watchlist/', WatchlistView.as_view(), name='watchlist'),
 ]
