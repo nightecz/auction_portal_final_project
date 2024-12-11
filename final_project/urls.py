@@ -5,7 +5,7 @@ from django.contrib.auth import views
 from django.urls import path
 # from viewer.models import Auction
 from viewer.views import (index, CustomLoginView, ProfileView, RegisterView, AuctionView, WatchlistView,
-                          AuctionCreateView, ProfileEditView)
+                          AuctionCreateView, ProfileEditView, AuctionDetailView)
 
 
 urlpatterns = [
@@ -20,6 +20,7 @@ urlpatterns = [
 
     path('auctions/', AuctionView.as_view(), name='auctions'),
     path('auction_create/', AuctionCreateView.as_view(), name='auction_create'),
+    path('auction/detail', AuctionDetailView.as_view(), name='auction_detail'),
 
     path('watchlist/', WatchlistView.as_view(), name='watchlist'),
 ]

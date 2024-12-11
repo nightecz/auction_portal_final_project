@@ -1,12 +1,50 @@
 {% extends 'base.html' %}
 
-{% block nadpis %}-Auctions{% endblock %}
+{% block title %}
+    Auctions
+{% endblock %}
 
 {% block content %}
-    <h1>Auctions</h1>
-    <ul>
-        {% for auction in auctions %}
-            <li>{{ auction.name }}</li>
+    <h2>Auctions overview</h2>
+    <table class="table table-bordered">
+        <thead>
+        <tr>
+            <th>Item</th>
+            <th>Picture</th>
+            <th>Seller</th>
+            <th>Categories</th>
+            <th>Current price</th>
+            <th>Ends at</th>
+        </tr>
+        </thead>
+        <tbody>
+        {% for auction in object_list %}
+        <tr>
+            <td>
+                <a href="{% url 'auction_detail' %}?auction={{ auction.id }}">{{ auction.name }}</a>
+            </td>
+            <td>
+                {% with auction.images.first as image %}
+                    {% if image %}
+                        <img src="{{ image.image.url }}" alt="Auction Image" width="200px">
+                    {% else %}
+                        No image available
+                    {% endif %}
+                {% endwith %}
+            </td>
+            <td>{{ auction.seller.user.username }}</td>
+            <td>
+                {% for category in auction.categories.all %}
+                    {{ category.name }}{% if not forloop.last %}, {% endif %}
+                {% endfor %}
+            </td>
+            <td>{{ auction.current_price }}</td>
+            <td>{{ auction.end_time }}</td>
+        </tr>
         {% endfor %}
-    </ul>
+        </tbody>
+    </table>
+    {% if not object_list %}
+        <p>No auctions yet.</p>
+    {% endif %}
 {% endblock %}

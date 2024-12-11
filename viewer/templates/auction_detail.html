@@ -1,0 +1,90 @@
+{% extends 'base.html' %}
+
+{% block title %}
+    {{ auction.name }} - Auction Detail
+{% endblock %}
+
+{% block content %}
+<div class="container">
+    <h1 class="mt-4">{{ auction.name }}</h1>
+
+    <div class="row">
+        <!-- Auction Images -->
+        <div class="col-md-6">
+            <div id="auctionCarousel" class="carousel slide" data-bs-ride="carousel">
+                {% if auction.images.exists %}
+                    <div class="carousel-inner">
+                        {% for image in auction.images.all %}
+                            <div class="carousel-item {% if forloop.first %}active{% endif %}">
+                                <img src="{{ image.image.url }}" class="d-block w-100" alt="{{ image.description }}">
+                            </div>
+                        {% endfor %}
+                    </div>
+                    <button class="carousel-control-prev" type="button" data-bs-target="#auctionCarousel" data-bs-slide="prev">
+                        <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+                        <span class="visually-hidden">Previous</span>
+                    </button>
+                    <button class="carousel-control-next" type="button" data-bs-target="#auctionCarousel" data-bs-slide="next">
+                        <span class="carousel-control-next-icon" aria-hidden="true"></span>
+                        <span class="visually-hidden">Next</span>
+                    </button>
+                {% else %}
+                    <p class="text-danger">No images available for this auction.</p>
+                {% endif %}
+            </div>
+        </div>
+
+        <!-- Auction Details -->
+        <div class="col-md-6">
+            <p><strong>Description:</strong> {{ auction.description }}</p>
+            <p><strong>Seller:</strong> {{ auction.seller.user.username }}</p>
+            <p><strong>Categories:</strong>
+                {% for category in auction.categories.all %}
+                    {{ category.name }}{% if not forloop.last %}, {% endif %}
+                {% endfor %}
+            </p>
+            <p><strong>Starting Price:</strong> ${{ auction.starting_price }}</p>
+            <p><strong>Current Price:</strong> ${{ auction.current_price }}</p>
+            <p><strong>Auction Ends:</strong> {{ auction.end_time }}</p>
+
+            {% if user.is_authenticated %}
+                <form method="post" class="mt-4">
+                    {% csrf_token %}
+                    <div class="mb-3">
+                        <label for="bidAmount" class="form-label"><strong>Place Your Bid:</strong></label>
+                        <input type="number" name="bid_amount" id="bidAmount" class="form-control" step="0.01" min="{{ auction.current_price|floatformat:2 }}">
+                    </div>
+                    <button type="submit" class="btn btn-primary">Bid</button>
+                </form>
+            {% else %}
+                <p class="text-danger">You must <a href="{% url 'login' %}">log in</a> to place a bid.</p>
+            {% endif %}
+        </div>
+    </div>
+
+    <!-- Bid History -->
+    <h2 class="mt-5">Bid History</h2>
+    {% if auction.bids.exists %}
+        <table class="table table-striped">
+            <thead>
+                <tr>
+                    <th>Bidder</th>
+                    <th>Amount</th>
+                    <th>Time</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for bid in auction.bids.all|dictsortreversed:"created_at" %}
+                <tr>
+                    <td>{{ bid.bidder.username }}</td>
+                    <td>${{ bid.amount }}</td>
+                    <td>{{ bid.created_at }}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    {% else %}
+        <p>No bids yet. Be the first to bid!</p>
+    {% endif %}
+</div>
+{% endblock %}

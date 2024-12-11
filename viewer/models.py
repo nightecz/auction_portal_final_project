@@ -36,8 +36,10 @@ class Auction(Model):
     end_time = DateTimeField()
     categories = ManyToManyField('Category', related_name='auctions')
 
-    def __str__(self):
-        return self.name
+    def save(self, *args, **kwargs):
+        if self.pk is None:
+            self.current_price = self.starting_price
+        super().save(*args, **kwargs)
 
 
 class Watchlist(Model):
