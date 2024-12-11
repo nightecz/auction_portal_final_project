@@ -21,7 +21,7 @@
         {% for auction in object_list %}
         <tr>
             <td>
-                <a href="{% url 'Auction_detail' auction.id %}">{{ auction.name }}</a>
+                <a href="{% url 'auction_detail' %}?auction={{ auction.id }}">{{ auction.name }}</a>
             </td>
             <td>
                 {% with auction.images.first as image %}

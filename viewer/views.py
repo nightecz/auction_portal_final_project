@@ -4,7 +4,7 @@ from django.contrib.auth import logout, login
 from django.contrib.auth.views import LoginView
 from django.shortcuts import render, redirect
 from django.db.models import CharField, TextField, DateTimeField, ForeignKey
-from django.views.generic import FormView, ListView, TemplateView, UpdateView, DeleteView
+from django.views.generic import FormView, ListView, TemplateView, UpdateView, DeleteView, DetailView
 from viewer.forms import SignUpForm, AuctionCreateForm
 from django.urls import reverse_lazy
 from viewer.models import Watchlist, Auction
@@ -62,19 +62,30 @@ class AuctionCreateView(FormView):
     success_url = reverse_lazy('auctions')
 
     def form_valid(self, form):
-        result = super().form_valid(form)
         cleaned_data = form.cleaned_data
         auction = Auction.objects.create(
             name=cleaned_data['name'],
             description=cleaned_data['description'],
             starting_price=cleaned_data['starting_price'],
-            start_time=cleaned_data['start_time'],
             end_time=cleaned_data['end_time'],
+            seller=self.request.user.profile
         )
         categories = form.cleaned_data['categories']
         auction.categories.set(categories)
 
         return super().form_valid(form)
+
+
+class AuctionDetailView(TemplateView):
+    model = Auction
+    template_name = 'auction_detail.html'
+    context_object_name = 'auction'
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        auction_id = self.request.GET.get('auction')
+        context['auction'] = Auction.objects.get(pk=auction_id)
+        return context
 
 
 class WatchlistView(ListView):
