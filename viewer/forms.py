@@ -37,7 +37,7 @@ class ProfileEditForm(ModelForm):
 class AuctionCreateForm(ModelForm):
     class Meta:
         model = Auction
-        fields = ['name', 'description', 'starting_price', 'end_time', 'categories']
+        fields = ['name', 'description', 'starting_price', 'end_time', 'categories', 'image']
         widgets = {
             'categories': CheckboxSelectMultiple(),
             'end_time': DateTimeInput(attrs={'type': 'datetime-local'}),

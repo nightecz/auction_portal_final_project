@@ -12,13 +12,12 @@
         <!-- Auction Images -->
         <div class="col-md-6">
             <div id="auctionCarousel" class="carousel slide" data-bs-ride="carousel">
-                {% if auction.images.exists %}
+                {% if auction.image %}
+                <div id="auctionCarousel" class="carousel slide" data-bs-ride="carousel">
                     <div class="carousel-inner">
-                        {% for image in auction.images.all %}
-                            <div class="carousel-item {% if forloop.first %}active{% endif %}">
-                                <img src="{{ image.image.url }}" class="d-block w-100" alt="{{ image.description }}">
-                            </div>
-                        {% endfor %}
+                        <div class="carousel-item active">
+                            <img src="{{ auction.image.url }}" class="d-block w-100" alt="Auction Image">
+                        </div>
                     </div>
                     <button class="carousel-control-prev" type="button" data-bs-target="#auctionCarousel" data-bs-slide="prev">
                         <span class="carousel-control-prev-icon" aria-hidden="true"></span>
@@ -28,8 +27,9 @@
                         <span class="carousel-control-next-icon" aria-hidden="true"></span>
                         <span class="visually-hidden">Next</span>
                     </button>
+                </div>
                 {% else %}
-                    <p class="text-danger">No images available for this auction.</p>
+                <p class="text-danger">No images available for this auction.</p>
                 {% endif %}
             </div>
         </div>

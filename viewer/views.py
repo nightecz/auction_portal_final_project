@@ -4,8 +4,9 @@ from django.contrib.auth import logout, login
 from django.contrib.auth.views import LoginView
 from django.shortcuts import render, redirect
 from django.db.models import CharField, TextField, DateTimeField, ForeignKey
+from django.views import View
 from django.views.generic import FormView, ListView, TemplateView, UpdateView, DeleteView, DetailView
-from viewer.forms import SignUpForm, AuctionCreateForm
+from viewer.forms import SignUpForm, AuctionCreateForm, ProfileEditForm
 from django.urls import reverse_lazy
 from viewer.models import Watchlist, Auction, User, Profile
 from django.contrib.auth.forms import UserChangeForm
@@ -39,18 +40,18 @@ class ProfileEditView(View):
 
     def get(self, request, *args, **kwargs):
         form = self.form_class(instance=request.user.profile)
-        return render(request, self.template_name, {'form': form})  # Použijte render místo render_to_response
+        return render(request, self.template_name, {'form': form})
 
     def post(self, request, *args, **kwargs):
         form = self.form_class(request.POST, request.FILES, instance=request.user.profile)
         if form.is_valid():
             form.save()
             return redirect(self.success_url)
-        return render(request, self.template_name, {'form': form})  # Opět použijte render
+        return render(request, self.template_name, {'form': form})
 
     def dispatch(self, request, *args, **kwargs):
         if not request.user.is_authenticated:
-            return redirect('/login')  # Přesměrování na login, pokud není uživatel přihlášen
+            return redirect('/login')
         return super().dispatch(request, *args, **kwargs)
 
 
@@ -88,7 +89,8 @@ class AuctionCreateView(FormView):
             description=cleaned_data['description'],
             starting_price=cleaned_data['starting_price'],
             end_time=cleaned_data['end_time'],
-            seller=self.request.user.profile
+            seller=self.request.user,
+            image=cleaned_data.get('image')
         )
         categories = form.cleaned_data['categories']
         auction.categories.set(categories)
@@ -103,13 +105,25 @@ class AuctionDetailView(TemplateView):
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        auction_id = self.request.GET.get('auction')
-        context['auction'] = Auction.objects.get(pk=auction_id)
+        context['auction'] = Auction.objects.get(pk=kwargs['id'])
         return context
 
 
+class AuctionSellingView(ListView):
+    template_name = 'my_auctions.html'
+    model = Auction
+
+    def get_queryset(self):
+        return Auction.objects.filter(seller=self.request.user)
+
+    def dispatch(self, request, *args, **kwargs):
+        if not request.user.is_authenticated:
+            return redirect('login')
+        return super().dispatch(request, *args, **kwargs)
+
+
 class WatchlistView(ListView):
-    template_name = "watchlist.html"
+    template_name = "watchlist/watchlist.html"
     model = Watchlist
 
     def get_queryset(self):
@@ -119,3 +133,19 @@ class WatchlistView(ListView):
         if not request.user.is_authenticated:
             return redirect('login')
         return super().dispatch(request, *args, **kwargs)
+
+def check_if_auction_is_in_watchlist(user, movie):
+    return Watchlist.objects.filter(user=user, auction=auction).exists()
+
+def watchlist_add(request):
+    movie_id = request.GET.get('movie')
+    check_if_auction_is_in_watchlist(request.user, Auction.objects.get(pk=auction_id))
+    if check_if_auction_is_in_watchlist(request.user, Auction.objects.get(pk=auction_id)):
+        return redirect('watchlist/watchlist')
+    else:
+        Watchlist.objects.create(
+            user=request.user,
+            movie=Auction.objects.get(pk=auction_id)
+        )
+
+    return redirect('watchlist')

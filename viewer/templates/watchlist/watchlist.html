@@ -7,18 +7,18 @@
 <table class="table table-bordered">
     <thead>
     <tr>
-<!--        <th>Title</th>-->
-<!--        <th>Genre</th>-->
-<!--        <th>Description</th>-->
-<!--        <th>Rating</th>-->
-<!--        <th>Year</th>-->
-<!--        <th>Delete</th>-->
+        <th>Item</th>
+        <th>Picture</th>
+        <th>Current price</th>
+        <th>Ends at</th>
     </tr>
     </thead>
     {% for item in object_list %}
     <tbody>
         <td>{{ item.auction.title }}</td>
-        <td>{{ item.auction.genre }}</td>
+        <td>{{ item.auction.picture }}</td>
+        <td>{{ item.auction.current_price }}</td>
+        <td>{{ item.auction.end_time }}</td>
         <td><a href="{% url 'watchlist_delete' item.pk %}" class="btn btn-danger">x</a>
             </tbody>
         {% endfor %}

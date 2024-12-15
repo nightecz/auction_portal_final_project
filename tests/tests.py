@@ -37,3 +37,14 @@ class LoginTest(TestCase):
             'username': self.username,
             'password': self.password
         })
+
+# class AuctionTest(TestCase):
+#     def setUp(self):
+#     self.profile = Profile.objects.get(user__username='TestTest')
+#     Auction.objects.create(
+#         name="Test Auction",
+#         description="This is a test auction.",
+#         seller=profile,
+#         starting_price=100.00,
+#         current_price=100.00,
+#         end_time=now() + timedelta(days=7)

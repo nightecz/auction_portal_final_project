@@ -4,7 +4,7 @@
 
 {% block content %}
 <div class="container">
-    <h2 class="text-center">My Auctions to Sell</h2>
+    <h2 class="text-center">My Auctions</h2>
 
     {% if object_list %}
         <div class="row">
@@ -13,6 +13,9 @@
                     <div class="card mb-4">
                         <div class="card-header text-center">
                             <h5 class="card-title">{{ auction.name }}</h5>
+                            {% if auction.image %}
+                                <img src="{{ auction.image.url }}" alt="Auction Image" class="img-fluid" style="max-height: 100px; margin-top: 10px;">
+                            {% endif %}
                         </div>
                         <div class="card-body">
                             <p class="card-text">{{ auction.description }}</p>

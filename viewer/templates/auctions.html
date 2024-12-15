@@ -21,18 +21,16 @@
         {% for auction in object_list %}
         <tr>
             <td>
-                <a href="{% url 'auction_detail' %}?auction={{ auction.id }}">{{ auction.name }}</a>
+                <a href="{% url 'auction_detail' auction.id %}">{{ auction.name }}</a>
             </td>
             <td>
-                {% with auction.images.first as image %}
-                    {% if image %}
-                        <img src="{{ image.image.url }}" alt="Auction Image" width="200px">
-                    {% else %}
-                        No image available
-                    {% endif %}
-                {% endwith %}
+                {% if auction.image %}
+                    <img src="{{ auction.image.url }}" alt="Auction Image" width="200px">
+                {% else %}
+                    No image available
+                {% endif %}
             </td>
-            <td>{{ auction.seller.user.username }}</td>
+            <td>{{ auction.seller.username }}</td>
             <td>
                 {% for category in auction.categories.all %}
                     {{ category.name }}{% if not forloop.last %}, {% endif %}

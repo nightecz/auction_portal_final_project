@@ -61,11 +61,12 @@
                         </a>
                         <div class="dropdown-menu" aria-labelledby="navbarDropdownMenuLink">
                             <a class="dropdown-item" href="{% url 'profile' %}">Profile</a>
+                            <a class="dropdown-item" href="{% url 'my_selling_auctions' %}">My Auctions</a>
+                            <a class="dropdown-item" href="{% url 'watchlist' %}">Watchlist</a>
                             <form action="{% url 'logout' %}" method="POST" style="display: inline;">
                                 {% csrf_token %}
                                 <button class="dropdown-item" type="submit">Logout</button>
                             </form>
-                            <a class="dropdown-item" href="{% url 'watchlist' %}">Watchlist</a>
                         </div>
                     </li>
                 {% else %}
