@@ -1,0 +1,32 @@
+{% extends 'base.html' %}
+
+{% block nadpis %}- My Sellings{% endblock %}
+
+{% block content %}
+<div class="container">
+    <h2 class="text-center">My Auctions to Sell</h2>
+
+    {% if object_list %}
+        <div class="row">
+            {% for auction in object_list %}
+                <div class="col-md-4">
+                    <div class="card mb-4">
+                        <div class="card-header text-center">
+                            <h5 class="card-title">{{ auction.name }}</h5>
+                        </div>
+                        <div class="card-body">
+                            <p class="card-text">{{ auction.description }}</p>
+                            <p class="card-text">Starting Price: ${{ auction.starting_price }}</p>
+                            <p class="card-text">Current Price: ${{ auction.current_price }}</p>
+                            <p class="card-text">Ends on: {{ auction.end_time|date:"D, M d, Y H:i" }}</p>
+                            <a href="{% url 'auction_detail' auction.id %}" class="btn btn-primary btn-block">View Details</a>
+                        </div>
+                    </div>
+                </div>
+            {% endfor %}
+        </div>
+    {% else %}
+        <p class="text-center">You have no auctions to sell at the moment.</p>
+    {% endif %}
+</div>
+{% endblock %}
