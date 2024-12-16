@@ -15,8 +15,11 @@ class Category(Model):
 class Profile(Model):
     user = OneToOneField(User, on_delete=CASCADE, related_name='profile')
     phone = CharField(max_length=20, blank=True, null=True)
-    address = TextField(blank=True, null=True)
-    city = CharField(max_length=100, blank=True, null=True)
+    street = CharField(max_length=20, blank=True, null=True)
+    house_number = CharField(max_length=20, blank=True, null=True)
+    city = CharField(max_length=20, blank=True, null=True)
+    zip_code = CharField(max_length=20, blank=True, null=True)
+    country = CharField(max_length=20, blank=True, null=True)
     avatar = ImageField(upload_to='avatars/', blank=True, null=True, validators=[
         FileExtensionValidator(allowed_extensions=['jpg', 'jpeg', 'png'])
     ])
