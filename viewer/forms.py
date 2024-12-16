@@ -1,10 +1,10 @@
 import re
 from django.contrib.auth.forms import UserChangeForm
 from django.core.exceptions import ValidationError
-from viewer.models import Profile
+from viewer.models import Profile, Bid
 from django.forms import (
     CharField, DateField, Form, IntegerField, ModelChoiceField, Textarea, TextInput, EmailInput, PasswordInput,
-    ModelForm, DateInput, NumberInput, CheckboxSelectMultiple, DateTimeInput
+    ModelForm, DateInput, NumberInput, CheckboxSelectMultiple, DateTimeInput, DecimalField
 )
 from django.contrib.auth.forms import UserCreationForm
 from django.contrib.auth.models import User
@@ -57,3 +57,17 @@ class AuctionCreateForm(ModelForm):
             auction.save()  # Uložíme aukci do databáze
             self.save_m2m()
         return auction
+
+
+
+class BidForm(ModelForm):
+    bid_amount = DecimalField(label='Place Your Bid', widget=NumberInput(attrs={
+        'class': 'form-control',
+        'step': '0.01',
+        'min': '0'
+    }))
+
+    class Meta:
+        model = Bid
+        fields = ['bid_amount']
+
