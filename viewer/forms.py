@@ -14,6 +14,7 @@ from django.urls import reverse_lazy
 from django.shortcuts import redirect
 
 class SignUpForm(UserCreationForm):
+    phone = CharField(max_length=20, required=True, label='Phone')
     street = CharField(max_length=20, required=True, label='Street')
     house_number = CharField(max_length=20, required=True, label='Address House number')
     city = CharField(max_length=20, required=True, label='City')
@@ -22,12 +23,29 @@ class SignUpForm(UserCreationForm):
 
     class Meta:
         model = User
-        fields = ['username', 'email', 'password1', 'password2', 'street', 'house_number', 'city', 'zip_code', 'country']
+        fields = ['username', 'email', 'password1', 'password2', 'phone', 'street', 'house_number', 'city', 'zip_code', 'country']
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         for field_name in self.fields:
             self.fields[field_name].widget.attrs['class'] = 'form-control'
+
+    def save(self, commit=True):
+        user = super().save(commit=False)
+        if commit:
+            user.save()
+
+        profile = Profile.objects.create(
+            user=user,
+            phone=self.cleaned_data['phone'],
+            street=self.cleaned_data['street'],
+            house_number=self.cleaned_data['house_number'],
+            city=self.cleaned_data['city'],
+            zip_code=self.cleaned_data['zip_code'],
+            country=self.cleaned_data['country']
+        )
+
+        return user
 
 class ProfileEditForm(ModelForm):
     class Meta:

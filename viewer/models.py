@@ -13,7 +13,7 @@ class Category(Model):
         return self.name
 
 class Profile(Model):
-    user = OneToOneField(User, on_delete=CASCADE, related_name='profile')
+    user = OneToOneField(User, on_delete=CASCADE, related_name='profile', unique=True)
     phone = CharField(max_length=20, blank=True, null=True)
     street = CharField(max_length=20, blank=True, null=True)
     house_number = CharField(max_length=20, blank=True, null=True)
