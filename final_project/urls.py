@@ -4,7 +4,7 @@ from django.contrib import admin
 from django.contrib.auth import views
 from django.urls import path
 from viewer.views import (index, CustomLoginView, ProfileView, RegisterView, AuctionView, WatchlistView,
-                          AuctionCreateView, ProfileEditView, AuctionDetailView, AuctionSellingView)
+                          AuctionCreateView, ProfileEditView, AuctionDetailView, AuctionSellingView, PlaceBidView)
 
 
 urlpatterns = [
@@ -21,6 +21,7 @@ urlpatterns = [
     path('auction_create/', AuctionCreateView.as_view(), name='auction_create'),
     path('auction/detail/<int:id>/', AuctionDetailView.as_view(), name='auction_detail'),
     path('auctions/my_selling_auctions/', AuctionSellingView.as_view(), name='my_selling_auctions'),
+    path('auction/bid/', PlaceBidView.as_view(), name='place_bid'),
 
     path('watchlist/', WatchlistView.as_view(), name='watchlist'),
 ]

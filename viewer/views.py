@@ -1,4 +1,4 @@
-from django.http import HttpResponse
+from django.http import HttpResponse, HttpResponseBadRequest, HttpResponseRedirect
 from django.contrib import messages
 from django.contrib.auth import logout, login
 from django.contrib.auth.views import LoginView
@@ -6,9 +6,9 @@ from django.shortcuts import render, redirect
 from django.db.models import CharField, TextField, DateTimeField, ForeignKey
 from django.views import View
 from django.views.generic import FormView, ListView, TemplateView, UpdateView, DeleteView, DetailView
-from viewer.forms import SignUpForm, AuctionCreateForm, ProfileEditForm
-from django.urls import reverse_lazy
-from viewer.models import Watchlist, Auction, User, Profile
+from viewer.forms import SignUpForm, AuctionCreateForm, ProfileEditForm, BidForm
+from django.urls import reverse_lazy, reverse
+from viewer.models import Watchlist, Auction, User, Profile, Bid
 from django.contrib.auth.forms import UserChangeForm
 
 def index(request):
@@ -72,7 +72,7 @@ class RegisterView(FormView):
         login(self.request, user)
         return redirect(self.success_url)
 
-    def for_invalid(self, form):
+    def form_invalid(self, form):
         messages.error(self.request, form.errors)
         return super().form_invalid(form)
 
@@ -125,6 +125,44 @@ class AuctionSellingView(ListView):
         if not request.user.is_authenticated:
             return redirect('login')
         return super().dispatch(request, *args, **kwargs)
+
+class PlaceBidView(FormView):
+    template_name = 'auction_detail.html'
+    form_class = BidForm
+    success_url = reverse_lazy('auction_detail')
+
+    def post(self, request, *args, **kwargs):
+        auction_id = request.GET.get('auction')
+        if not auction_id:
+            return HttpResponseBadRequest("No auction specified.")
+
+        try:
+            auction = Auction.objects.get(pk=auction_id)
+        except Auction.DoesNotExist:
+            return HttpResponseBadRequest("Auction does not exist.")
+
+        form = BidForm(request.POST)
+
+        if not form.is_valid():
+            return HttpResponseBadRequest("Invalid bid value.")
+
+        bid_amount = form.cleaned_data['bid_amount']
+
+        if auction.end_time < timezone.now():
+            return HttpResponseBadRequest("This auction is closed.")
+
+        if bid_amount <= auction.current_price:
+            return HttpResponseBadRequest("Bid must be higher than current price.")
+
+        auction.current_price = bid_amount
+        auction.save()
+
+        auction.bids.create(
+            bidder=request.user,
+            amount=bid_amount
+        )
+        messages.success(request, "Your bid was placed.")
+        return HttpResponseRedirect(reverse('auction_detail') + f'?auction={auction_id}')
 
 
 class WatchlistView(ListView):
