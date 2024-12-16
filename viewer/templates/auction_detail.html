@@ -48,11 +48,11 @@
             <p><strong>Auction Ends:</strong> {{ auction.end_time }}</p>
 
             {% if user.is_authenticated %}
-                <form method="post" class="mt-4">
+                <form method="post" action="{% url 'place_bid' %}?auction={{ auction.id }}" class="mt-4">
                     {% csrf_token %}
                     <div class="mb-3">
                         <label for="bidAmount" class="form-label"><strong>Place Your Bid:</strong></label>
-                        <input type="number" name="bid_amount" id="bidAmount" class="form-control" step="0.01" min="{{ auction.current_price|floatformat:2 }}">
+                        <input type="number" name="bid_amount" id="bidAmount" class="form-control" step="0.01" min="{{ auction.current_price|floatformat:2 }}" required>
                     </div>
                     <button type="submit" class="btn btn-primary">Bid</button>
                 </form>
@@ -77,7 +77,7 @@
                 {% for bid in auction.bids.all|dictsortreversed:"created_at" %}
                 <tr>
                     <td>{{ bid.bidder.username }}</td>
-                    <td>${{ bid.amount }}</td>
+                    <td>{{ bid.amount }} $</td>
                     <td>{{ bid.created_at }}</td>
                 </tr>
                 {% endfor %}
