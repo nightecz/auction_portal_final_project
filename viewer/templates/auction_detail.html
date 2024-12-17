@@ -5,20 +5,27 @@
 {% endblock %}
 
 {% block content %}
+
 <div class="container">
+    {% if messages %}
+        <div class="alert alert-warning" role="alert">
+            {% for message in messages %}
+                {{ message }}
+            {% endfor %}
+        </div>
+    {% endif %}
+
     <h1 class="mt-4">{{ auction.name }}</h1>
 
     <div class="row">
         <!-- Auction Images -->
         <div class="col-md-6">
             <div id="auctionCarousel" class="carousel slide" data-bs-ride="carousel">
-                {% if auction.images.exists %}
+                {% if auction.image %}
                     <div class="carousel-inner">
-                        {% for image in auction.images.all %}
-                            <div class="carousel-item {% if forloop.first %}active{% endif %}">
-                                <img src="{{ image.image.url }}" class="d-block w-100" alt="{{ image.description }}">
-                            </div>
-                        {% endfor %}
+                        <div class="carousel-item active">
+                            <img src="{{ auction.image.url }}" class="d-block w-75 mx-auto" alt="Auction Image" style="max-height: 400px; object-fit: contain;">
+                        </div>
                     </div>
                     <button class="carousel-control-prev" type="button" data-bs-target="#auctionCarousel" data-bs-slide="prev">
                         <span class="carousel-control-prev-icon" aria-hidden="true"></span>
@@ -37,7 +44,7 @@
         <!-- Auction Details -->
         <div class="col-md-6">
             <p><strong>Description:</strong> {{ auction.description }}</p>
-            <p><strong>Seller:</strong> {{ auction.seller.user.username }}</p>
+            <p><strong>Seller:</strong> {{ auction.seller.username }}</p>
             <p><strong>Categories:</strong>
                 {% for category in auction.categories.all %}
                     {{ category.name }}{% if not forloop.last %}, {% endif %}

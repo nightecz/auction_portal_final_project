@@ -13,10 +13,13 @@ class Category(Model):
         return self.name
 
 class Profile(Model):
-    user = OneToOneField(User, on_delete=CASCADE, related_name='profile')
+    user = OneToOneField(User, on_delete=CASCADE, related_name='profile', unique=True)
     phone = CharField(max_length=20, blank=True, null=True)
-    address = TextField(blank=True, null=True)
-    city = CharField(max_length=100, blank=True, null=True)
+    street = CharField(max_length=20, blank=True, null=True)
+    house_number = CharField(max_length=20, blank=True, null=True)
+    city = CharField(max_length=20, blank=True, null=True)
+    zip_code = CharField(max_length=20, blank=True, null=True)
+    country = CharField(max_length=20, blank=True, null=True)
     avatar = ImageField(upload_to='avatars/', blank=True, null=True, validators=[
         FileExtensionValidator(allowed_extensions=['jpg', 'jpeg', 'png'])
     ])
@@ -29,12 +32,15 @@ class Profile(Model):
 class Auction(Model):
     name = CharField(max_length=128)
     description = CharField(max_length=255)
-    seller = ForeignKey(Profile, on_delete=CASCADE)
+    seller = ForeignKey(User, on_delete=CASCADE)
     starting_price = DecimalField(max_digits=10, decimal_places=2, validators=[MinValueValidator(0)])
     current_price = DecimalField(max_digits=10, decimal_places=2, default=0)
     start_time = DateTimeField(auto_now_add=True)
     end_time = DateTimeField()
     categories = ManyToManyField('Category', related_name='auctions')
+    image = ImageField(upload_to='auctions/', blank=True, null=True, validators=[
+        FileExtensionValidator(allowed_extensions=['jpg', 'jpeg', 'png'])
+    ])
 
     def save(self, *args, **kwargs):
         if self.pk is None:
@@ -69,11 +75,12 @@ class Purchase(Model):
         return f" Winner of {self.auction.name} is {self.buyer.username} for {self.winning_price}"
 
 
-class AuctionImage(Model):
-    auction = ForeignKey(Auction, on_delete=CASCADE, related_name='images')
-    image = ImageField(upload_to='auction_images/',
-                       validators=[FileExtensionValidator(allowed_extensions=['jpg', 'jpeg', 'png'])])
-    description = CharField(max_length=255, blank=True, null=True)
+# class AuctionImage(Model):
+#     auction = ForeignKey(Auction, on_delete=CASCADE, related_name='images')
+#     image = ImageField(upload_to='auctions/',
+#                        validators=[FileExtensionValidator(allowed_extensions=['jpg', 'jpeg', 'png'])])
+#     description = CharField(max_length=255, blank=True, null=True)
+#
+#     def __str__(self):
+#         return f'Image for {self.auction.name}'
 
-    def __str__(self):
-        return f'Image for {self.auction.name}'
