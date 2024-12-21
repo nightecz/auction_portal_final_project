@@ -52,7 +52,8 @@
         <tr>
             <th>Item</th>
             <th>Picture</th>
-            <th>Seller</th>
+            <th>City</th>
+<!--            <th>Seller</th>-->
             <th>Categories</th>
             <th>Current price</th>
             <th>Ends at</th>
@@ -75,7 +76,8 @@
                     No image available
                 {% endif %}
             </td>
-            <td>{{ auction.seller.username }}</td>
+            <td>{{ auction.seller.profile.city }}</td>
+<!--            <td>{{ auction.seller.username }}</td>-->
             <td>
                   {% for category in auction.categories.all %}
                     {{ category.name }}{% if not forloop.last %}, {% endif %}
@@ -83,7 +85,6 @@
             </td>
             <td>{{ auction.current_price }}</td>
             <td>{{ auction.end_time }}</td>
-<!--            <td>{{ auction.seller.profile.city }}</td>-->
             {% if user.is_authenticated %}
                         <td style="text-align:center">
                 {% if auction.seller != user %}
