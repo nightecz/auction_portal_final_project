@@ -4,6 +4,15 @@
 
 <h2>Watchlist</h2>
 
+<div class="container">
+    {% if messages %}
+        <div class="alert alert-warning" role="alert">
+            {% for message in messages %}
+                {{ message }}
+            {% endfor %}
+        </div>
+    {% endif %}
+
 <table class="table table-bordered">
     <thead>
     <tr>
@@ -11,16 +20,27 @@
         <th>Picture</th>
         <th>Current price</th>
         <th>Ends at</th>
+        <th>Remove</th>
     </tr>
     </thead>
     {% for item in object_list %}
     <tbody>
-        <td>{{ item.auction.title }}</td>
-        <td>{{ item.auction.picture }}</td>
+        <td>{{ item.auction.name }}</td>
+        <td>{% if item.auction.image %}
+        <img src="{{ item.auction.image.url }}" alt="Auction Image" width="200px">
+        {% else %}
+        No image available
+        {% endif %}
+        </td>
         <td>{{ item.auction.current_price }}</td>
         <td>{{ item.auction.end_time }}</td>
-        <td><a href="{% url 'watchlist_delete' item.pk %}" class="btn btn-danger">x</a>
-            </tbody>
+        <td>
+        <form action="{% url 'remove_from_watchlist' item.pk %}" method="POST">
+        {% csrf_token %}
+        <button type="submit" class="btn btn-danger">-</button>
+        </form>
+        </td>
+    </tbody>
         {% endfor %}
     </table>
     {% if not object_list %}

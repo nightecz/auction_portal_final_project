@@ -9,7 +9,7 @@ from django.forms import (
 from django.contrib.auth.forms import UserCreationForm
 from django.contrib.auth.models import User
 from django.contrib.auth.decorators import login_required
-from viewer.models import Auction, Category
+from viewer.models import Auction, Category, Watchlist
 from django.urls import reverse_lazy
 from django.shortcuts import redirect
 
@@ -89,3 +89,12 @@ class BidForm(ModelForm):
         model = Bid
         fields = ['bid_amount']
 
+
+class WatchlistForm(ModelForm):
+    class Meta:
+        model = Watchlist
+        fields = ['auction']
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.fields['auction'].widget.attrs['class'] = 'form-control'

@@ -6,6 +6,47 @@
 
 {% block content %}
     <h2>Auctions overview</h2>
+
+<div class="container">
+    {% if messages %}
+        <div class="alert alert-warning" role="alert">
+            {% for message in messages %}
+                {{ message }}
+            {% endfor %}
+        </div>
+    {% endif %}
+
+<!--    Category-->
+<div class="categories mb-4">
+    <h4>Filter by Category:</h4>
+    <ul class="list-inline">
+        <li class="list-inline-item">
+            <a href="{% url 'auctions' %}" class="btn btn-secondary">All</a>
+        </li>
+        {% for category in categories %}
+        <li class="list-inline-item">
+            <a href="?category={{ category.id }}" class="btn btn-primary">
+                {{ category.name }}
+            </a>
+        </li>
+        {% endfor %}
+    </ul>
+</div>
+
+<!--Searching-->
+    <form method="get" class="mb-4">
+        <div class="row">
+            <div class="col-md-4">
+                <input type="text" name="q" class="form-control" placeholder="Search by item name or category" value="{{ request.GET.q }}">
+            </div>
+            <div class="col-md-2">
+                <button type="submit" class="btn btn-primary">Search</button>
+            </div>
+            <div>
+                <a href="{% url 'advanced_search' %}" class="btn btn-secondary">Advanced search</a>
+            </div>
+        </div>
+    </form>
     <table class="table table-bordered">
         <thead>
         <tr>
@@ -15,6 +56,9 @@
             <th>Categories</th>
             <th>Current price</th>
             <th>Ends at</th>
+            {% if user.is_authenticated %}
+            <th>Watchlist</th>
+            {% endif %}
 <!--            <th>City of the seller</th>-->
         </tr>
         </thead>
@@ -33,13 +77,34 @@
             </td>
             <td>{{ auction.seller.username }}</td>
             <td>
-                {% for category in auction.categories.all %}
+                  {% for category in auction.categories.all %}
                     {{ category.name }}{% if not forloop.last %}, {% endif %}
                 {% endfor %}
             </td>
             <td>{{ auction.current_price }}</td>
             <td>{{ auction.end_time }}</td>
 <!--            <td>{{ auction.seller.profile.city }}</td>-->
+            {% if user.is_authenticated %}
+                        <td style="text-align:center">
+                {% if auction.seller != user %}
+                    {% if auction.id in auction_ids_in_watchlist %}
+                        <!-- Auction already in Watchlist, button for delete is avaiable-->
+                        <form action="{% url 'watchlist' %}" method="get">
+                            <button type="submit" class="btn btn-danger">Edit watchlist</button>
+                        </form>
+                    {% else %}
+                        <!-- Auction not added, able to add to Watchlist -->
+                        <form method="post" action="{% url 'add_to_watchlist' auction.id %}">
+                            {% csrf_token %}
+                            <button type="submit" class="btn btn-info">+</button>
+                        </form>
+                    {% endif %}
+                {% else %}
+                    <!-- User == seller, not able to add to watchlist-->
+                    <span>your own auction.</span>
+                {% endif %}
+            </td>
+            {% endif %}
         </tr>
         {% endfor %}
         </tbody>

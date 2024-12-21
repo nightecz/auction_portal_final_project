@@ -2,7 +2,7 @@ from django.contrib.auth.models import User
 from django.core.validators import MinValueValidator, MaxValueValidator, FileExtensionValidator
 from django.db.models import (
     DO_NOTHING, CharField, DateField, DateTimeField, ForeignKey, IntegerField,
-    Model, TextField, ImageField, OneToOneField, CASCADE, DecimalField, ManyToManyField
+    Model, TextField, ImageField, OneToOneField, CASCADE, DecimalField, ManyToManyField, BooleanField
 )
 
 
@@ -24,7 +24,7 @@ class Profile(Model):
         FileExtensionValidator(allowed_extensions=['jpg', 'jpeg', 'png'])
     ])
     created_at = DateTimeField(auto_now_add=True)
-
+    is_premium = BooleanField(default=False)  # Prémiový uživatel
     def __str__(self):
         return self.user.username
 
@@ -49,10 +49,13 @@ class Auction(Model):
 
 
 class Watchlist(Model):
-    user = OneToOneField(User, on_delete=CASCADE, related_name='watchlist')
-    auctions = ManyToManyField('Auction', related_name='watchlists')
+    user = ForeignKey(User, on_delete=CASCADE, related_name='watchlist')
+    auction = ForeignKey(Auction, on_delete=CASCADE, null=True)
 
+    class Meta:
+        unique_together = ('user', 'auction')
     def __str__(self):
+        return self.user.username
         return self.user.username
 
 class Bid(Model):
@@ -73,14 +76,3 @@ class Purchase(Model):
 
     def __str__(self):
         return f" Winner of {self.auction.name} is {self.buyer.username} for {self.winning_price}"
-
-
-# class AuctionImage(Model):
-#     auction = ForeignKey(Auction, on_delete=CASCADE, related_name='images')
-#     image = ImageField(upload_to='auctions/',
-#                        validators=[FileExtensionValidator(allowed_extensions=['jpg', 'jpeg', 'png'])])
-#     description = CharField(max_length=255, blank=True, null=True)
-#
-#     def __str__(self):
-#         return f'Image for {self.auction.name}'
-
