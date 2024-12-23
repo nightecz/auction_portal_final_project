@@ -7,7 +7,7 @@ from django.contrib import messages
 from django.contrib.auth import logout, login
 from django.contrib.auth.views import LoginView
 from django.shortcuts import render, redirect, get_object_or_404
-from django.db.models import CharField, TextField, DateTimeField, ForeignKey, Q
+from django.db.models import CharField, TextField, DateTimeField, ForeignKey, Q, BooleanField, Case, When
 from django.utils.decorators import method_decorator
 from django.views import View
 from django.views.generic import FormView, ListView, TemplateView, UpdateView, DeleteView, DetailView
@@ -81,14 +81,25 @@ class AuctionView(ListView):
         search_query = self.request.GET.get('q', '').strip()
         category_id = self.request.GET.get('category')
 
+        #Filtered by category
         if search_query:
             queryset = queryset.filter(
                 Q(name__icontains=search_query) |
                 Q(categories__name__icontains=search_query)
             ).distinct()
 
+        #Filtered by category
         if category_id:
             queryset = queryset.filter(categories__id=category_id)
+
+        # Premium auctions priority
+        queryset = queryset.annotate(
+            is_premium_user=Case(
+                When(seller__profile__is_premium=True, then=True),
+                default=False,
+                output_field=BooleanField(),
+            )
+        ).order_by('-is_premium_user', '-start_time')
 
         return queryset
 
@@ -146,7 +157,13 @@ class AuctionSearchView(ListView):
             auctions = auctions.filter(categories__id=category)
 
         # Premium auctions priority
-        # auctions = auctions.order_by('-seller__profile__is_premium', '-created_at')
+        auctions = auctions.annotate(
+            is_premium=Case(
+                When(seller__profile__is_premium=True, then=True),
+                default=False,
+                output_field=BooleanField(),
+            )
+        ).order_by('-is_premium', '-start_time')
 
         # Filtering by city and end_time
         city = self.request.GET.get('city')

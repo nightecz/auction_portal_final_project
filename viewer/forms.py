@@ -4,7 +4,7 @@ from django.core.exceptions import ValidationError
 from viewer.models import Profile, Bid
 from django.forms import (
     CharField, DateField, Form, IntegerField, ModelChoiceField, Textarea, TextInput, EmailInput, PasswordInput,
-    ModelForm, DateInput, NumberInput, CheckboxSelectMultiple, DateTimeInput, DecimalField
+    ModelForm, DateInput, NumberInput, CheckboxSelectMultiple, DateTimeInput, DecimalField, ChoiceField
 )
 from django.contrib.auth.forms import UserCreationForm
 from django.contrib.auth.models import User
@@ -14,16 +14,23 @@ from django.urls import reverse_lazy
 from django.shortcuts import redirect
 
 class SignUpForm(UserCreationForm):
+    first_name = CharField(max_length=20, required=True, label='First name')
+    last_name = CharField(max_length=20, required=True, label='Last name')
     phone = CharField(max_length=20, required=True, label='Phone')
     street = CharField(max_length=20, required=True, label='Street')
     house_number = CharField(max_length=20, required=True, label='Address House number')
     city = CharField(max_length=20, required=True, label='City')
     zip_code = CharField(max_length=20, required=True, label='ZIP code')
     country = CharField(max_length=20, required=True, label='Country')
+    prefer_communication = ChoiceField(
+        choices=Profile.COMMUNICATION_CHOICES,
+        required=True,
+        label="Prefered communication via"
+    )
 
     class Meta:
         model = User
-        fields = ['username', 'email', 'password1', 'password2', 'phone', 'street', 'house_number', 'city', 'zip_code', 'country']
+        fields = ['username', 'email', 'password1', 'password2', 'first_name', 'last_name', 'phone', 'street', 'house_number', 'city', 'zip_code', 'country', 'prefer_communication']
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
@@ -32,6 +39,8 @@ class SignUpForm(UserCreationForm):
 
     def save(self, commit=True):
         user = super().save(commit=False)
+        user.first_name = self.cleaned_data['first_name']
+        user.last_name = self.cleaned_data['last_name']
         if commit:
             user.save()
 
@@ -42,7 +51,8 @@ class SignUpForm(UserCreationForm):
             house_number=self.cleaned_data['house_number'],
             city=self.cleaned_data['city'],
             zip_code=self.cleaned_data['zip_code'],
-            country=self.cleaned_data['country']
+            country=self.cleaned_data['country'],
+            prefer_communication=self.cleaned_data['prefer_communication']
         )
 
         return user

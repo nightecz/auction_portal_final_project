@@ -14,14 +14,24 @@
     </div>
     <div class="card-body">
         <h5 class="card-title">About user</h5>
-        <p class="card-text">Name: {{ user.username }}</p>
+        <p class="card-text">
+    Premium account:
+    {% if profile.is_premium %}
+        <span style="color: green">YES</span>
+    {% else %}
+        <span style="color: red">NO</span>
+    {% endif %}
+        </p>
+        <p class="card-text">Username: {{ user.username }}</p>
         <p class="card-text">Email: {{ user.email }}</p>
+        <p class="card-text">Name: {{ user.first_name }} {{ user.last_name }}</p>
         <p class="card-text">Phone number: {{ profile.phone }}</p>
         <p class="card-text">Street: {{ profile.street }}</p>
         <p class="card-text">House number: {{ profile.house_number }}</p>
         <p class="card-text">City: {{ profile.city }}</p>
         <p class="card-text">Zip code: {{ profile.zip_code }}</p>
         <p class="card-text">Country: {{ profile.country }}</p>
+        <p class="card-text">Prefer communication: {{ profile.prefer_communication }}</p>
         {% if user.is_staff == 1 %}
             <p class="card-text">Role: Admin</p>
         {% else %}

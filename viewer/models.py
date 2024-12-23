@@ -13,6 +13,11 @@ class Category(Model):
         return self.name
 
 class Profile(Model):
+    COMMUNICATION_CHOICES = [
+        ('mail', 'Post'),
+        ('email', 'Email'),
+    ]
+
     user = OneToOneField(User, on_delete=CASCADE, related_name='profile', unique=True)
     phone = CharField(max_length=20, blank=True, null=True)
     street = CharField(max_length=20, blank=True, null=True)
@@ -24,7 +29,14 @@ class Profile(Model):
         FileExtensionValidator(allowed_extensions=['jpg', 'jpeg', 'png'])
     ])
     created_at = DateTimeField(auto_now_add=True)
-    is_premium = BooleanField(default=False)  # Prémiový uživatel
+    is_premium = BooleanField(default=False)  # Premium user
+    prefer_communication = CharField(
+        max_length=10,
+        choices=COMMUNICATION_CHOICES,
+        default='email',
+    )
+    first_name = CharField(max_length=20, blank=True, null=True)
+    last_name = CharField(max_length=20, blank=True, null=True)
     def __str__(self):
         return self.user.username
 
