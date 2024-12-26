@@ -135,3 +135,12 @@ MEDIA_URL = '/media/'
 MEDIA_ROOT = os.path.join(
     BASE_DIR / 'media'
 )
+
+TIME_ZONE = 'Europe/Prague'
+USE_TZ = True
+
+
+
+
+
+LANGUAGE_CODE = 'en-us'

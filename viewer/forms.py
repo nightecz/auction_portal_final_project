@@ -1,7 +1,9 @@
 import re
 from django.contrib.auth.forms import UserChangeForm
 from django.core.exceptions import ValidationError
-from viewer.models import Profile, Bid
+from django.forms.widgets import HiddenInput
+
+from viewer.models import Profile, Bid, Purchase
 from django.forms import (
     CharField, DateField, Form, IntegerField, ModelChoiceField, Textarea, TextInput, EmailInput, PasswordInput,
     ModelForm, DateInput, NumberInput, CheckboxSelectMultiple, DateTimeInput, DecimalField
@@ -81,11 +83,16 @@ class AuctionCreateForm(ModelForm):
 class BidForm(ModelForm):
     bid_amount = DecimalField(label='Place Your Bid', widget=NumberInput(attrs={
         'class': 'form-control',
-        'step': '0.01',
-        'min': '0'
+        'step': '0.1',
+        'min': '0,1'
     }))
 
     class Meta:
         model = Bid
         fields = ['bid_amount']
 
+
+class PurchaseForm(ModelForm):
+    class Meta:
+        model = Purchase
+        fields = ['winning_price', 'buyer']

@@ -14,6 +14,7 @@
             <th>Seller</th>
             <th>Categories</th>
             <th>Current price</th>
+            <th>Status</th>
             <th>Ends at</th>
 <!--            <th>City of the seller</th>-->
         </tr>
@@ -38,6 +39,7 @@
                 {% endfor %}
             </td>
             <td>{{ auction.current_price }}</td>
+            <td>{{ auction.get_status_display }}</td>
             <td>{{ auction.end_time }}</td>
 <!--            <td>{{ auction.seller.profile.city }}</td>-->
         </tr>
