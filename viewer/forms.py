@@ -86,7 +86,13 @@ class AuctionCreateForm(ModelForm):
             self.save_m2m()
         return auction
 
-
+class AuctionUpdateForm(ModelForm):
+    class Meta:
+        model = Auction
+        fields = ['name', 'description', 'categories', 'image'] #permitted field
+        widgets = {
+            'categories': CheckboxSelectMultiple(),
+        }
 
 class BidForm(ModelForm):
     bid_amount = DecimalField(label='Place Your Bid', widget=NumberInput(attrs={

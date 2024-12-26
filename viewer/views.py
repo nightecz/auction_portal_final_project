@@ -1,4 +1,6 @@
 from django.contrib.auth.decorators import login_required
+from django.contrib.auth.mixins import PermissionRequiredMixin, LoginRequiredMixin
+from django.core.exceptions import PermissionDenied
 from django.utils import timezone
 from decimal import Decimal
 
@@ -11,7 +13,7 @@ from django.db.models import CharField, TextField, DateTimeField, ForeignKey, Q,
 from django.utils.decorators import method_decorator
 from django.views import View
 from django.views.generic import FormView, ListView, TemplateView, UpdateView, DeleteView, DetailView
-from viewer.forms import SignUpForm, AuctionCreateForm, ProfileEditForm, BidForm, WatchlistForm
+from viewer.forms import SignUpForm, AuctionCreateForm, ProfileEditForm, BidForm, WatchlistForm, AuctionUpdateForm
 from django.urls import reverse_lazy, reverse
 from viewer.models import Watchlist, Auction, User, Profile, Bid, Category
 from django.contrib.auth.forms import UserChangeForm
@@ -196,8 +198,6 @@ class AuctionDetailView(TemplateView):
         context['auction_ids_in_watchlist'] = auction_ids_in_watchlist
         return context
 
-
-
 class AuctionSellingView(ListView):
     template_name = 'my_auctions.html'
     model = Auction
@@ -208,6 +208,18 @@ class AuctionSellingView(ListView):
     def dispatch(self, request, *args, **kwargs):
         if not request.user.is_authenticated:
             return redirect('login')
+        return super().dispatch(request, *args, **kwargs)
+
+class AuctionUpdateView(UpdateView):
+    template_name = 'auction_update.html'
+    form_class = AuctionUpdateForm
+    model = Auction
+    success_url = reverse_lazy('my_auctions')
+
+    def dispatch(self, request, *args, **kwargs):
+        auction = self.get_object() #gets the auction instance by pk from URL
+        if auction.seller != request.user: #check if the user is seller
+            raise PermissionDenied("You do not have permission to edit this auction.")
         return super().dispatch(request, *args, **kwargs)
 
 class PlaceBidView(FormView):

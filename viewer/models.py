@@ -54,11 +54,14 @@ class Auction(Model):
         FileExtensionValidator(allowed_extensions=['jpg', 'jpeg', 'png'])
     ])
 
+    class Meta:
+        permissions = [
+            ("auction_update", "Can edit auction"),
+        ]
     def save(self, *args, **kwargs):
         if self.pk is None:
             self.current_price = self.starting_price
         super().save(*args, **kwargs)
-
 
 class Watchlist(Model):
     user = ForeignKey(User, on_delete=CASCADE, related_name='watchlist')
