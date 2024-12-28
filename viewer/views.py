@@ -163,10 +163,15 @@ class AuctionSearchView(ListView):
                 Q(seller__username__icontains=query)
             ).distinct()
 
-        # Filtering by category
-        category = self.request.GET.get('category')
-        if category:
-            auctions = auctions.filter(categories__id=category)
+        # Filtering by main category
+        main_category = self.request.GET.get('main_category')
+        if main_category:
+            auctions = auctions.filter(categories__parent__isnull=True, categories__id=main_category)
+
+        # Filtering by subcategory
+        sub_category = self.request.GET.get('sub_category')
+        if sub_category:
+            auctions = auctions.filter(categories__id=sub_category)
 
         # Premium auctions priority
         auctions = auctions.annotate(
@@ -192,7 +197,15 @@ class AuctionSearchView(ListView):
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        context['categories'] = Category.objects.all()  # Poskytne seznam kategorií pro filtr
+        context['categories'] = Category.objects.select_related('parent').all()
+        main_category = self.request.GET.get('main_category')
+
+    #Filter categories for subcategory dropdown after selected main_category
+        if main_category:
+            context['sub_categories'] = Category.objects.filter(parent_id=main_category)
+        else:
+            context['sub_categories'] = Category.objects.none()
+
         return context
 
 class AuctionDetailView(TemplateView):

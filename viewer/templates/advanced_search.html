@@ -21,14 +21,34 @@
                     <option value="end_time" {% if request.GET.sort_by == 'end_time' %}selected{% endif %}>Ending soon</option>
                 </select>
             </div>
+
             <div class="col-md-2">
-                <select name="category" class="form-select">
+                <select id="main-category" name="main_category" class="form-select">
                     <option value="">Filter by Category</option>
                     {% for category in categories %}
-                        <option value="{{ category.id }}" {% if request.GET.category == category.id|stringformat:"s" %}selected{% endif %}>{{ category.name }}</option>
+                        {% if not category.parent %}
+                            <option value="{{ category.id }}"
+                                    {% if request.GET.main_category == category.id|stringformat:"s" %}selected{% endif %}>
+                                {{ category.name }}
+                            </option>
+                        {% endif %}
                     {% endfor %}
                 </select>
             </div>
+
+            <div class="col-md-2">
+                <select id="sub-category" name="sub_category" class="form-select">
+                    <option value="">Subcategory</option>
+                    {% for sub_category in sub_categories %}
+                        <option value="{{ sub_category.id }}"
+                                {% if request.GET.sub_category == sub_category.id|stringformat:"s" %}selected{% endif %}>
+                            {{ sub_category.name }}
+                        </option>
+                    {% endfor %}
+                </select>
+                <small class="form-text text-muted">Please select a main category first and search to see subcategories.</small>
+            </div>
+
             <div class="col-md-2">
                 <button type="submit" class="btn btn-primary">Search</button>
             </div>
