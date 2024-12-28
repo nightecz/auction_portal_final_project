@@ -63,8 +63,31 @@
                     </div>
                     <button type="submit" class="btn btn-primary">Bid</button>
                 </form>
+
             {% else %}
                 <p class="text-danger">You must <a href="{% url 'login' %}">log in</a> to place a bid.</p>
+            {% endif %}
+<!--            Watchlist-->
+        {% if user.is_authenticated %}
+                <div class="mt-3" style="text-align:center;">
+                    {% if auction.seller != user %}
+                        {% if auction.id in auction_ids_in_watchlist %}
+                            <!-- Auction already in Watchlist -->
+                            <p>This auction is in your watchlist.</p>
+                             <form action="{% url 'watchlist' %}" method="get">
+                            <button type="submit" class="btn btn-danger">Edit watchlist</button>
+                        </form>
+                    {% else %}
+                            <!-- Auction not added, able to add to Watchlist -->
+                        <form method="post" action="{% url 'add_to_watchlist' auction.id %}">
+                            {% csrf_token %}
+                            <button type="submit" class="btn btn-info">Add to watchlist</button>
+                        </form>
+                        {% endif %}
+                    {% else %}
+                        <span>your own auction.</span>
+                    {% endif %}
+                </div>
             {% endif %}
         </div>
     </div>

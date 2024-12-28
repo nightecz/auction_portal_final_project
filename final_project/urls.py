@@ -4,7 +4,8 @@ from django.contrib import admin
 from django.contrib.auth import views
 from django.urls import path
 from viewer.views import (index, CustomLoginView, ProfileView, RegisterView, AuctionView, WatchlistView,
-                          AuctionCreateView, ProfileEditView, AuctionDetailView, AuctionSellingView, PlaceBidView)
+                          AuctionCreateView, ProfileEditView, AuctionDetailView, AuctionSellingView, PlaceBidView,
+                          AddToWatchlistView, WatchlistDeleteView, AuctionSearchView, AuctionUpdateView)
 
 
 urlpatterns = [
@@ -20,10 +21,14 @@ urlpatterns = [
     path('auctions/', AuctionView.as_view(), name='auctions'),
     path('auction_create/', AuctionCreateView.as_view(), name='auction_create'),
     path('auction/detail/<int:id>/', AuctionDetailView.as_view(), name='auction_detail'),
-    path('auctions/my_selling_auctions/', AuctionSellingView.as_view(), name='my_selling_auctions'),
+    path('auctions/my_auctions/', AuctionSellingView.as_view(), name='my_auctions'),
     path('auction/bid/', PlaceBidView.as_view(), name='place_bid'),
+    path('auction/advanced_search', AuctionSearchView.as_view(), name='advanced_search'),
+    path('auction/update/<pk>', AuctionUpdateView.as_view(), name='auction_update'),
 
     path('watchlist/', WatchlistView.as_view(), name='watchlist'),
+    path('add-to-watchlist/<int:auction_id>/', AddToWatchlistView.as_view(), name='add_to_watchlist'),
+    path('remove_from_watchlist/<int:pk>/', WatchlistDeleteView.as_view(), name='remove_from_watchlist'),
 ]
 
 

@@ -1,0 +1,87 @@
+{% extends 'base.html' %}
+
+{% block title %}
+    Auction Search
+{% endblock %}
+
+{% block content %}
+    <h2>Search Results</h2>
+    <form method="get" action="{% url 'advanced_search' %}" class="mb-4">
+        <div class="row">
+            <div class="col-md-3">
+                <input type="text" name="q" class="form-control" placeholder="Search by keyword..." value="{{ request.GET.q }}">
+            </div>
+            <div class="col-md-3">
+                <input type="text" name="city" class="form-control" placeholder="Filter by city..." value="{{ request.GET.city }}">
+            </div>
+            <div class="col-md-2">
+                <select name="sort_by" class="form-select">
+                    <option value="">Sort by...</option>
+                    <option value="created_at" {% if request.GET.sort_by == 'created_at' %}selected{% endif %}>Newest</option>
+                    <option value="end_time" {% if request.GET.sort_by == 'end_time' %}selected{% endif %}>Ending soon</option>
+                </select>
+            </div>
+            <div class="col-md-2">
+                <select name="category" class="form-select">
+                    <option value="">Filter by Category</option>
+                    {% for category in categories %}
+                        <option value="{{ category.id }}" {% if request.GET.category == category.id|stringformat:"s" %}selected{% endif %}>{{ category.name }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+            <div class="col-md-2">
+                <button type="submit" class="btn btn-primary">Search</button>
+            </div>
+        </div>
+    </form>
+
+    {% if auctions %}
+        <table class="table table-bordered">
+            <thead>
+                <tr>
+                    <th>Item</th>
+                    <th>Picture</th>
+                    <th>Seller</th>
+                    <th>Categories</th>
+                    <th>Current Price</th>
+                    <th>Ends At</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for auction in auctions %}
+                <tr>
+                    <td><a href="{% url 'auction_detail' auction.id %}">{{ auction.name }}</a></td>
+                    <td>
+                        {% if auction.image %}
+                            <img src="{{ auction.image.url }}" alt="{{ auction.name }}" width="100px">
+                        {% else %}
+                            No image available
+                        {% endif %}
+                    </td>
+                    <td><a href="{% url 'advanced_search' %}?q={{ auction.seller.username }}">{{ auction.seller.username }}</a></td>
+                    <td>
+                        {% for category in auction.categories.all %}
+                            <a href="{% url 'advanced_search' %}?category={{ category.id }}">{{ category.name }}</a>{% if not forloop.last %}, {% endif %}
+                        {% endfor %}
+                    </td>
+                    <td>{{ auction.current_price }}</td>
+                    <td>{{ auction.end_time }}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+        {% if is_paginated %}
+            <div class="pagination">
+                {% if page_obj.has_previous %}
+                    <a href="?{% with request.GET.q as q %}q={{ q }}&page={{ page_obj.previous_page_number }}{% endwith %}">Previous</a>
+                {% endif %}
+                <span>Page {{ page_obj.number }} of {{ page_obj.paginator.num_pages }}</span>
+                {% if page_obj.has_next %}
+                    <a href="?{% with request.GET.q as q %}q={{ q }}&page={{ page_obj.next_page_number }}{% endwith %}">Next</a>
+                {% endif %}
+            </div>
+        {% endif %}
+    {% else %}
+        <p>No auctions found.</p>
+    {% endif %}
+{% endblock %}

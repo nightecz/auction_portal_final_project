@@ -1,4 +1,6 @@
 from django.contrib.auth.decorators import login_required
+from django.contrib.auth.mixins import PermissionRequiredMixin, LoginRequiredMixin
+from django.core.exceptions import PermissionDenied
 from django.utils import timezone
 from decimal import Decimal
 
@@ -6,19 +8,21 @@ from django.http import HttpResponse, HttpResponseBadRequest, HttpResponseRedire
 from django.contrib import messages
 from django.contrib.auth import logout, login
 from django.contrib.auth.views import LoginView
-from django.shortcuts import render, redirect
-from django.db.models import CharField, TextField, DateTimeField, ForeignKey
+from django.shortcuts import render, redirect, get_object_or_404
+from django.db.models import CharField, TextField, DateTimeField, ForeignKey, Q, BooleanField, Case, When
 from django.utils.decorators import method_decorator
 from django.views import View
 from django.views.generic import FormView, ListView, TemplateView, UpdateView, DeleteView, DetailView
-from viewer.forms import SignUpForm, AuctionCreateForm, ProfileEditForm, BidForm
+from viewer.forms import SignUpForm, AuctionCreateForm, ProfileEditForm, BidForm, WatchlistForm, AuctionUpdateForm
 from django.urls import reverse_lazy, reverse
-from viewer.models import Watchlist, Auction, User, Profile, Bid
+from viewer.models import Watchlist, Auction, User, Profile, Bid, Category
 from django.contrib.auth.forms import UserChangeForm
 
 def index(request):
     value = request.GET.get('value', '')
-    return render(request, template_name='index.html', context={'value': value})
+    main_categories = Category.objects.filter(parent__isnull=True)  # only main categories
+    return render(request, template_name='index.html', context={'value': value, 'main_categories': main_categories})
+
 
 class RegisterView(FormView):
     template_name = 'registration/register.html'
@@ -76,6 +80,42 @@ class AuctionView(ListView):
     template_name = 'auctions.html'
     model = Auction
 
+    def get_queryset(self):
+        queryset = super().get_queryset()
+        search_query = self.request.GET.get('q', '').strip()
+        category_id = self.request.GET.get('category')
+
+        #Filtered by category
+        if search_query:
+            queryset = queryset.filter(
+                Q(name__icontains=search_query) |
+                Q(categories__name__icontains=search_query)
+            ).distinct()
+
+        #Filtered by category
+        if category_id:
+            queryset = queryset.filter(categories__id=category_id)
+
+        # Premium auctions priority
+        queryset = queryset.annotate(
+            is_premium_user=Case(
+                When(seller__profile__is_premium=True, then=True),
+                default=False,
+                output_field=BooleanField(),
+            )
+        ).order_by('-is_premium_user', '-start_time')
+
+        return queryset
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['categories'] = Category.objects.all()
+        if self.request.user.is_authenticated:
+            user_watchlist = Watchlist.objects.filter(user=self.request.user)
+            auction_ids_in_watchlist = user_watchlist.values_list('auction_id', flat=True)
+            context['auction_ids_in_watchlist'] = auction_ids_in_watchlist
+        return context
+
 class AuctionCreateView(FormView):
     template_name = 'auction_create.html'
     form_class = AuctionCreateForm
@@ -96,6 +136,57 @@ class AuctionCreateView(FormView):
 
         return super().form_valid(form)
 
+class AuctionSearchView(ListView):
+    template_name = 'advanced_search.html'
+    model = Auction
+    context_object_name = 'auctions'
+    paginate_by = 10  # numbers of auction on page
+
+    def get_queryset(self):
+        query = self.request.GET.get('q', '')
+        auctions = Auction.objects.all()
+
+        # Filtering by user task (keyword)
+        if query:
+            auctions = auctions.filter(
+                Q(name__icontains=query) |
+                Q(description__icontains=query) |
+                Q(categories__name__icontains=query) |
+                Q(seller__username__icontains=query)
+            ).distinct()
+
+        # Filtering by category
+        category = self.request.GET.get('category')
+        if category:
+            auctions = auctions.filter(categories__id=category)
+
+        # Premium auctions priority
+        auctions = auctions.annotate(
+            is_premium=Case(
+                When(seller__profile__is_premium=True, then=True),
+                default=False,
+                output_field=BooleanField(),
+            )
+        ).order_by('-is_premium', '-start_time')
+
+        # Filtering by city and end_time
+        city = self.request.GET.get('city')
+        if city:
+            auctions = auctions.filter(seller__profile__city__icontains=city)
+
+        sort_by = self.request.GET.get('sort_by')
+        if sort_by == 'end_time':
+            auctions = auctions.order_by('end_time')
+        elif sort_by == 'start-time':
+            auctions = auctions.order_by('-start-time')
+
+        return auctions
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['categories'] = Category.objects.all()  # Poskytne seznam kategorií pro filtr
+        return context
+
 class AuctionDetailView(TemplateView):
     template_name = 'auction_detail.html'
     context_object_name = 'auction'
@@ -104,9 +195,10 @@ class AuctionDetailView(TemplateView):
         context = super().get_context_data(**kwargs)
         auction_id = self.kwargs.get('id')
         context['auction'] = Auction.objects.get(pk=auction_id)
+        user_watchlist = Watchlist.objects.filter(user=self.request.user)
+        auction_ids_in_watchlist = user_watchlist.values_list('auction_id', flat=True)
+        context['auction_ids_in_watchlist'] = auction_ids_in_watchlist
         return context
-
-
 
 class AuctionSellingView(ListView):
     template_name = 'my_auctions.html'
@@ -118,6 +210,18 @@ class AuctionSellingView(ListView):
     def dispatch(self, request, *args, **kwargs):
         if not request.user.is_authenticated:
             return redirect('login')
+        return super().dispatch(request, *args, **kwargs)
+
+class AuctionUpdateView(UpdateView):
+    template_name = 'auction_update.html'
+    form_class = AuctionUpdateForm
+    model = Auction
+    success_url = reverse_lazy('my_auctions')
+
+    def dispatch(self, request, *args, **kwargs):
+        auction = self.get_object() #gets the auction instance by pk from URL
+        if auction.seller != request.user: #check if the user is seller
+            raise PermissionDenied("You do not have permission to edit this auction.")
         return super().dispatch(request, *args, **kwargs)
 
 class PlaceBidView(FormView):
@@ -172,22 +276,29 @@ class WatchlistView(ListView):
     def get_queryset(self):
         return Watchlist.objects.filter(user=self.request.user)
 
-@login_required
-def watchlist_add(request):
-    auction_id = request.GET.get('auction')
-    if not auction_id:
-        return HttpResponseBadRequest("Auction ID is required.")
+class AddToWatchlistView(FormView):
+    def post(self, request, *args, **kwargs):
+        auction_id = self.kwargs['auction_id']
+        auction = get_object_or_404(Auction, pk=auction_id)
 
-    try:
-        auction = Auction.objects.get(pk=auction_id)
-    except Auction.DoesNotExist:
-        return HttpResponseBadRequest("Auction does not exist.")
+        if Watchlist.objects.filter(user=request.user, auction=auction).exists():
+            messages.error(request, "This auction is already in your watchlist.")
+        else:
+            Watchlist.objects.create(user=request.user, auction=auction)
+            messages.success(request, "Auction added to your watchlist.")
 
-    watchlist, created = Watchlist.objects.get_or_create(user=request.user)
-    if watchlist.auctions.filter(pk=auction.pk).exists():
-        messages.info(request, "Auction is already in your watchlist.")
-    else:
-        watchlist.auctions.add(auction)
-        messages.success(request, "Auction added to your watchlist.")
+        return HttpResponseRedirect(request.META.get('HTTP_REFERER', '/'))
 
-    return redirect('watchlist')
+class WatchlistDeleteView(DeleteView):
+    model = Watchlist
+    success_url = reverse_lazy('watchlist')
+    template_name = 'watchlist/removed_from_watchlist.html'
+
+    def dispatch(self, request, *args, **kwargs):
+        self.object = get_object_or_404(Watchlist, pk=self.kwargs['pk'])
+        if not request.user.is_authenticated or self.object.user != request.user:
+            return redirect('watchlist')
+
+        response = super().dispatch(request, *args, **kwargs)
+        messages.success(request, "Item removed from your watchlist.")
+        return HttpResponseRedirect(self.success_url)

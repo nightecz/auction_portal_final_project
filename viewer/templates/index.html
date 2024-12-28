@@ -2,7 +2,53 @@
 
 {% block nadpis %}-Home{% endblock %}
 {% block content %}
-<h1>Welcome to Auctions!</h1>
-<p>Lorem.</p>
-<a href="{% url 'auctions' %}" class="btn btn-primary">View Auctions</a>
+<div class="container">
+    <!-- Main content: Headline -->
+    <div class="text-center mb-4">
+        <h1>Welcome to Auctions Portal Team 6!</h1>
+        <p>Browse auctions by category or view all auctions.</p>
+        <a href="{% url 'auctions' %}" class="btn btn-secondary">View All Auctions</a>
+    </div>
+
+    <div class="row">
+        <!-- Left column: Categories -->
+        <div class="col-md-3">
+            <h4>Browse Categories</h4>
+            <ul class="list-group">
+                {% for category in main_categories %}
+                <li class="list-group-item">
+                    <!-- Main category with toggle -->
+                    <a href="{% url 'auctions' %}?category={{ category.id }}"
+                       class="d-block text-decoration-none">
+                        {{ category.name }}
+                    </a>
+
+                    <!-- Subcategories toggle button -->
+                    <button class="btn btn-sm btn-link" type="button" data-bs-toggle="collapse"
+                            data-bs-target="#subcategory-{{ category.id }}" aria-expanded="false"
+                            aria-controls="subcategory-{{ category.id }}">
+                        Subcategories
+                    </button>
+
+                    <!-- Subcategories -->
+                    <ul class="collapse list-unstyled ms-3" id="subcategory-{{ category.id }}">
+                        {% for subcategory in category.subcategories.all %}
+                        <li>
+                            <a href="{% url 'auctions' %}?category={{ subcategory.id }}">
+                                {{ subcategory.name }}
+                            </a>
+                        </li>
+                        {% endfor %}
+                    </ul>
+                </li>
+                {% endfor %}
+            </ul>
+        </div>
+
+        <!-- Right column: Extra content -->
+        <div class="col-md-9">
+            <p>Extra content to be drafted.</p>
+        </div>
+    </div>
+</div>
 {% endblock %}

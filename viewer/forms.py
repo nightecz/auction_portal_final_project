@@ -4,26 +4,33 @@ from django.core.exceptions import ValidationError
 from viewer.models import Profile, Bid
 from django.forms import (
     CharField, DateField, Form, IntegerField, ModelChoiceField, Textarea, TextInput, EmailInput, PasswordInput,
-    ModelForm, DateInput, NumberInput, CheckboxSelectMultiple, DateTimeInput, DecimalField
+    ModelForm, DateInput, NumberInput, CheckboxSelectMultiple, DateTimeInput, DecimalField, ChoiceField
 )
 from django.contrib.auth.forms import UserCreationForm
 from django.contrib.auth.models import User
 from django.contrib.auth.decorators import login_required
-from viewer.models import Auction, Category
+from viewer.models import Auction, Category, Watchlist
 from django.urls import reverse_lazy
 from django.shortcuts import redirect
 
 class SignUpForm(UserCreationForm):
+    first_name = CharField(max_length=20, required=True, label='First name')
+    last_name = CharField(max_length=20, required=True, label='Last name')
     phone = CharField(max_length=20, required=True, label='Phone')
     street = CharField(max_length=20, required=True, label='Street')
     house_number = CharField(max_length=20, required=True, label='Address House number')
     city = CharField(max_length=20, required=True, label='City')
     zip_code = CharField(max_length=20, required=True, label='ZIP code')
     country = CharField(max_length=20, required=True, label='Country')
+    prefer_communication = ChoiceField(
+        choices=Profile.COMMUNICATION_CHOICES,
+        required=True,
+        label="Prefered communication via"
+    )
 
     class Meta:
         model = User
-        fields = ['username', 'email', 'password1', 'password2', 'phone', 'street', 'house_number', 'city', 'zip_code', 'country']
+        fields = ['username', 'email', 'password1', 'password2', 'first_name', 'last_name', 'phone', 'street', 'house_number', 'city', 'zip_code', 'country', 'prefer_communication']
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
@@ -32,6 +39,8 @@ class SignUpForm(UserCreationForm):
 
     def save(self, commit=True):
         user = super().save(commit=False)
+        user.first_name = self.cleaned_data['first_name']
+        user.last_name = self.cleaned_data['last_name']
         if commit:
             user.save()
 
@@ -42,7 +51,8 @@ class SignUpForm(UserCreationForm):
             house_number=self.cleaned_data['house_number'],
             city=self.cleaned_data['city'],
             zip_code=self.cleaned_data['zip_code'],
-            country=self.cleaned_data['country']
+            country=self.cleaned_data['country'],
+            prefer_communication=self.cleaned_data['prefer_communication']
         )
 
         return user
@@ -57,6 +67,7 @@ class AuctionCreateForm(ModelForm):
         model = Auction
         fields = ['name', 'description', 'starting_price', 'end_time', 'categories', 'image']
         widgets = {
+            'description': Textarea(),
             'categories': CheckboxSelectMultiple(),
             'end_time': DateTimeInput(attrs={'type': 'datetime-local'}),
         }
@@ -67,6 +78,8 @@ class AuctionCreateForm(ModelForm):
             self.fields[field_name].widget.attrs['class'] = 'form-control'
         self.fields['categories'].widget.attrs.pop('class', None)
 
+
+
     def save(self, commit=True):
         auction = super().save(commit=False)  # Nejprve uložíme aukci bez okamžitého commitu do DB
         if not auction.current_price:
@@ -76,7 +89,14 @@ class AuctionCreateForm(ModelForm):
             self.save_m2m()
         return auction
 
-
+class AuctionUpdateForm(ModelForm):
+    class Meta:
+        model = Auction
+        fields = ['description', 'categories', 'image'] #permitted field
+        widgets = {
+            'description': Textarea(),
+            'categories': CheckboxSelectMultiple(),
+        }
 
 class BidForm(ModelForm):
     bid_amount = DecimalField(label='Place Your Bid', widget=NumberInput(attrs={
@@ -89,3 +109,12 @@ class BidForm(ModelForm):
         model = Bid
         fields = ['bid_amount']
 
+
+class WatchlistForm(ModelForm):
+    class Meta:
+        model = Watchlist
+        fields = ['auction']
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.fields['auction'].widget.attrs['class'] = 'form-control'
