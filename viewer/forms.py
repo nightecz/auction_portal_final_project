@@ -78,6 +78,8 @@ class AuctionCreateForm(ModelForm):
             self.fields[field_name].widget.attrs['class'] = 'form-control'
         self.fields['categories'].widget.attrs.pop('class', None)
 
+
+
     def save(self, commit=True):
         auction = super().save(commit=False)  # Nejprve uložíme aukci bez okamžitého commitu do DB
         if not auction.current_price:

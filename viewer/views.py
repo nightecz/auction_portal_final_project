@@ -20,7 +20,9 @@ from django.contrib.auth.forms import UserChangeForm
 
 def index(request):
     value = request.GET.get('value', '')
-    return render(request, template_name='index.html', context={'value': value})
+    main_categories = Category.objects.filter(parent__isnull=True)  # only main categories
+    return render(request, template_name='index.html', context={'value': value, 'main_categories': main_categories})
+
 
 class RegisterView(FormView):
     template_name = 'registration/register.html'

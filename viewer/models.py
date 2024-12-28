@@ -8,7 +8,9 @@ from django.db.models import (
 
 class Category(Model):
     name = CharField(max_length=128, unique=True)
-
+    parent = ForeignKey(
+        'self', null=True, blank=True, related_name='subcategories', on_delete=CASCADE
+    )
     def __str__(self):
         return self.name
 
