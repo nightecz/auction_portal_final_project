@@ -1,0 +1,10 @@
+{% extends 'base.html' %}
+
+{% block content %}
+    <h1>Are you sure you want to cancel the auction "{{ object.title }}"?</h1>
+    <form method="post">
+        {% csrf_token %}
+        <input type="submit" value="Yes, cancel it!">
+    </form>
+    <a href="{% url 'my_auctions' %}">Back</a>
+{% endblock %}

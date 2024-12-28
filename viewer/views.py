@@ -93,6 +93,9 @@ class AuctionView(ListView):
         search_query = self.request.GET.get('q', '').strip()
         category_id = self.request.GET.get('category')
 
+        #Filtering only auctions in "running" status
+        queryset = queryset.filter(status="running")
+
         #Filtered by category
         if search_query:
             queryset = queryset.filter(
@@ -271,7 +274,14 @@ class AuctionSellingView(ListView):
     model = Auction
 
     def get_queryset(self):
-        return Auction.objects.filter(seller=self.request.user)
+        queryset = Auction.objects.filter(seller=self.request.user)
+
+        # Filtration by status of auction ("running", "closed" ...)
+        status_filter = self.request.GET.get('status', None)
+        if status_filter:
+            queryset = queryset.filter(status=status_filter)
+
+        return queryset
 
     def dispatch(self, request, *args, **kwargs):
         if not request.user.is_authenticated:
@@ -289,6 +299,21 @@ class AuctionUpdateView(UpdateView):
         if auction.seller != request.user: #check if the user is seller
             raise PermissionDenied("You do not have permission to edit this auction.")
         return super().dispatch(request, *args, **kwargs)
+
+class AuctionCancelView(UpdateView):
+    model = Auction
+    template_nae = 'auction_cancel.html'
+    fields = []
+    success_url = reverse_lazy('my_auctions')
+
+    def form_valid(self, form):
+        # set status to "Canceled"
+        form.instance.status = 'Canceled'
+        return super().form_valid(form)
+
+    def get_queryset(self):
+        # Check if user is the owner
+        return Auction.objects.filter(seller=self.request.user)
 
 class PlaceBidView(FormView):
     template_name = 'auction_detail.html'

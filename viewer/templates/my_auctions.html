@@ -3,27 +3,42 @@
 {% block nadpis %}- My Sellings{% endblock %}
 
 {% block content %}
+
+<form method="get" class="mb-4">
+    <label for="status">Filter by auction status:</label>
+    <select id="status" name="status" class="form-select">
+        <option value="">-- All --</option>
+        <option value="running" {% if request.GET.status == "running" %}selected{% endif %}>Running</option>
+        <option value="closed" {% if request.GET.status == "closed" %}selected{% endif %}>Closed</option>
+        <option value="Sold" {% if request.GET.status == "Sold" %}selected{% endif %}>Sold</option>
+        <option value="Canceled" {% if request.GET.status == "Canceled" %}selected{% endif %}>Canceled</option>
+    </select>
+    <button type="submit" class="btn btn-primary mt-2">Filter</button>
+</form>
+
 <div class="container">
-    <h2 class="text-center">My active Auctions</h2>
+    <h2 class="text-center">My Auctions</h2>
 
     {% if object_list %}
-        <div class="row">
+        <div class="row g-3">
             {% for auction in object_list %}
-                <div class="col-md-4">
-                    <div class="card mb-4">
-                        <div class="card-header text-center">
-                            <h5 class="card-title">{{ auction.name }}</h5>
+                <div class="col-sm-6 col-md-4">
+                    <div class="card h-100">
+                        <div class="card-header text-center p-2">
+                            <h6 class="card-title mb-1 text-truncate" style="max-width: 200px;">{{ auction.name }}</h6>
                             {% if auction.image %}
-                                <img src="{{ auction.image.url }}" alt="Auction Image" class="img-fluid" style="max-height: 100px; margin-top: 10px;">
+                                <img src="{{ auction.image.url }}" alt="Auction Image" class="img-fluid rounded" style="max-height: 80px; object-fit: cover;">
                             {% endif %}
                         </div>
-                        <div class="card-body">
-                            <p class="card-text">{{ auction.description }}</p>
-                            <p class="card-text">Starting Price: ${{ auction.starting_price }}</p>
-                            <p class="card-text">Current Price: ${{ auction.current_price }}</p>
-                            <p class="card-text">Ends on: {{ auction.end_time|date:"D, M d, Y H:i" }}</p>
-                            <a href="{% url 'auction_detail' auction.id %}" class="btn btn-primary btn-block">View Details</a>
-                            <a href="{% url 'auction_update' auction.id %}" class="btn btn-block btn-info">Edit</a>
+                        <div class="card-body p-2">
+                            <p class="card-text text-truncate" style="max-height: 40px; overflow: hidden;">{{ auction.description }}</p>
+                            <p class="card-text mb-1"><small>Start: ${{ auction.starting_price }}</small></p>
+                            <p class="card-text mb-1"><small>Current: ${{ auction.current_price }}</small></p>
+                            <p class="card-text mb-1"><small>Ends: {{ auction.end_time|date:"D, M d, Y H:i" }}</small></p>
+                        </div>
+                        <div class="card-footer p-2 text-center">
+                            <a href="{% url 'auction_detail' auction.id %}" class="btn btn-sm btn-primary">View</a>
+                            <a href="{% url 'auction_update' auction.id %}" class="btn btn-sm btn-info">Edit</a>
                         </div>
                     </div>
                 </div>

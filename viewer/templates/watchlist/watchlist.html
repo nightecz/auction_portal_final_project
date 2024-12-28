@@ -25,7 +25,7 @@
     </thead>
     {% for item in object_list %}
     <tbody>
-        <td>{{ item.auction.name }}</td>
+        <td><a href="{% url 'auction_detail' item.auction.id %}">{{ item.auction.name }}</a></td>
         <td>{% if item.auction.image %}
         <img src="{{ item.auction.image.url }}" alt="Auction Image" width="200px">
         {% else %}
