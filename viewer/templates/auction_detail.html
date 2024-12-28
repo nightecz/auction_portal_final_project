@@ -5,6 +5,10 @@
 {% endblock %}
 
 {% block content %}
+<div class="container">
+    <h1>Current time</h1>
+    <p>{{ current_time }}</p>
+</div>
 
 <div class="container">
     {% if messages %}
@@ -14,11 +18,10 @@
             {% endfor %}
         </div>
     {% endif %}
-
+    <p><strong>Status:</strong> {{ auction.get_status_display }}</p>
     <h1 class="mt-4">{{ auction.name }}</h1>
 
     <div class="row">
-        <!-- Auction Images -->
         <div class="col-md-6">
             <div id="auctionCarousel" class="carousel slide" data-bs-ride="carousel">
                 {% if auction.image %}
@@ -40,8 +43,6 @@
                 {% endif %}
             </div>
         </div>
-
-        <!-- Auction Details -->
         <div class="col-md-6">
             <p><strong>Description:</strong> {{ auction.description }}</p>
             <p><strong>Seller:</strong> {{ auction.seller.username }}</p>
@@ -54,12 +55,12 @@
             <p><strong>Current Price:</strong> ${{ auction.current_price }}</p>
             <p><strong>Auction Ends:</strong> {{ auction.end_time }}</p>
 
-            {% if user.is_authenticated %}
+            {% if user.is_authenticated and auction.status != 'sold' %}
                 <form method="post" action="{% url 'place_bid' %}?auction={{ auction.id }}" class="mt-4">
                     {% csrf_token %}
                     <div class="mb-3">
                         <label for="bidAmount" class="form-label"><strong>Place Your Bid:</strong></label>
-                        <input type="number" name="bid_amount" id="bidAmount" class="form-control" step="0.01" min="{{ auction.current_price|floatformat:2 }}" required>
+                        <input type="number" name="bid_amount" id="bidAmount" class="form-control" step="0.1" min="{{ auction.current_price|floatformat:1 }}" required>
                     </div>
                     <button type="submit" class="btn btn-primary">Bid</button>
                 </form>
@@ -91,30 +92,44 @@
             {% endif %}
         </div>
     </div>
+</div>
 
-    <!-- Bid History -->
-    <h2 class="mt-5">Bid History</h2>
-    {% if auction.bids.exists %}
-        <table class="table table-striped">
-            <thead>
-                <tr>
-                    <th>Bidder</th>
-                    <th>Amount</th>
-                    <th>Time</th>
-                </tr>
-            </thead>
-            <tbody>
-                {% for bid in auction.bids.all|dictsortreversed:"created_at" %}
+<div class="container">
+    {% if user.is_authenticated and auction.status == 'closed' %}
+        {% if purchase %}
+            {% if purchase.buyer == request.user.profile and not purchase.buyer_confirmation %}
+                <a href="{% url 'buyer_confirmation' purchase.id %}" class="btn btn-warning btn-block">Confirm purchase</a>
+            {% endif %}
+            {% if purchase and purchase.seller == request.user.profile and purchase.buyer_confirmation and not purchase.seller_confirmation %}
+                <a href="{% url 'seller_confirmation' purchase.id %}" class="btn btn-success btn-block">Confirm selling</a>
+            {% endif %}
+        {% endif %}
+    {% endif %}
+</div>
+
+<h2 class="mt-5">Bid History</h2>
+{% if auction.bids.all %}
+    <table class="table table-striped">
+        <thead>
+            <tr>
+                <th>Bidder</th>
+                <th>Amount</th>
+                <th>Time</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for bid in auction.bids.all|dictsortreversed:"created_at" %}
                 <tr>
                     <td>{{ bid.bidder.username }}</td>
                     <td>{{ bid.amount }} $</td>
-                    <td>{{ bid.created_at }}</td>
+                    <td>{{ bid.created_at|date:"Y-m-d H:i:s" }}</td>
                 </tr>
-                {% endfor %}
-            </tbody>
-        </table>
-    {% else %}
-        <p>No bids yet. Be the first to bid!</p>
-    {% endif %}
+            {% endfor %}
+        </tbody>
+    </table>
+{% else %}
+    <p>No bids yet. Be the first to bid!</p>
+{% endif %}
 </div>
+
 {% endblock %}

@@ -75,6 +75,7 @@
             <th>City</th>
             <th>Categories</th>
             <th>Current price</th>
+            <th>Status</th>
             <th>Ends at</th>
             {% if user.is_authenticated %}
             <th>Watchlist</th>
@@ -101,6 +102,7 @@
                 {% endfor %}
             </td>
             <td>{{ auction.current_price }}</td>
+            <td>{{ auction.get_status_display }}</td>
             <td>{{ auction.end_time }}</td>
             {% if user.is_authenticated %}
             <td style="text-align:center">

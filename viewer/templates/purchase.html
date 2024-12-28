@@ -1,0 +1,24 @@
+{% extends 'base.html' %}
+
+{% block title %}
+    Complete Purchase for {{ auction.name }}
+{% endblock %}
+
+{% block content %}
+<div class="container">
+    <h1>Complete Purchase for {{ auction.name }}</h1>
+    <form method="post">
+        {% csrf_token %}
+        <div class="form-group">
+            <label for="id_winning_price">Winning Price:</label>
+            <input type="number" name="winning_price" value="{{ auction.current_price }}" class="form-control" id="id_winning_price" readonly>
+        </div>
+        <div class="form-group">
+            <label for="id_buyer">Buyer:</label>
+            <input type="text" name="buyer_display" value="{{ request.user.username }}" class="form-control" id="id_buyer_display" readonly>
+            <input type="hidden" name="buyer" value="{{ request.user.profile.id }}">
+        </div>
+        <button type="submit" class="btn btn-primary">Complete Purchase</button>
+    </form>
+</div>
+{% endblock %}

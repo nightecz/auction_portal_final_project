@@ -1,3 +1,5 @@
+from decimal import Decimal
+
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.mixins import PermissionRequiredMixin, LoginRequiredMixin
 from django.core.exceptions import PermissionDenied
@@ -10,13 +12,19 @@ from django.contrib.auth import logout, login
 from django.contrib.auth.views import LoginView
 from django.shortcuts import render, redirect, get_object_or_404
 from django.db.models import CharField, TextField, DateTimeField, ForeignKey, Q, BooleanField, Case, When
+from django.shortcuts import render, redirect
+from django.db.models import Q
 from django.utils.decorators import method_decorator
 from django.views import View
+from django.views.generic import FormView, ListView, TemplateView
+from viewer.forms import SignUpForm, AuctionCreateForm, ProfileEditForm, BidForm, PurchaseForm
 from django.views.generic import FormView, ListView, TemplateView, UpdateView, DeleteView, DetailView
 from viewer.forms import SignUpForm, AuctionCreateForm, ProfileEditForm, BidForm, WatchlistForm, AuctionUpdateForm
 from django.urls import reverse_lazy, reverse
 from viewer.models import Watchlist, Auction, User, Profile, Bid, Category
 from django.contrib.auth.forms import UserChangeForm
+from viewer.models import Watchlist, Auction, User, Profile, Bid, Purchase
+
 
 def index(request):
     value = request.GET.get('value', '')
@@ -198,7 +206,52 @@ class AuctionDetailView(TemplateView):
         user_watchlist = Watchlist.objects.filter(user=self.request.user)
         auction_ids_in_watchlist = user_watchlist.values_list('auction_id', flat=True)
         context['auction_ids_in_watchlist'] = auction_ids_in_watchlist
+        auction = Auction.objects.get(pk=auction_id)
+
+        print(f"Auction status: {auction.status}")
+
+        context['auction'] = auction
+
+        # Načtení Purchase z databáze, pokud existuje
+        try:
+            purchase = Purchase.objects.get(auction=auction)
+            print(f"Purchase found: {purchase}")
+        except Purchase.DoesNotExist:
+            purchase = None
+            print(f"No purchase record found for auction {auction.id}")
+
+
+        def close_auction_and_create_purchase(auction):
+            print(f"Closing auction: {auction.id}")
+            if auction.status == Auction.CLOSED and not auction.purchases.exists():
+                if auction.bids.exists():
+                    highest_bid = auction.bids.latest('created_at')
+                    print(f"Highest bid: {highest_bid.amount} by {highest_bid.bidder.username}")
+                    purchase = Purchase.objects.create(
+                        auction=auction,
+                        buyer=highest_bid.bidder.profile,
+                        seller=auction.seller.profile,
+                        winning_price=highest_bid.amount
+                    )
+                    purchase.save()  # Explicitně uložit Purchase
+                    print(f"Purchase created: {purchase}")
+                    return purchase
+            return None
+
+        if auction.end_time < timezone.now() and auction.status != Auction.CLOSED:
+            auction.status = Auction.CLOSED
+            auction.save()
+            print(f"Auction {auction.id} status updated to CLOSED")
+
+            purchase = close_auction_and_create_purchase(auction)
+
+        context['purchase'] = purchase
+        context['current_time'] = timezone.now()
+
+        print(f"Context purchase: {context['purchase']}")
         return context
+
+
 
 class AuctionSellingView(ListView):
     template_name = 'my_auctions.html'
@@ -246,12 +299,14 @@ class PlaceBidView(FormView):
         form = BidForm(request.POST)
 
         if not form.is_valid():
-            return HttpResponseBadRequest("Invalid bid value.")
+            messages.error(request, "Invalid bid value.")
+            return HttpResponseRedirect(reverse('auction_detail', kwargs={'id': auction_id}))
 
         bid_amount = form.cleaned_data['bid_amount']
 
         if auction.end_time < timezone.now():
-            return HttpResponseBadRequest("This auction is closed.")
+            messages.error(request, "This auction is closed.")
+            return HttpResponseRedirect(reverse('auction_detail', kwargs={'id': auction_id}))
 
         if bid_amount <= auction.current_price:
             messages.error(request, "Bid must be higher than current price.")
@@ -302,3 +357,41 @@ class WatchlistDeleteView(DeleteView):
         response = super().dispatch(request, *args, **kwargs)
         messages.success(request, "Item removed from your watchlist.")
         return HttpResponseRedirect(self.success_url)
+
+
+class SellerConfirmView(View):
+    def get(self, request, purchase_id):
+        try:
+            purchase = Purchase.objects.get(id=purchase_id)
+
+            # Ensure the current user is the buyer
+            if purchase.seller != request.user.profile:
+                raise Http404("Not authorized to confirm the purchase")
+
+            # Confirm purchase
+            purchase.seller_confirmation = True
+            purchase.save()
+
+            return redirect('auction_detail', id=purchase.auction.id)
+
+        except Purchase.DoesNotExist:
+            raise Http404("Purchase does not exist")
+
+
+class BuyerConfirmView(View):
+    def get(self, request, purchase_id):
+        try:
+            purchase = Purchase.objects.get(id=purchase_id)
+
+            # Ensure the current user is the buyer
+            if purchase.buyer != request.user.profile:
+                raise Http404("Not authorized to confirm the purchase")
+
+            # Confirm purchase
+            purchase.buyer_confirmation = True
+            purchase.save()
+
+            return redirect('auction_detail', id=purchase.auction.id)
+
+        except Purchase.DoesNotExist:
+            raise Http404("Purchase does not exist")

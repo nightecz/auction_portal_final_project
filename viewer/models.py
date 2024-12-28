@@ -44,6 +44,15 @@ class Profile(Model):
 
 
 class Auction(Model):
+    RUNNING = 'running'
+    CLOSED = 'closed'
+    SOLD = 'Sold'
+    STATUS_CHOICES = [
+        (RUNNING, 'Running'),
+        (CLOSED, 'Closed'),
+        (SOLD, 'Sold'),
+    ]
+
     name = CharField(max_length=128)
     description = CharField(max_length=255)
     seller = ForeignKey(User, on_delete=CASCADE)
@@ -52,9 +61,20 @@ class Auction(Model):
     start_time = DateTimeField(auto_now_add=True)
     end_time = DateTimeField()
     categories = ManyToManyField('Category', related_name='auctions')
+    purchase = OneToOneField(
+        'Purchase',
+        on_delete=SET_NULL,
+        null=True,
+        blank=True,
+        related_name='related_auction'
+    )
     image = ImageField(upload_to='auctions/', blank=True, null=True, validators=[
         FileExtensionValidator(allowed_extensions=['jpg', 'jpeg', 'png'])
     ])
+    status = CharField(max_length=10,
+                       choices=STATUS_CHOICES,
+                       default=RUNNING,
+                    )
 
     class Meta:
         permissions = [
@@ -65,6 +85,7 @@ class Auction(Model):
             self.current_price = self.starting_price
         super().save(*args, **kwargs)
 
+
 class Watchlist(Model):
     user = ForeignKey(User, on_delete=CASCADE, related_name='watchlist')
     auction = ForeignKey(Auction, on_delete=CASCADE, null=True)
@@ -73,7 +94,7 @@ class Watchlist(Model):
         unique_together = ('user', 'auction')
     def __str__(self):
         return self.user.username
-        return self.user.username
+
 
 class Bid(Model):
     auction = ForeignKey(Auction, on_delete=CASCADE, related_name='bids')
@@ -84,12 +105,19 @@ class Bid(Model):
     def __str__(self):
         return f"{self.bidder.username} bid {self.amount} on {self.auction.name}"
 
+    class Meta:
+        get_latest_by = 'created_at'
+
 
 class Purchase(Model):
-    auction = ForeignKey(Auction, on_delete=CASCADE, related_name='purchase')
-    buyer = ForeignKey(Profile, on_delete=DO_NOTHING)
-    winning_price = DecimalField(max_digits=10, decimal_places=2)
+    auction = ForeignKey(Auction, on_delete=CASCADE, related_name='purchases')
+    buyer = ForeignKey('Profile', on_delete=CASCADE, related_name='purchases_as_buyer')
+    seller = ForeignKey('Profile', on_delete=CASCADE, related_name='purchases_as_seller')
+    amount = DecimalField(max_digits=10, decimal_places=2, default=0.00)
     purchase_date = DateTimeField(auto_now_add=True)
+    seller_confirmation = BooleanField(default=False)
+    winning_price = DecimalField(max_digits=10, decimal_places=2, default=0.00)
+    buyer_confirmation = BooleanField(default=False)
 
     def __str__(self):
         return f" Winner of {self.auction.name} is {self.buyer.username} for {self.winning_price}"
