@@ -35,6 +35,7 @@
                             <p class="card-text mb-1"><small>Start: ${{ auction.starting_price }}</small></p>
                             <p class="card-text mb-1"><small>Current: ${{ auction.current_price }}</small></p>
                             <p class="card-text mb-1"><small>Ends: {{ auction.end_time|date:"D, M d, Y H:i" }}</small></p>
+                            <p class="card-text mb-1"><small>Status: {{ auction.status }}</small></p>
                         </div>
                         <div class="card-footer p-2 text-center">
                             <a href="{% url 'auction_detail' auction.id %}" class="btn btn-sm btn-primary">View</a>

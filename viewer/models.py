@@ -44,8 +44,8 @@ class Profile(Model):
 
 
 class Auction(Model):
-    RUNNING = 'running'
-    CLOSED = 'closed'
+    RUNNING = 'Running'
+    CLOSED = 'Closed'
     SOLD = 'Sold'
     CANCELED = 'Canceled'
     STATUS_CHOICES = [
