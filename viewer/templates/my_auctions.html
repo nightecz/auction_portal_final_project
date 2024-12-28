@@ -4,7 +4,7 @@
 
 {% block content %}
 <div class="container">
-    <h2 class="text-center">My Auctions</h2>
+    <h2 class="text-center">My active Auctions</h2>
 
     {% if object_list %}
         <div class="row">
@@ -30,7 +30,7 @@
             {% endfor %}
         </div>
     {% else %}
-        <p class="text-center">You have no auctions to sell at the moment.</p>
+        <p class="text-center">You have no active auctions to sell at the moment.</p>
     {% endif %}
 </div>
 {% endblock %}

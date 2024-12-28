@@ -67,6 +67,7 @@ class AuctionCreateForm(ModelForm):
         model = Auction
         fields = ['name', 'description', 'starting_price', 'end_time', 'categories', 'image']
         widgets = {
+            'description': Textarea(),
             'categories': CheckboxSelectMultiple(),
             'end_time': DateTimeInput(attrs={'type': 'datetime-local'}),
         }
@@ -89,8 +90,9 @@ class AuctionCreateForm(ModelForm):
 class AuctionUpdateForm(ModelForm):
     class Meta:
         model = Auction
-        fields = ['name', 'description', 'categories', 'image'] #permitted field
+        fields = ['description', 'categories', 'image'] #permitted field
         widgets = {
+            'description': Textarea(),
             'categories': CheckboxSelectMultiple(),
         }
 
