@@ -2,7 +2,7 @@ from django.contrib.auth.models import User
 from django.core.validators import MinValueValidator, MaxValueValidator, FileExtensionValidator
 from django.db.models import (
     DO_NOTHING, CharField, DateField, DateTimeField, ForeignKey, IntegerField,
-    Model, TextField, ImageField, OneToOneField, CASCADE, DecimalField, ManyToManyField, BooleanField
+    Model, TextField, ImageField, OneToOneField, CASCADE, DecimalField, ManyToManyField, BooleanField, SET_NULL
 )
 
 
