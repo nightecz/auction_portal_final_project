@@ -143,7 +143,8 @@ class AuctionCreateView(FormView):
             image=cleaned_data.get('image')
         )
         categories = form.cleaned_data['categories']
-        auction.categories.set(categories)
+        if categories:  # Ensure categories are not empty
+            auction.categories.set(categories)
 
         return super().form_valid(form)
 
@@ -151,11 +152,12 @@ class AuctionSearchView(ListView):
     template_name = 'advanced_search.html'
     model = Auction
     context_object_name = 'auctions'
-    paginate_by = 10  # numbers of auction on page
+    paginate_by = 10  # numbers of auctions per page
 
     def get_queryset(self):
         query = self.request.GET.get('q', '')
         auctions = Auction.objects.all()
+        status = self.request.GET.get('status')  # gets status from GET parameter
 
         # Filtering by user task (keyword)
         if query:
@@ -165,6 +167,10 @@ class AuctionSearchView(ListView):
                 Q(categories__name__icontains=query) |
                 Q(seller__username__icontains=query)
             ).distinct()
+
+        # Filtering by status
+        if status:
+            auctions = auctions.filter(status=status)
 
         # Filtering by main category
         main_category = self.request.GET.get('main_category')
@@ -190,16 +196,18 @@ class AuctionSearchView(ListView):
         if city:
             auctions = auctions.filter(seller__profile__city__icontains=city)
 
+        # Sorting by end_time or start_time
         sort_by = self.request.GET.get('sort_by')
         if sort_by == 'end_time':
             auctions = auctions.order_by('end_time')
-        elif sort_by == 'start-time':
-            auctions = auctions.order_by('-start-time')
+        elif sort_by == 'start_time':
+            auctions = auctions.order_by('-start_time')
 
         return auctions
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
+        context['auction_status'] = Auction.STATUS_CHOICES
         context['categories'] = Category.objects.select_related('parent').all()
         main_category = self.request.GET.get('main_category')
 
@@ -313,7 +321,7 @@ class AuctionCancelView(View):
     def post(self, request, pk):
         # Load auction by ID a user
         auction = get_object_or_404(Auction, pk=pk, seller=request.user)
-        auction.status = Auction.CANCELED  # change status auction to "Canceled"
+        auction.status = Auction.CANCELLED  # change status auction to "Canceled"
         auction.save()
         messages.success(request, "Auction have been cancelled.")
         return redirect(self.success_url)

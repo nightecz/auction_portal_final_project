@@ -47,12 +47,12 @@ class Auction(Model):
     RUNNING = 'Running'
     CLOSED = 'Closed'
     SOLD = 'Sold'
-    CANCELED = 'Canceled'
+    CANCELLED = 'Cancelled'
     STATUS_CHOICES = [
         (RUNNING, 'Running'),
         (CLOSED, 'Closed'),
         (SOLD, 'Sold'),
-        (CANCELED, 'Canceled')
+        (CANCELLED, 'Cancelled')
     ]
 
     name = CharField(max_length=128)

@@ -23,6 +23,17 @@
             </div>
 
             <div class="col-md-2">
+                <select id="status" name="status" class="form-select">
+                    <option value="">Status</option>
+                    {% for status_choice in auction_status %}
+                        <option value="{{ status_choice.0 }}" {% if request.GET.status == status_choice.0 %}selected{% endif %}>
+                            {{ status_choice.1 }}
+                        </option>
+                    {% endfor %}
+                </select>
+            </div>
+
+            <div class="col-md-2">
                 <select id="main-category" name="main_category" class="form-select">
                     <option value="">Filter by Category</option>
                     {% for category in categories %}
@@ -48,7 +59,6 @@
                 </select>
                 <small class="form-text text-muted">Please select a main category first and "Search" to see subcategories.</small>
             </div>
-
             <div class="col-md-2">
                 <button type="submit" class="btn btn-primary">Search</button>
             </div>
@@ -65,6 +75,7 @@
                     <th>Categories</th>
                     <th>Current Price</th>
                     <th>Ends At</th>
+                    <th>Status</th>
                 </tr>
             </thead>
             <tbody>
@@ -86,6 +97,7 @@
                     </td>
                     <td>{{ auction.current_price }}</td>
                     <td>{{ auction.end_time }}</td>
+                    <td>{{ auction.status }}</td>
                 </tr>
                 {% endfor %}
             </tbody>

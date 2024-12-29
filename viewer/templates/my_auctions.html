@@ -20,7 +20,7 @@
         <option value="Running" {% if request.GET.status == "Running" %}selected{% endif %}>Running</option>
         <option value="Closed" {% if request.GET.status == "Closed" %}selected{% endif %}>Closed</option>
         <option value="Sold" {% if request.GET.status == "Sold" %}selected{% endif %}>Sold</option>
-        <option value="Canceled" {% if request.GET.status == "Canceled" %}selected{% endif %}>Canceled</option>
+        <option value="Cancelled" {% if request.GET.status == "Cancelled" %}selected{% endif %}>Cancelled</option>
     </select>
     <button type="submit" class="btn btn-primary mt-2">Filter</button>
 </form>
