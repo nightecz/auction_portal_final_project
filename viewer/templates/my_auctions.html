@@ -4,6 +4,15 @@
 
 {% block content %}
 
+<div class="container">
+    {% if messages %}
+        <div class="alert alert-warning" role="alert">
+            {% for message in messages %}
+                {{ message }}
+            {% endfor %}
+        </div>
+    {% endif %}
+
 <form method="get" class="mb-4">
     <label for="status">Filter by auction status:</label>
     <select id="status" name="status" class="form-select">
