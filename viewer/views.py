@@ -94,7 +94,7 @@ class AuctionView(ListView):
         category_id = self.request.GET.get('category')
 
         #Filtering only auctions in "running" status
-        queryset = queryset.filter(status="running")
+        queryset = queryset.filter(status="Running")
 
         #Filtered by category
         if search_query:
@@ -276,7 +276,7 @@ class AuctionSellingView(ListView):
     def get_queryset(self):
         queryset = Auction.objects.filter(seller=self.request.user)
 
-        # Filtration by status of auction ("running", "closed" ...)
+        # Filtration by status of auction ("Running", "Closed" ...)
         status_filter = self.request.GET.get('status', None)
         if status_filter:
             queryset = queryset.filter(status=status_filter)
@@ -300,20 +300,23 @@ class AuctionUpdateView(UpdateView):
             raise PermissionDenied("You do not have permission to edit this auction.")
         return super().dispatch(request, *args, **kwargs)
 
-class AuctionCancelView(UpdateView):
+class AuctionCancelView(View):
     model = Auction
-    template_nae = 'auction_cancel.html'
-    fields = []
+    template_name = 'auction_cancel.html'
     success_url = reverse_lazy('my_auctions')
 
-    def form_valid(self, form):
-        # set status to "Canceled"
-        form.instance.status = 'Canceled'
-        return super().form_valid(form)
+    def get(self, request, pk):
+        # Load auction by ID a user
+        auction = get_object_or_404(Auction, pk=pk, seller=request.user)
+        return render(request, self.template_name, {'object': auction})
 
-    def get_queryset(self):
-        # Check if user is the owner
-        return Auction.objects.filter(seller=self.request.user)
+    def post(self, request, pk):
+        # Load auction by ID a user
+        auction = get_object_or_404(Auction, pk=pk, seller=request.user)
+        auction.status = Auction.CANCELED  # change status auction to "Canceled"
+        auction.save()
+        messages.success(request, "Auction have been cancelled.")
+        return redirect(self.success_url)
 
 class PlaceBidView(FormView):
     template_name = 'auction_detail.html'

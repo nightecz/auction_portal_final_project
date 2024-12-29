@@ -8,8 +8,8 @@
     <label for="status">Filter by auction status:</label>
     <select id="status" name="status" class="form-select">
         <option value="">-- All --</option>
-        <option value="running" {% if request.GET.status == "running" %}selected{% endif %}>Running</option>
-        <option value="closed" {% if request.GET.status == "closed" %}selected{% endif %}>Closed</option>
+        <option value="Running" {% if request.GET.status == "Running" %}selected{% endif %}>Running</option>
+        <option value="Closed" {% if request.GET.status == "Closed" %}selected{% endif %}>Closed</option>
         <option value="Sold" {% if request.GET.status == "Sold" %}selected{% endif %}>Sold</option>
         <option value="Canceled" {% if request.GET.status == "Canceled" %}selected{% endif %}>Canceled</option>
     </select>
