@@ -195,6 +195,10 @@ class AuctionSearchView(ListView):
         context['categories'] = Category.objects.all()  # Poskytne seznam kategorií pro filtr
         return context
 
+from django.utils import timezone
+
+from django.utils import timezone
+
 class AuctionDetailView(TemplateView):
     template_name = 'auction_detail.html'
     context_object_name = 'auction'
@@ -202,54 +206,53 @@ class AuctionDetailView(TemplateView):
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         auction_id = self.kwargs.get('id')
-        context['auction'] = Auction.objects.get(pk=auction_id)
-        user_watchlist = Watchlist.objects.filter(user=self.request.user)
-        auction_ids_in_watchlist = user_watchlist.values_list('auction_id', flat=True)
-        context['auction_ids_in_watchlist'] = auction_ids_in_watchlist
         auction = Auction.objects.get(pk=auction_id)
-
-        print(f"Auction status: {auction.status}")
-
         context['auction'] = auction
 
-        # Načtení Purchase z databáze, pokud existuje
+        if self.request.user.is_authenticated:
+            user_watchlist = Watchlist.objects.filter(user=self.request.user)
+            auction_ids_in_watchlist = user_watchlist.values_list('auction_id', flat=True)
+            context['auction_ids_in_watchlist'] = auction_ids_in_watchlist
+        else:
+            context['auction_ids_in_watchlist'] = []
+
+
         try:
             purchase = Purchase.objects.get(auction=auction)
-            print(f"Purchase found: {purchase}")
         except Purchase.DoesNotExist:
             purchase = None
-            print(f"No purchase record found for auction {auction.id}")
-
 
         def close_auction_and_create_purchase(auction):
-            print(f"Closing auction: {auction.id}")
             if auction.status == Auction.CLOSED and not auction.purchases.exists():
                 if auction.bids.exists():
                     highest_bid = auction.bids.latest('created_at')
-                    print(f"Highest bid: {highest_bid.amount} by {highest_bid.bidder.username}")
+
                     purchase = Purchase.objects.create(
                         auction=auction,
                         buyer=highest_bid.bidder.profile,
                         seller=auction.seller.profile,
                         winning_price=highest_bid.amount
                     )
-                    purchase.save()  # Explicitně uložit Purchase
-                    print(f"Purchase created: {purchase}")
+                    purchase.save()
+
+                    auction.status = Auction.CLOSED
+                    auction.save()
+
                     return purchase
             return None
 
-        if auction.end_time < timezone.now() and auction.status != Auction.CLOSED:
+        if auction.end_time < timezone.now() and auction.status == Auction.RUNNING:
             auction.status = Auction.CLOSED
             auction.save()
-            print(f"Auction {auction.id} status updated to CLOSED")
+
 
             purchase = close_auction_and_create_purchase(auction)
 
         context['purchase'] = purchase
         context['current_time'] = timezone.now()
 
-        print(f"Context purchase: {context['purchase']}")
         return context
+
 
 
 
@@ -360,22 +363,26 @@ class WatchlistDeleteView(DeleteView):
 
 
 class SellerConfirmView(View):
-    def get(self, request, purchase_id):
+    def post(self, request, *args, **kwargs):
+        purchase_id = self.kwargs.get('purchase_id')
         try:
             purchase = Purchase.objects.get(id=purchase_id)
-
-            # Ensure the current user is the buyer
-            if purchase.seller != request.user.profile:
-                raise Http404("Not authorized to confirm the purchase")
-
-            # Confirm purchase
-            purchase.seller_confirmation = True
-            purchase.save()
-
+        except Purchase.DoesNotExist:
+            messages.error(request, "Purchase not found.")
             return redirect('auction_detail', id=purchase.auction.id)
 
-        except Purchase.DoesNotExist:
-            raise Http404("Purchase does not exist")
+        if purchase.auction.seller.profile != request.user.profile:
+            messages.error(request, "You are not authorized to confirm the sale.")
+            return redirect('auction_detail', id=purchase.auction.id)
+
+        purchase.seller_confirmation = True
+        purchase.save()
+
+        purchase.auction.status = Auction.SOLD
+        purchase.auction.save()
+
+        return redirect('contact_info', purchase_id=purchase.id)
+
 
 
 class BuyerConfirmView(View):
@@ -395,3 +402,35 @@ class BuyerConfirmView(View):
 
         except Purchase.DoesNotExist:
             raise Http404("Purchase does not exist")
+
+
+class ContactInfoView(View):
+    def get(self, request, *args, **kwargs):
+        purchase_id = self.kwargs.get('purchase_id')
+        try:
+            purchase = Purchase.objects.get(id=purchase_id)
+        except Purchase.DoesNotExist:
+            messages.error(request, "Purchase not found.")
+            return redirect('index')
+
+        buyer_contact_info = {
+            'name': f"{purchase.buyer.first_name} {purchase.buyer.last_name}",
+            'email': purchase.buyer.user.email,
+            'phone': purchase.buyer.phone,
+            'street': purchase.buyer.street,
+            'house_number': purchase.buyer.house_number,
+            'city': purchase.buyer.city,
+            'zip_code': purchase.buyer.zip_code,
+            'country': purchase.buyer.country
+        }
+
+        print(f"Buyer Contact Info: {buyer_contact_info}")  # Přidání ladicího výstupu
+
+        context = {
+            'purchase': purchase,
+            'buyer_contact_info': buyer_contact_info
+        }
+
+        return render(request, 'contact_info.html', context)
+
+
