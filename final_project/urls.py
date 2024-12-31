@@ -28,6 +28,7 @@ urlpatterns = [
     path('auction/update/<pk>', AuctionUpdateView.as_view(), name='auction_update'),
     path('auction/cancel/<pk>/', AuctionCancelView.as_view(), name='auction_cancel'),
 
+
     path('auction/<int:purchase_id>/buyer-confirmation/', BuyerConfirmView.as_view(), name='buyer_confirmation'),
     path('auction/<int:purchase_id>/seller-confirmation/', SellerConfirmView.as_view(), name='seller_confirmation'),
 

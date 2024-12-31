@@ -6,7 +6,7 @@ from django.forms.widgets import HiddenInput
 from viewer.models import Profile, Bid, Purchase
 from django.forms import (
     CharField, DateField, Form, IntegerField, ModelChoiceField, Textarea, TextInput, EmailInput, PasswordInput,
-    ModelForm, DateInput, NumberInput, CheckboxSelectMultiple, DateTimeInput, DecimalField, ChoiceField
+    ModelForm, DateInput, NumberInput, CheckboxSelectMultiple, DateTimeInput, DecimalField, ChoiceField, ModelMultipleChoiceField
 )
 from django.contrib.auth.forms import UserCreationForm
 from django.contrib.auth.models import User
@@ -65,20 +65,45 @@ class ProfileEditForm(ModelForm):
         fields = ['avatar']
 
 class AuctionCreateForm(ModelForm):
+    subcategories = ModelMultipleChoiceField(
+        queryset=Category.objects.filter(parent__isnull=False),
+        required=False,
+        widget=CheckboxSelectMultiple(),
+        label="Subcategories (optional)"
+    )
     class Meta:
         model = Auction
         fields = ['name', 'description', 'starting_price', 'end_time', 'categories', 'image']
         widgets = {
             'description': Textarea(),
-            'categories': CheckboxSelectMultiple(),
+            'categories': CheckboxSelectMultiple(attrs={'class': 'form-control'}),
             'end_time': DateTimeInput(attrs={'type': 'datetime-local'}),
         }
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
+
+        #only main_category is visible
+        self.fields['categories'].queryset = Category.objects.filter(parent__isnull=True)
+        #only sub_categories are visible
+        self.fields['subcategories'].queryset = Category.objects.filter(parent__isnull=False)
+
         for field_name in self.fields:
             self.fields[field_name].widget.attrs['class'] = 'form-control'
         self.fields['categories'].widget.attrs.pop('class', None)
+        self.fields['subcategories'].widget.attrs.pop('class', None)
+
+    def clean_categories(self):
+        categories = self.cleaned_data.get('categories')
+        if categories.count() > 1:
+            raise ValidationError("You can select only one main category.")
+        return categories
+
+    def clean_subcategories(self):
+        subcategories = self.cleaned_data.get('subcategories')
+        if subcategories and subcategories.count() > 2:
+            raise ValidationError("You can select up to two subcategories.")
+        return subcategories
 
     def save(self, commit=True):
         auction = super().save(commit=False)  # Nejprve uložíme aukci bez okamžitého commitu do DB
@@ -90,6 +115,12 @@ class AuctionCreateForm(ModelForm):
         return auction
 
 class AuctionUpdateForm(ModelForm):
+    subcategories = ModelMultipleChoiceField(
+        queryset=Category.objects.filter(parent__isnull=False),
+        required=False,
+        widget=CheckboxSelectMultiple(),
+        label="Subcategories (optional)"
+    )
     class Meta:
         model = Auction
         fields = ['description', 'categories', 'image'] #permitted field
@@ -97,6 +128,54 @@ class AuctionUpdateForm(ModelForm):
             'description': Textarea(),
             'categories': CheckboxSelectMultiple(),
         }
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+
+        # only main_category is visible
+        self.fields['categories'].queryset = Category.objects.filter(parent__isnull=True)
+        # only sub_categories are visible
+        self.fields['subcategories'].queryset = Category.objects.filter(parent__isnull=False)
+
+        # add classes to form fields
+        for field_name in self.fields:
+            self.fields[field_name].widget.attrs['class'] = 'form-control'
+        self.fields['categories'].widget.attrs.pop('class', None)
+        self.fields['subcategories'].widget.attrs.pop('class', None)
+
+        # Pre-fill 'subcategories' with the current subcategories of the auction
+        if self.instance.pk:
+            self.fields['subcategories'].initial = self.instance.categories.filter(parent__isnull=False)
+
+    def clean_categories(self):
+        categories = self.cleaned_data.get('categories')
+        if categories.count() > 1:
+            raise ValidationError("You can select only one main category.")
+        return categories
+
+    def clean_subcategories(self):
+        subcategories = self.cleaned_data.get('subcategories')
+        if subcategories and subcategories.count() > 2:
+            raise ValidationError("You can select up to two subcategories.")
+        return subcategories
+
+    def save(self, commit=True):
+        # Get the instance of Auction object being updated
+        auction = super().save(commit=False)
+
+        # Ensure the main category is added to categories
+        main_category = self.cleaned_data.get('categories')
+        if main_category:
+            auction.categories.set(main_category)
+
+        # Add subcategories
+        subcategories = self.cleaned_data.get('subcategories')
+        if subcategories:
+            auction.categories.add(*subcategories)
+
+        if commit:
+            auction.save()
+        return auction
 
 class BidForm(ModelForm):
     bid_amount = DecimalField(label='Place Your Bid', widget=NumberInput(attrs={

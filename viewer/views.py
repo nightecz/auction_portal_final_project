@@ -133,18 +133,20 @@ class AuctionCreateView(FormView):
     success_url = reverse_lazy('auctions')
 
     def form_valid(self, form):
-        cleaned_data = form.cleaned_data
-        auction = Auction.objects.create(
-            name=cleaned_data['name'],
-            description=cleaned_data['description'],
-            starting_price=cleaned_data['starting_price'],
-            end_time=cleaned_data['end_time'],
-            seller=self.request.user,
-            image=cleaned_data.get('image')
-        )
+        #Gets data from form
+        print("Form cleaned_data:", form.cleaned_data)
+
+        auction = form.save(commit=False)
+        auction.seller = self.request.user
+        auction.save()
+
         categories = form.cleaned_data['categories']
+        subcategories = form.cleaned_data['subcategories']
+
         if categories:  # Ensure categories are not empty
             auction.categories.set(categories)
+        if subcategories:  # Subcategories, if they are choose
+            auction.categories.add(*subcategories)
 
         return super().form_valid(form)
 

@@ -92,7 +92,7 @@
                     <td><a href="{% url 'advanced_search' %}?q={{ auction.seller.username }}">{{ auction.seller.username }}</a></td>
                     <td>
                         {% for category in auction.categories.all %}
-                            <a href="{% url 'advanced_search' %}?category={{ category.id }}">{{ category.name }}</a>{% if not forloop.last %}, {% endif %}
+                            <a href="{% url 'advanced_search' %}?sub_category={{ category.id }}">{{ category.name }}</a>{% if not forloop.last %}, {% endif %}
                         {% endfor %}
                     </td>
                     <td>{{ auction.current_price }}</td>
