@@ -73,7 +73,7 @@ class AuctionCreateForm(ModelForm):
     )
     class Meta:
         model = Auction
-        fields = ['name', 'description', 'starting_price', 'end_time', 'categories', 'image']
+        fields = ['name', 'description', 'starting_price', 'end_time', 'categories', 'image1', 'image2', 'image3']
         widgets = {
             'description': Textarea(),
             'categories': CheckboxSelectMultiple(attrs={'class': 'form-control'}),
@@ -123,7 +123,7 @@ class AuctionUpdateForm(ModelForm):
     )
     class Meta:
         model = Auction
-        fields = ['description', 'categories', 'image'] #permitted field
+        fields = ['description', 'categories', 'image1', 'image2', 'image3'] #permitted field
         widgets = {
             'description': Textarea(),
             'categories': CheckboxSelectMultiple(),

@@ -24,11 +24,23 @@
     <div class="row">
         <div class="col-md-6">
             <div id="auctionCarousel" class="carousel slide" data-bs-ride="carousel">
-                {% if auction.image %}
+                {% if auction.image1 or auction.image2 or auction.image3 %}
                     <div class="carousel-inner">
-                        <div class="carousel-item active">
-                            <img src="{{ auction.image.url }}" class="d-block w-75 mx-auto" alt="Auction Image" style="max-height: 400px; object-fit: contain;">
-                        </div>
+                        {% if auction.image1 %}
+                            <div class="carousel-item active">
+                                <img src="{{ auction.image1.url }}" class="d-block w-75 mx-auto" alt="Auction Image 1" style="max-height: 400px; object-fit: contain;">
+                            </div>
+                        {% endif %}
+                        {% if auction.image2 %}
+                            <div class="carousel-item {% if not auction.image1 %}active{% endif %}">
+                                <img src="{{ auction.image2.url }}" class="d-block w-75 mx-auto" alt="Auction Image 2" style="max-height: 400px; object-fit: contain;">
+                            </div>
+                        {% endif %}
+                        {% if auction.image3 %}
+                            <div class="carousel-item {% if not auction.image1 and not auction.image2 %}active{% endif %}">
+                                <img src="{{ auction.image3.url }}" class="d-block w-75 mx-auto" alt="Auction Image 3" style="max-height: 400px; object-fit: contain;">
+                            </div>
+                        {% endif %}
                     </div>
                     <button class="carousel-control-prev" type="button" data-bs-target="#auctionCarousel" data-bs-slide="prev">
                         <span class="carousel-control-prev-icon" aria-hidden="true"></span>

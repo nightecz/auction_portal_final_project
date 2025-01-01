@@ -50,8 +50,12 @@
                 {% for auction in recent_auctions %}
                 <div class="col">
                     <div class="card h-100">
-                        {% if auction.image %}
-                        <img src="{{ auction.image.url }}" class="card-img-top" alt="{{ auction.name }}">
+                        {% if auction.image1 %}
+                        <img src="{{ auction.image1.url }}" class="card-img-top" alt="{{ auction.name }}">
+                        {% elif auction.image2 %}
+                        <img src="{{ auction.image2.url }}" class="card-img-top" alt="{{ auction.name }}">
+                        {% elif auction.image3 %}
+                        <img src="{{ auction.image3.url }}" class="card-img-top" alt="{{ auction.name }}">
                         {% else %}
                         <img src="{% static 'images/default-auction-image.jpg' %}" class="card-img-top" alt="Default image">
                         {% endif %}
@@ -72,8 +76,12 @@
                 {% for auction in ending_soon_auctions %}
                 <div class="col">
                     <div class="card h-100">
-                        {% if auction.image %}
-                        <img src="{{ auction.image.url }}" class="card-img-top" alt="{{ auction.name }}">
+                        {% if auction.image1 %}
+                        <img src="{{ auction.image1.url }}" class="card-img-top" alt="{{ auction.name }}">
+                        {% elif auction.image2 %}
+                        <img src="{{ auction.image2.url }}" class="card-img-top" alt="{{ auction.name }}">
+                        {% elif auction.image3 %}
+                        <img src="{{ auction.image3.url }}" class="card-img-top" alt="{{ auction.name }}">
                         {% else %}
                         <img src="{% static 'images/default-auction-image.jpg' %}" class="card-img-top" alt="Default image">
                         {% endif %}
@@ -94,8 +102,12 @@
                 {% for auction in ended_auctions %}
                 <div class="col">
                     <div class="card h-100">
-                        {% if auction.image %}
-                        <img src="{{ auction.image.url }}" class="card-img-top" alt="{{ auction.name }}">
+                        {% if auction.image1 %}
+                        <img src="{{ auction.image1.url }}" class="card-img-top" alt="{{ auction.name }}">
+                        {% elif auction.image2 %}
+                        <img src="{{ auction.image2.url }}" class="card-img-top" alt="{{ auction.name }}">
+                        {% elif auction.image3 %}
+                        <img src="{{ auction.image3.url }}" class="card-img-top" alt="{{ auction.name }}">
                         {% else %}
                         <img src="{% static 'images/default-auction-image.jpg' %}" class="card-img-top" alt="Default image">
                         {% endif %}

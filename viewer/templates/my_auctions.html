@@ -35,8 +35,12 @@
                     <div class="card h-100">
                         <div class="card-header text-center p-2">
                             <h6 class="card-title mb-1 text-truncate" style="max-width: 200px;">{{ auction.name }}</h6>
-                            {% if auction.image %}
-                                <img src="{{ auction.image.url }}" alt="Auction Image" class="img-fluid rounded" style="max-height: 80px; object-fit: cover;">
+                            {% if auction.image1 %}
+                                <img src="{{ auction.image1.url }}" alt="Auction Image" class="img-fluid rounded" style="max-height: 80px; object-fit: cover;">
+                             {% elif auction.image2 %}
+                                <img src="{{ auction.image2.url }}" alt="Auction Image" class="img-fluid rounded" style="max-height: 80px; object-fit: cover;">
+                            {% elif auction.image3 %}
+                                <img src="{{ auction.image3.url }}" alt="Auction Image" class="img-fluid rounded" style="max-height: 80px; object-fit: cover;">
                             {% endif %}
                         </div>
                         <div class="card-body p-2">

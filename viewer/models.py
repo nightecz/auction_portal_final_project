@@ -70,7 +70,13 @@ class Auction(Model):
         blank=True,
         related_name='related_auction'
     )
-    image = ImageField(upload_to='auctions/', blank=True, null=True, validators=[
+    image1 = ImageField(upload_to='auctions/', blank=True, null=True, validators=[
+        FileExtensionValidator(allowed_extensions=['jpg', 'jpeg', 'png'])
+    ])
+    image2 = ImageField(upload_to='auctions/', blank=True, null=True, validators=[
+        FileExtensionValidator(allowed_extensions=['jpg', 'jpeg', 'png'])
+    ])
+    image3 = ImageField(upload_to='auctions/', blank=True, null=True, validators=[
         FileExtensionValidator(allowed_extensions=['jpg', 'jpeg', 'png'])
     ])
     status = CharField(max_length=10,
