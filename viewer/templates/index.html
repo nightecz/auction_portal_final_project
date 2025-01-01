@@ -2,6 +2,10 @@
 
 {% block nadpis %}-Home{% endblock %}
 {% block content %}
+
+{% load static %}
+    <link rel="stylesheet" href="{% static 'css/styles.css' %}">
+
 <div class="container">
     <!-- Main content: Headline -->
     <div class="text-center mb-4">
@@ -49,7 +53,7 @@
                         {% if auction.image %}
                         <img src="{{ auction.image.url }}" class="card-img-top" alt="{{ auction.name }}">
                         {% else %}
-                        <img src="/media/auctions/default-image.jpg" class="card-img-top" alt="Default image">
+                        <img src="{% static 'images/default-auction-image.jpg' %}" class="card-img-top" alt="Default image">
                         {% endif %}
                         <div class="card-body text-center">
                             <h6 class="card-title text-truncate">{{ auction.name }}</h6>
