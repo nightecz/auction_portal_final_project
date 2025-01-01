@@ -29,14 +29,16 @@ from viewer.models import Watchlist, Auction, User, Profile, Bid, Purchase
 def index(request):
     value = request.GET.get('value', '')
     main_categories = Category.objects.filter(parent__isnull=True)  # only main categories
-    recent_auctions = Auction.objects.filter(status="Running").order_by('-start_time')[:5]  # showing recently added auctions
-    ending_soon_auctions = Auction.objects.filter(status="Running", end_time__gt=timezone.now()).order_by('end_time')[:5] # ending soon auctions
+    recent_auctions = Auction.objects.filter(status="Running").order_by('-start_time')[:4]  # showing recently added auctions
+    ending_soon_auctions = Auction.objects.filter(status="Running", end_time__gt=timezone.now()).order_by('end_time')[:4] # ending soon auctions
+    ended_auctions = Auction.objects.filter(status__in=["Closed", "Sold"]).order_by('-end_time')[:4]
 
     return render(request, 'index.html', {
         'value': value,
         'main_categories': main_categories,
         'recent_auctions': recent_auctions,
-        'ending_soon_auctions': ending_soon_auctions
+        'ending_soon_auctions': ending_soon_auctions,
+        'ended_auctions': ended_auctions
     })
 class RegisterView(FormView):
     template_name = 'registration/register.html'
@@ -165,7 +167,7 @@ class AuctionSearchView(ListView):
     def get_queryset(self):
         query = self.request.GET.get('q', '')
         auctions = Auction.objects.all()
-        status = self.request.GET.get('status')  # gets status from GET parameter
+        status = self.request.GET.get('status', 'Running')  # gets status from GET parameter, default in search is status 'Running'
 
         # Filtering by user task (keyword)
         if query:
@@ -333,6 +335,16 @@ class AuctionCancelView(View):
         auction.save()
         messages.success(request, "Auction have been cancelled.")
         return redirect(self.success_url)
+
+@method_decorator(login_required, name='dispatch')
+class AuctionBiddingView(ListView):
+    template_name = "auctions/bidding.html"
+    model = Auction
+    context_object_name = "auctions"
+
+    def get_queryset(self):
+        # getting auctions by bids, where user is also bidder
+        return Auction.objects.filter(bids__bidder=self.request.user).distinct()
 
 class PlaceBidView(FormView):
     template_name = 'auction_detail.html'

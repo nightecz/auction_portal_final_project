@@ -6,7 +6,7 @@ from django.urls import path
 from viewer.views import (index, CustomLoginView, ProfileView, RegisterView, AuctionView, WatchlistView,
                           AuctionCreateView, ProfileEditView, AuctionDetailView, AuctionSellingView, PlaceBidView,
                           AddToWatchlistView, WatchlistDeleteView, AuctionSearchView, AuctionUpdateView,
-                          SellerConfirmView, BuyerConfirmView, AuctionCancelView)
+                          SellerConfirmView, BuyerConfirmView, AuctionCancelView, AuctionBiddingView)
 
 
 urlpatterns = [
@@ -20,14 +20,15 @@ urlpatterns = [
     path('profile/edit/', ProfileEditView.as_view(), name='profile_edit'),
 
     path('auctions/', AuctionView.as_view(), name='auctions'),
+    path('auctions/my_auctions/', AuctionSellingView.as_view(), name='my_auctions'),
+    path('auctions/bidding', AuctionBiddingView.as_view(), name='bidding'),
+
     path('auction_create/', AuctionCreateView.as_view(), name='auction_create'),
     path('auction/detail/<int:id>/', AuctionDetailView.as_view(), name='auction_detail'),
-    path('auctions/my_auctions/', AuctionSellingView.as_view(), name='my_auctions'),
     path('auction/bid/', PlaceBidView.as_view(), name='place_bid'),
     path('auction/advanced_search', AuctionSearchView.as_view(), name='advanced_search'),
     path('auction/update/<pk>', AuctionUpdateView.as_view(), name='auction_update'),
     path('auction/cancel/<pk>/', AuctionCancelView.as_view(), name='auction_cancel'),
-
 
     path('auction/<int:purchase_id>/buyer-confirmation/', BuyerConfirmView.as_view(), name='buyer_confirmation'),
     path('auction/<int:purchase_id>/seller-confirmation/', SellerConfirmView.as_view(), name='seller_confirmation'),

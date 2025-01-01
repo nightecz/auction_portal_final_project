@@ -66,6 +66,7 @@
                         <div class="dropdown-menu" aria-labelledby="navbarDropdownMenuLink">
                             <a class="dropdown-item" href="{% url 'profile' %}">Profile</a>
                             <a class="dropdown-item" href="{% url 'my_auctions' %}">My Auctions</a>
+                            <a class="dropdown-item" href="{% url 'bidding' %}">Bidding</a>
                             <a class="dropdown-item" href="{% url 'watchlist' %}">Watchlist</a>
                             <form action="{% url 'logout' %}" method="POST" style="display: inline;">
                                 {% csrf_token %}

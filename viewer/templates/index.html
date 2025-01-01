@@ -58,7 +58,7 @@
                         <div class="card-body text-center">
                             <h6 class="card-title text-truncate">{{ auction.name }}</h6>
                             <p class="small text-muted mb-2">{{ auction.description|truncatechars:50 }}</p>
-                            <p><strong>${{ auction.starting_price }}</strong></p>
+                            <p><strong>${{ auction.current_price }}</strong></p>
                             <a href="{% url 'auction_detail' auction.id %}" class="btn btn-sm btn-primary">Details</a>
                         </div>
                     </div>
@@ -75,18 +75,40 @@
                         {% if auction.image %}
                         <img src="{{ auction.image.url }}" class="card-img-top" alt="{{ auction.name }}">
                         {% else %}
-                        <img src="/media/auctions/default-image.jpg" class="card-img-top" alt="Default image">
+                        <img src="{% static 'images/default-auction-image.jpg' %}" class="card-img-top" alt="Default image">
                         {% endif %}
                         <div class="card-body text-center">
                             <h6 class="card-title text-truncate">{{ auction.name }}</h6>
                             <p class="small text-muted mb-2">{{ auction.description|truncatechars:50 }}</p>
-                            <p><strong>${{ auction.starting_price }}</strong></p>
+                            <p><strong>${{ auction.current_price }}</strong></p>
                             <a href="{% url 'auction_detail' auction.id %}" class="btn btn-sm btn-primary">Details</a>
                         </div>
                     </div>
                 </div>
                 {% empty %}
                 <p>No auctions ending soon.</p>
+                {% endfor %}
+            </div>
+            <h4>Auctions just ended</h4>
+            <div class="row row-cols-1 row-cols-sm-2 row-cols-md-3 row-cols-lg-5 g-3">
+                {% for auction in ended_auctions %}
+                <div class="col">
+                    <div class="card h-100">
+                        {% if auction.image %}
+                        <img src="{{ auction.image.url }}" class="card-img-top" alt="{{ auction.name }}">
+                        {% else %}
+                        <img src="{% static 'images/default-auction-image.jpg' %}" class="card-img-top" alt="Default image">
+                        {% endif %}
+                        <div class="card-body text-center">
+                            <h6 class="card-title text-truncate">{{ auction.name }}</h6>
+                            <p class="small text-muted mb-2">{{ auction.description|truncatechars:50 }}</p>
+                            <p><strong>${{ auction.current_price }}</strong></p>
+                            <a href="{% url 'auction_detail' auction.id %}" class="btn btn-sm btn-primary">Details</a>
+                        </div>
+                    </div>
+                </div>
+                {% empty %}
+                <p>No auctions ended.</p>
                 {% endfor %}
             </div>
         </div>
