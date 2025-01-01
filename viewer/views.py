@@ -29,9 +29,15 @@ from viewer.models import Watchlist, Auction, User, Profile, Bid, Purchase
 def index(request):
     value = request.GET.get('value', '')
     main_categories = Category.objects.filter(parent__isnull=True)  # only main categories
-    return render(request, template_name='index.html', context={'value': value, 'main_categories': main_categories})
+    recent_auctions = Auction.objects.order_by('-start_time')[:5]  # showing recently added auctions
+    ending_soon_auctions = Auction.objects.filter(end_time__gt=timezone.now()).order_by('end_time')[:5] # ending soon auctions
 
-
+    return render(request, 'index.html', {
+        'value': value,
+        'main_categories': main_categories,
+        'recent_auctions': recent_auctions,
+        'ending_soon_auctions': ending_soon_auctions
+    })
 class RegisterView(FormView):
     template_name = 'registration/register.html'
     form_class = SignUpForm
