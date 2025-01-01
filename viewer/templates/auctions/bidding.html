@@ -8,8 +8,8 @@
     {% for auction in auctions %}
         <div class="col-md-4">
             <div class="card mb-3">
-                {% if auction.image %}
-                <img src="{{ auction.image.url }}" class="card-img-top" alt="{{ auction.name }}">
+                {% if auction.image1 %}
+                <img src="{{ auction.image1.url }}" class="card-img-top" alt="{{ auction.name }}">
                 {% else %}
                 <img src="{% static 'images/default-auction-image.jpg' %}" class="card-img-top" alt="Default image">
                 {% endif %}
