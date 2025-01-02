@@ -63,7 +63,7 @@
 
                 <div class="container">
                     {% if user.is_authenticated %}
-                        {% if auction.status == 'running' %}
+                        {% if auction.status == 'Running' %}
                             <form method="post" action="{% url 'place_bid' %}?auction={{ auction.id }}" class="mt-4">
                                 {% csrf_token %}
                                 <div class="mb-3">
@@ -107,7 +107,7 @@
         </div>
     </div>
 <div class="container">
-    {% if user.is_authenticated and auction.status == 'closed' %}
+    {% if user.is_authenticated and auction.status == 'Closed' %}
         {% if purchase %}
             {% if purchase.buyer == request.user.profile and not purchase.buyer_confirmation %}
                 <a href="{% url 'buyer_confirmation' purchase.id %}" class="btn btn-warning btn-block my-4">Confirm purchase</a>
@@ -121,7 +121,7 @@
         {% endif %}
     {% endif %}
 
-    {% if auction.status == 'sold' and purchase.seller == request.user.profile %}
+    {% if auction.status == 'Sold' and purchase.seller == request.user.profile %}
         <a href="{% url 'contact_info' purchase.id %}" class="btn btn-primary btn-block my-4">View Buyer Contact Info</a>
     {% endif %}
 </div>
