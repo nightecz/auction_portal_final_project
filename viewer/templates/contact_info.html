@@ -1,0 +1,24 @@
+{% extends 'base.html' %}
+
+{% block title %}
+    Confirm Sale
+{% endblock %}
+
+{% block content %}
+    <h1>You confirmed auction: {{ purchase.auction.name }}</h1>
+    <div class="container my-4">
+        <h2 class="my-4">Here you can have Buyer Contact Information</h2>
+        <p><strong>Name:</strong> {{ buyer_contact_info.name }}</p>
+        <p><strong>Email:</strong> {{ buyer_contact_info.email }}</p>
+        <p><strong>Phone:</strong> {{ buyer_contact_info.phone }}</p>
+        <p><strong>Address:</strong></p>
+        <ul>
+            <li><strong>Street:</strong> {{ buyer_contact_info.street }}</li>
+            <li><strong>House Number:</strong> {{ buyer_contact_info.house_number }}</li>
+            <li><strong>City:</strong> {{ buyer_contact_info.city }}</li>
+            <li><strong>ZIP Code:</strong> {{ buyer_contact_info.zip_code }}</li>
+            <li><strong>Country:</strong> {{ buyer_contact_info.country }}</li>
+        </ul>
+        <a href="{% url 'auction_detail' purchase.auction.id %}" class="btn btn-primary my-4">Back to Auction</a>
+    </div>
+{% endblock %}
