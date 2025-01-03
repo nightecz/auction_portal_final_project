@@ -39,8 +39,11 @@ class Profile(Model):
     )
     first_name = CharField(max_length=20, blank=True, null=True)
     last_name = CharField(max_length=20, blank=True, null=True)
+
     def __str__(self):
-        return self.user.username
+        if self.user:
+            return self.user.username  # Zajišťujeme, že se používá uživatelský objekt
+        return "No user associated"
 
     def calculate_average_rating(self):
         reviews = self.received_reviews.all()
@@ -134,7 +137,7 @@ class Purchase(Model):
     buyer_confirmation = BooleanField(default=False)
 
     def __str__(self):
-        return f" Winner of {self.auction.name} is {self.buyer.username} for {self.winning_price}"
+        return f" Winner of {self.auction.name} is {self.buyer.user.username} for ${self.winning_price}"
 
 class Review(Model):
     RATING_CHOICES = [(i, str(i)) for i in range(1, 6)]  # 1-5 stars
