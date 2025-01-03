@@ -17,13 +17,12 @@ from django.db.models import Q
 from django.utils.decorators import method_decorator
 from django.views import View
 from django.views.generic import FormView, ListView, TemplateView
-from viewer.forms import SignUpForm, AuctionCreateForm, ProfileEditForm, BidForm, PurchaseForm
+from viewer.forms import SignUpForm, AuctionCreateForm, ProfileEditForm, BidForm, PurchaseForm, ReviewForm
 from django.views.generic import FormView, ListView, TemplateView, UpdateView, DeleteView, DetailView
 from viewer.forms import SignUpForm, AuctionCreateForm, ProfileEditForm, BidForm, WatchlistForm, AuctionUpdateForm
 from django.urls import reverse_lazy, reverse
-from viewer.models import Watchlist, Auction, User, Profile, Bid, Category
+from viewer.models import Watchlist, Auction, User, Profile, Bid, Category, Review, Purchase
 from django.contrib.auth.forms import UserChangeForm
-from viewer.models import Watchlist, Auction, User, Profile, Bid, Purchase
 
 
 def index(request):
@@ -502,4 +501,57 @@ class ContactInfoView(View):
 
         return render(request, 'contact_info.html', context)
 
+class ReviewCreateView(FormView):
+    model = Review
+    template_name = 'review_form.html'
+    form_class = ReviewForm
+    success_url = reverse_lazy('my_auctions')
 
+    # Get the purchase id from the URL and then get the purchase object and pass it to the form
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        purchase_id = self.request.GET.get('purchase')
+        context['purchase'] = Purchase.objects.get(pk=purchase_id)
+        return context
+
+    def dispatch(self, request, *args, **kwargs):
+        if not request.user.is_authenticated:
+            return redirect('login')
+        return super().dispatch(request, *args, **kwargs)
+
+    def form_valid(self, form):
+        cleaned_data = form.cleaned_data
+        purchase_id = self.request.GET.get('purchase')
+        purchase = Purchase.objects.get(pk=purchase_id)
+
+        # conditions, who is writting the review
+        if self.request.user.profile == purchase.buyer:
+            reviewer = purchase.buyer
+            reviewee = purchase.seller
+        elif self.request.user.profile == purchase.seller:
+            reviewer = purchase.seller
+            reviewee = purchase.buyer
+        else:
+            return self.form_invalid(form)
+
+        # check if review does not already exist
+        existing_review = Review.objects.filter(
+            Q(reviewer=reviewer) & Q(purchase=purchase)
+        ).exists()
+
+        if existing_review:
+            form.add_error(None, "You have already written a review for this purchase.")
+            return self.form_invalid(form)
+
+        # create review
+        Review.objects.create(
+            reviewer=reviewer,
+            reviewee=reviewee,
+            purchase=purchase,
+            rating=cleaned_data['rating'],
+            text=cleaned_data['text']
+            )
+
+        # average rating calculation
+        purchase.seller.calculate_average_rating()
+        return super().form_valid(form)

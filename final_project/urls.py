@@ -6,7 +6,7 @@ from django.urls import path
 from viewer.views import (index, CustomLoginView, ProfileView, RegisterView, AuctionView, WatchlistView,
                           AuctionCreateView, ProfileEditView, AuctionDetailView, AuctionSellingView, PlaceBidView,
                           AddToWatchlistView, WatchlistDeleteView, AuctionSearchView, AuctionUpdateView, ContactInfoView,
-                          SellerConfirmView, BuyerConfirmView, AuctionCancelView, AuctionBiddingView)
+                          SellerConfirmView, BuyerConfirmView, AuctionCancelView, AuctionBiddingView, ReviewCreateView)
 
 
 urlpatterns = [
@@ -29,10 +29,10 @@ urlpatterns = [
     path('auction/advanced_search', AuctionSearchView.as_view(), name='advanced_search'),
     path('auction/update/<pk>', AuctionUpdateView.as_view(), name='auction_update'),
     path('auction/cancel/<pk>/', AuctionCancelView.as_view(), name='auction_cancel'),
-
     path('auction/<int:purchase_id>/buyer-confirmation/', BuyerConfirmView.as_view(), name='buyer_confirmation'),
     path('auction/<int:purchase_id>/seller-confirmation/', SellerConfirmView.as_view(), name='seller_confirmation'),
     path('contact-info/<int:purchase_id>/', ContactInfoView.as_view(), name='contact_info'),
+    path('review/add/', ReviewCreateView.as_view(), name='review_form'),
 
     path('watchlist/', WatchlistView.as_view(), name='watchlist'),
     path('add-to-watchlist/<int:auction_id>/', AddToWatchlistView.as_view(), name='add_to_watchlist'),

@@ -11,7 +11,7 @@ from django.forms import (
 from django.contrib.auth.forms import UserCreationForm
 from django.contrib.auth.models import User
 from django.contrib.auth.decorators import login_required
-from viewer.models import Auction, Category, Watchlist
+from viewer.models import Auction, Category, Watchlist, Review
 from django.urls import reverse_lazy
 from django.shortcuts import redirect
 
@@ -203,3 +203,16 @@ class PurchaseForm(ModelForm):
     class Meta:
         model = Purchase
         fields = ['winning_price', 'buyer']
+
+class ReviewForm(ModelForm):
+    class Meta:
+        model = Review
+        fields = ["rating", "text"]
+
+        widgets = {
+            'rating': NumberInput(attrs={'class': 'form-control', 'min': 1, 'max': 5}),
+            'text': Textarea(attrs={'class': 'form-control'})
+        }
+    def __init__(self, *args, **kwargs): # text is not required
+        super().__init__(*args, **kwargs)
+        self.fields['text'].required = False

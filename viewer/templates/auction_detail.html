@@ -123,6 +123,9 @@
 
     {% if auction.status == 'Sold' and purchase.seller == request.user.profile %}
         <a href="{% url 'contact_info' purchase.id %}" class="btn btn-primary btn-block my-4">View Buyer Contact Info</a>
+        <a href="{% url 'review_form' %}?purchase={{ purchase.id }}" class="btn btn-primary">Write review</a></td>
+    {% elif auction.status == 'Sold' and purchase.buyer == request.user.profile %}
+        <a href="{% url 'review_form' %}?purchase={{ purchase.id }}" class="btn btn-primary">Write review</a>
     {% endif %}
 </div>
 

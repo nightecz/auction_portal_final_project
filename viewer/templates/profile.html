@@ -14,6 +14,7 @@
     </div>
     <div class="card-body">
         <h5 class="card-title">About user</h5>
+        <h4>Average Rating: {{ profile.calculate_average_rating|default:"No ratings yet" }}</h4>
         <p class="card-text">
     Premium account:
     {% if profile.is_premium %}
@@ -46,5 +47,17 @@
     </div>
   <a href="{% url 'profile_edit' %}"><button>Change Profile</button></a>
 </form>
+    <div class="card-footer text-muted">
+    Reviews:
+    {% for review in profile.received_reviews.all %}
+    <div class="card">
+        <div class="card-header">
+            <small>By: {{ review.reviewer.user.username }} ({{ review.created|date:'H:i:s M d, Y' }})</small>
+        </div>
+        <div class="card-body">
+            <strong>{{ review.rating }}/5</strong> <br>Comment: {{ review.text }}
+        </div>
+        {% endfor %}
+    </div>
 </div>
 {% endblock %}

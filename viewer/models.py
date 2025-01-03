@@ -42,6 +42,12 @@ class Profile(Model):
     def __str__(self):
         return self.user.username
 
+    def calculate_average_rating(self):
+        reviews = self.received_reviews.all()
+        if reviews:
+            return sum(review.rating for review in reviews) / len(reviews)
+        return None
+
 
 class Auction(Model):
     RUNNING = 'Running'
@@ -129,3 +135,16 @@ class Purchase(Model):
 
     def __str__(self):
         return f" Winner of {self.auction.name} is {self.buyer.username} for {self.winning_price}"
+
+class Review(Model):
+    RATING_CHOICES = [(i, str(i)) for i in range(1, 6)]  # 1-5 stars
+
+    reviewer = ForeignKey('Profile', on_delete=CASCADE, related_name='written_reviews')
+    reviewee = ForeignKey('Profile', on_delete=CASCADE, related_name='received_reviews')
+    purchase = ForeignKey('Purchase', on_delete=CASCADE, related_name='reviews')
+    rating = IntegerField(choices=RATING_CHOICES)
+    text = TextField(blank=True, null=True)
+    created = DateTimeField(auto_now_add=True)
+
+    def __str__(self):
+      return f" Review from {self.reviewer} for {self.reviewee} is {self.rating}/5"
