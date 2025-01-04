@@ -260,7 +260,7 @@ class UserSearchView(ListView):
 
 
         # sorting by average score
-        sort_by = self.request.GET.get('sort_by', '-average_rating')  # Výchozí řazení
+        sort_by = self.request.GET.get('sort_by', '-average_rating')  # default sorting
         if sort_by in ['average_rating', '-average_rating']:
             profiles = profiles.order_by(sort_by)
         return profiles
