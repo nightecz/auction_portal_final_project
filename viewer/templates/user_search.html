@@ -35,12 +35,12 @@
             <tbody>
                 {% for profile in profiles %}
                 <tr>
-                    <td>{{ profile.user.username }}</td>
+                    <td><a href="{% url 'advanced_search' %}?q={{ profile.user.username }}">{{ profile.user.username }}</td>
                     <td>
                         {% if profile.average_rating %}
                             {{ profile.average_rating|floatformat:1 }}
                         {% else %}
-                            No reviews yet
+                            No rating yet
                         {% endif %}
                     </td>
                 </tr>
