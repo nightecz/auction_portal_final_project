@@ -1,0 +1,64 @@
+{% extends 'base.html' %}
+
+{% block title %}
+    User Search
+{% endblock %}
+
+{% block content %}
+    <h2>Search for user</h2>
+    <form method="get" action="{% url 'user_search' %}" class="mb-4">
+        <div class="row">
+            <div class="col-md-3">
+                <input type="text" name="q" class="form-control" placeholder="Search by keyword..." value="{{ request.GET.q }}">
+            </div>
+            <div class="col-md-2">
+                <select name="sort_by" class="form-select">
+                    <option value="">Sort by...</option>
+                    <option value="average_rating" {% if request.GET.sort_by == 'average_rating' %}selected{% endif %}>Average Rating</option>
+                    <option value="-average_rating" {% if request.GET.sort_by == '-average_rating' %}selected{% endif %}>Highest Rating</option>
+                </select>
+            </div>
+            <div class="col-md-2">
+                <button type="submit" class="btn btn-primary">Search</button>
+            </div>
+        </div>
+    </form>
+
+    {% if profiles %}
+        <table class="table table-bordered">
+            <thead>
+                <tr>
+                    <th>Username</th>
+                    <th>Average Rating</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for profile in profiles %}
+                <tr>
+                    <td>{{ profile.user.username }}</td>
+                    <td>
+                        {% if profile.average_rating %}
+                            {{ profile.average_rating|floatformat:1 }}
+                        {% else %}
+                            No reviews yet
+                        {% endif %}
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+        {% if is_paginated %}
+            <div class="pagination">
+                {% if page_obj.has_previous %}
+                    <a href="?{% with request.GET.q as q %}q={{ q }}&page={{ page_obj.previous_page_number }}{% endwith %}" class="btn btn-light">Previous</a>
+                {% endif %}
+                <span>Page {{ page_obj.number }} of {{ page_obj.paginator.num_pages }}</span>
+                {% if page_obj.has_next %}
+                    <a href="?{% with request.GET.q as q %}q={{ q }}&page={{ page_obj.next_page_number }}{% endwith %}" class="btn btn-light">Next</a>
+                {% endif %}
+            </div>
+        {% endif %}
+    {% else %}
+        <p>No users found.</p>
+    {% endif %}
+{% endblock %}

@@ -11,7 +11,7 @@ from django.contrib import messages
 from django.contrib.auth import logout, login
 from django.contrib.auth.views import LoginView
 from django.shortcuts import render, redirect, get_object_or_404
-from django.db.models import CharField, TextField, DateTimeField, ForeignKey, Q, BooleanField, Case, When
+from django.db.models import CharField, TextField, DateTimeField, ForeignKey, Q, BooleanField, Case, When, Avg
 from django.shortcuts import render, redirect
 from django.db.models import Q
 from django.utils.decorators import method_decorator
@@ -245,6 +245,44 @@ class AuctionSearchView(ListView):
         return context
 
 from django.utils import timezone
+
+class UserSearchView(ListView):
+    template_name = 'user_search.html'
+    model = Profile
+    context_object_name = 'profiles'
+    paginate_by = 20  # numbers of auctions per page
+
+    def get_queryset(self):
+        profiles = Profile.objects.all()
+
+        profiles = profiles.annotate(average_rating=Avg('received_reviews__rating'))
+
+        # filtering by username (keyword)
+        query = self.request.GET.get('q', '').strip()
+        if query:
+            profiles = profiles.filter(
+                Q(user__username__icontains=query))
+
+        # filtering by average score
+        min_average_rating = self.request.GET.get('average_rating')
+        if min_average_rating:
+            try:
+                min_average_rating = float(min_average_rating)
+                profiles = profiles.filter(average_rating__gte=min_average_rating)
+            except ValueError:
+                pass  # if number is not valit, filtr ignore
+
+
+        # sorting by average score
+        sort_by = self.request.GET.get('sort_by', '-average_rating')  # default sorting
+        if sort_by in ['average_rating', '-average_rating']:
+            profiles = profiles.order_by(sort_by)
+        return profiles
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['average_rating'] = self.request.GET.get('average_rating', '')
+        return context
 
 class AuctionDetailView(TemplateView):
     template_name = 'auction_detail.html'
