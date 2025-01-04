@@ -68,6 +68,7 @@
                             <a class="dropdown-item" href="{% url 'my_auctions' %}">My Auctions</a>
                             <a class="dropdown-item" href="{% url 'bidding' %}">Bidding</a>
                             <a class="dropdown-item" href="{% url 'watchlist' %}">Watchlist</a>
+                            <a class="dropdown-item" href="{% url 'won_auctions' %}">Won Auctions</a>
                             <form action="{% url 'logout' %}" method="POST" style="display: inline;">
                                 {% csrf_token %}
                                 <button class="dropdown-item" type="submit">Logout</button>

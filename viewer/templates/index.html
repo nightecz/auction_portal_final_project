@@ -10,6 +10,20 @@
     <!-- Main content: Headline -->
     <div class="text-center mb-4">
         <h1>Welcome to Auctions Portal Team 6!</h1>
+        <div>
+            {% if unconfirmed_sales_count > 0 %}
+            <div class="alert alert-warning">
+                You have {{ unconfirmed_sales_count }} unconfirmed sales. Please visit: <a class="dropdown-item" href="{% url 'my_auctions' %}">My Auctions</a> and confirm them.
+            </div>
+            {% endif %}
+        </div>
+        <div>
+            {% if unconfirmed_purchases_count > 0 %}
+            <div class="alert alert-warning">
+                You have won {{ unconfirmed_purchases_count }} auctions. Please visit: <a class="dropdown-item" href="{% url 'won_auctions' %}">Won Auctions</a> and confirm your interest in purchase.
+            </div>
+            {% endif %}
+        </div>
         <p>Browse auctions by category or view all auctions.</p>
         <a href="{% url 'auctions' %}" class="btn btn-secondary">View All Auctions</a>
     </div>

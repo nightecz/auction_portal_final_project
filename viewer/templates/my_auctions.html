@@ -49,6 +49,16 @@
                             <p class="card-text mb-1"><small>Current: ${{ auction.current_price }}</small></p>
                             <p class="card-text mb-1"><small>Ends: {{ auction.end_time|date:"D, M d, Y H:i" }}</small></p>
                             <p class="card-text mb-1"><small>Status: {{ auction.status }}</small></p>
+                            <p class="card-text mb-1">
+                                {% if auction.purchase %}
+                                    {% if auction.purchase.seller_confirmation %}
+                                        <p class="card-text mb-1 text-success"><small>Sale Confirmed</small></p>
+                                    {% else %}
+                                        <p class="card-text mb-1 text-danger"><small>Waiting for your confirmation</small></p>
+                                    {% endif %}
+                                {% else %}
+                                    <p class="card-text mb-1"><small>No purchase made yet.</small></p>
+                                {% endif %}</p>
                         </div>
                         <div class="card-footer p-2 text-center">
                             <a href="{% url 'auction_detail' auction.id %}" class="btn btn-sm btn-primary">View</a>

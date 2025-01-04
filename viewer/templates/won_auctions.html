@@ -1,0 +1,43 @@
+{% extends 'base.html' %}
+
+{% block title %}
+    Confirm Sale
+{% endblock %}
+
+{% block content %}
+    <h1>My won auctions</h1>
+    <table class="table table-bordered">
+        <thead>
+        <tr>
+            <th>Auction</th>
+            <th>Seller</th>
+            <th>Buyer (You) Confirmation Status</th>
+            <th>Seller Confirmation Status</th>
+        </tr>
+        </thead>
+        <tbody>
+        {% for auction in object_list %}
+        <tr>
+            <td>
+                <a href="{% url 'auction_detail' auction.id %}">{{ auction.name }}</a>
+            </td>
+            <td>{{ auction.seller }}</td>
+            <td>
+                {% if auction.purchase.buyer_confirmation %}
+                    <span class="badge badge-success">Confirmed</span>
+                {% else %}
+                    <span class="badge badge-warning">Not Confirmed</span>
+                {% endif %}
+            </td>
+                        <td>
+                {% if auction.purchase.seller_confirmation %}
+                    <span class="badge badge-success">Confirmed</span>
+                {% else %}
+                    <span class="badge badge-warning">Not Confirmed</span>
+                {% endif %}
+            </td>
+        </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+{% endblock %}

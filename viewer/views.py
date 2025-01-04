@@ -32,13 +32,29 @@ def index(request):
     ending_soon_auctions = Auction.objects.filter(status="Running", end_time__gt=timezone.now()).order_by('end_time')[:4] # ending soon auctions
     ended_auctions = Auction.objects.filter(status__in=["Closed", "Sold"]).order_by('-end_time')[:4]
 
+    unconfirmed_sales_count = 0
+    if request.user.is_authenticated:
+        user_profile = request.user.profile
+        unconfirmed_sales = Purchase.objects.filter(seller=user_profile, seller_confirmation=False)
+        unconfirmed_sales_count = unconfirmed_sales.count()
+
+    unconfirmed_purchases_count = 0
+    if request.user.is_authenticated:
+        user_profile = request.user.profile
+        unconfirmed_purchases = Purchase.objects.filter(buyer=user_profile, buyer_confirmation=False)
+        unconfirmed_purchases_count = unconfirmed_purchases.count()
+
     return render(request, 'index.html', {
         'value': value,
         'main_categories': main_categories,
         'recent_auctions': recent_auctions,
         'ending_soon_auctions': ending_soon_auctions,
-        'ended_auctions': ended_auctions
+        'ended_auctions': ended_auctions,
+        'unconfirmed_sales_count': unconfirmed_sales_count,
+        'unconfirmed_purchases_count': unconfirmed_purchases_count
     })
+
+
 class RegisterView(FormView):
     template_name = 'registration/register.html'
     form_class = SignUpForm
@@ -230,8 +246,6 @@ class AuctionSearchView(ListView):
 
 from django.utils import timezone
 
-from django.utils import timezone
-
 class AuctionDetailView(TemplateView):
     template_name = 'auction_detail.html'
     context_object_name = 'auction'
@@ -267,6 +281,9 @@ class AuctionDetailView(TemplateView):
                         winning_price=highest_bid.amount
                     )
                     purchase.save()
+
+                    auction.purchase = purchase
+                    auction.save()
 
                     auction.status = Auction.CLOSED
                     auction.save()
@@ -381,6 +398,11 @@ class PlaceBidView(FormView):
 
         if bid_amount <= auction.current_price:
             messages.error(request, "Bid must be higher than current price.")
+            return redirect(reverse('auction_detail', kwargs={'id': auction_id}))
+
+        last_bid = auction.bids.order_by('-created_at').first()
+        if last_bid and last_bid.bidder == request.user:
+            messages.error(request, "You cannot place another bid until someone else bids.")
             return redirect(reverse('auction_detail', kwargs={'id': auction_id}))
 
         auction.current_price = bid_amount
@@ -501,6 +523,12 @@ class ContactInfoView(View):
 
         return render(request, 'contact_info.html', context)
 
+    def dispatch(self, request, *args, **kwargs):
+        if not request.user.is_authenticated:
+            return redirect('/')
+        return super().dispatch(request, *args, **kwargs)
+
+
 class ReviewCreateView(FormView):
     model = Review
     template_name = 'review_form.html'
@@ -555,3 +583,35 @@ class ReviewCreateView(FormView):
         # average rating calculation
         purchase.seller.calculate_average_rating()
         return super().form_valid(form)
+
+
+class WonAuctionsView(ListView):
+    template_name = 'won_auctions.html'
+    model = Auction
+    context_object_name = 'auctions'
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        purchase_id = self.request.GET.get('purchase')
+        if purchase_id:
+            context['purchase'] = Purchase.objects.get(pk=purchase_id)
+
+        unconfirmed_purchase = Purchase.objects.filter(buyer=self.request.user.profile,
+                                                       buyer_confirmation=False).first()
+        if unconfirmed_purchase:
+            context['unconfirmed_purchase'] = unconfirmed_purchase
+
+        return context
+
+    def dispatch(self, request, *args, **kwargs):
+        if not request.user.is_authenticated:
+            return redirect('login')
+        return super().dispatch(request, *args, **kwargs)
+
+    def get_queryset(self):
+        won_auctions = Auction.objects.filter(status__in=[Auction.CLOSED, Auction.SOLD])
+        won_auctions_by_user = won_auctions.filter(purchase__buyer=self.request.user.profile)
+
+        return won_auctions_by_user
+
+
