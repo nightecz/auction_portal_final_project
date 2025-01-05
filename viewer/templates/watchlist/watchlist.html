@@ -32,7 +32,7 @@
         No image available
         {% endif %}
         </td>
-        <td>{{ item.auction.current_price }}</td>
+        <td>${{ item.auction.current_price }}</td>
         <td>{{ item.auction.end_time }}</td>
         <td>
         <form action="{% url 'remove_from_watchlist' item.pk %}" method="POST">

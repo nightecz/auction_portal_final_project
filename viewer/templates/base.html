@@ -47,13 +47,12 @@
                         auctions
                     </a>
                 </li>
+                {% if user.is_authenticated %}
                 <li class="nav-item">
                     <a class="nav-link {% active_link 'auction_create' strict=True %}" href="{% url 'auction_create' %}">
                         create auction
                     </a>
                 </li>
-
-                {% if user.is_authenticated %}
                 {% endif %}
             </ul>
             <ul class="navbar-nav">

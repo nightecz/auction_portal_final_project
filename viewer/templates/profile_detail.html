@@ -1,0 +1,45 @@
+{% extends 'base.html' %}
+{% block nadpis %}-Profile{% endblock %}
+{% block content %}
+<div class="card">
+    <div class="card-header text-center">
+        <h2 class="h2">Profile</h2>
+<p><strong>Avatar:</strong></p>
+{% if user.profile.avatar %}
+    <img src="{{ user.profile.avatar.url }}" alt="Avatar" width="150">
+{% else %}
+    <p>No avatar set.</p>  <!-- Zobrazí text, pokud není avatar -->
+{% endif %}
+    </div>
+    <div class="card-body">
+        <h5 class="card-title">About user</h5>
+            <h4>Average Rating: {{ profile.calculate_average_rating|default:"No ratings yet" }}</h4>
+        <p class="card-text">
+        </p>
+        <p class="card-text">Username: {{ profile.user.username }}</p>
+        {% if user.is_active %}
+            <p class="card-text">Stav: <span style="color: green">Active</span></p>
+        {% else %}
+            <p class="card-text">Stav: <span style="color: red">Not active</span></p>
+        {% endif %}
+        {% if back_to_auction_url %}
+            <button><a href="{{ back_to_auction_url }}">Back to auction</a></button>
+        {% endif %}
+    </div>
+</div>
+</form>
+    <div class="card-footer text-muted">
+    Reviews:
+    {% for review in profile.received_reviews.all %}
+    <div class="card">
+        <div class="card-header">
+            <small>By: {{ review.reviewer.user.username }} ({{ review.created|date:'H:i:s M d, Y' }})</small>
+        </div>
+        <div class="card-body">
+            <strong>{{ review.rating }}/5</strong> <br>Comment: {{ review.text }}
+        </div>
+        {% endfor %}
+    </div>
+</div>
+
+{% endblock %}

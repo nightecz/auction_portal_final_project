@@ -185,10 +185,14 @@ class AuctionSearchView(ListView):
     context_object_name = 'auctions'
     paginate_by = 10  # numbers of auctions per page
 
+
     def get_queryset(self):
         query = self.request.GET.get('q', '')
         auctions = Auction.objects.all()
-        status = self.request.GET.get('status', 'Running')  # gets status from GET parameter, default in search is status 'Running'
+        # Status "Running" by default if not changed by user
+        status = self.request.GET.get('status')
+        if not status:
+            status = 'Running'
 
         # Filtering by user task (keyword)
         if query:
@@ -228,11 +232,18 @@ class AuctionSearchView(ListView):
             auctions = auctions.filter(seller__profile__city__icontains=city)
 
         # Sorting by end_time or start_time
-        sort_by = self.request.GET.get('sort_by')
-        if sort_by == 'end_time':
+        sort_by_time = self.request.GET.get('sort_by_time')
+        if sort_by_time == 'end_time':
             auctions = auctions.order_by('end_time')
-        elif sort_by == 'start_time':
+        elif sort_by_time == 'start_time':
             auctions = auctions.order_by('-start_time')
+
+        # Sorting by price
+        sort_by_price = self.request.GET.get('sort_by_price')
+        if sort_by_price == 'highest':
+            auctions = auctions.order_by('-current_price')
+        elif sort_by_price == 'lowest':
+            auctions = auctions.order_by('current_price')
 
         return auctions
 
@@ -296,9 +307,16 @@ class AuctionDetailView(TemplateView):
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
+        # Getting auction by ID
         auction_id = self.kwargs.get('id')
         auction = Auction.objects.get(pk=auction_id)
         context['auction'] = auction
+
+        # Getting profile of seller
+        seller_profile = auction.seller.profile if hasattr(auction.seller, 'profile') else None
+
+        # Getting average_rating into context
+        context['average_rating'] = seller_profile.calculate_average_rating() if seller_profile else None
 
         if self.request.user.is_authenticated:
             user_watchlist = Watchlist.objects.filter(user=self.request.user)
@@ -554,6 +572,7 @@ class PlaceBidView(FormView):
             messages.error(request, "You cannot place another bid until someone else bids.")
             return redirect(reverse('auction_detail', kwargs={'id': auction_id}))
 
+
         auction.current_price = bid_amount
         auction.save()
 
@@ -561,11 +580,6 @@ class PlaceBidView(FormView):
             bidder=request.user,
             amount=bid_amount
         )
-
-        highest_bid = auction.bids.order_by('-amount').first()
-        if highest_bid and highest_bid.amount > auction.buy_now_price:
-            auction.buy_now_price = highest_bid.amount
-            auction.save()
 
         messages.success(request, "Your bid was placed.")
         return HttpResponseRedirect(reverse('auction_detail', kwargs={'id': auction_id}))
@@ -794,6 +808,8 @@ class BuyNowView(View):
             winning_price=auction.buy_now_price
         )
 
+
+
         # Mark the purchase as confirmed by the buyer
         purchase.buyer_confirmation = True
         purchase.save()
@@ -807,3 +823,22 @@ class BuyNowView(View):
         return redirect('auction_detail', id=auction.id)
 
 
+class ProfileDetailView(DetailView):
+    model = Profile
+    template_name = 'profile_detail.html'
+    context_object_name = 'profile'
+
+    # Gets id from URL due to (DetailView) only works with pk or URL
+    def get_object(self, queryset=None):
+        return Profile.objects.get(id=self.kwargs['id'])
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['reviews'] = self.object.received_reviews.all()
+
+        # Gets previous URL as a referer
+        referer = self.request.META.get('HTTP_REFERER')
+        if referer:
+            context['back_to_auction_url'] = referer
+
+        return context

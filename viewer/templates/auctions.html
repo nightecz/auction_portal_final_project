@@ -84,7 +84,7 @@
                     {{ category.name }}{% if not forloop.last %}, {% endif %}
                 {% endfor %}
             </td>
-            <td>{{ auction.current_price }}</td>
+            <td>${{ auction.current_price }}</td>
 <!--            <td>{{ auction.get_status_display }}</td>-->
             <td>{{ auction.end_time }}</td>
             {% if user.is_authenticated %}
