@@ -30,7 +30,7 @@ def index(request):
     main_categories = Category.objects.filter(parent__isnull=True)  # only main categories
     recent_auctions = Auction.objects.filter(status="Running").order_by('-start_time')[:4]  # showing recently added auctions
     ending_soon_auctions = Auction.objects.filter(status="Running", end_time__gt=timezone.now()).order_by('end_time')[:4] # ending soon auctions
-    ended_auctions = Auction.objects.filter(status__in=["Closed", "Sold"]).order_by('-end_time')[:4]
+    ended_auctions = Auction.objects.filter(status__in=["Closed", "Sold", "Unsold"]).order_by('-end_time')[:4]
 
     unconfirmed_sales_count = 0
     if request.user.is_authenticated:
@@ -331,8 +331,13 @@ class AuctionDetailView(TemplateView):
 
                     auction.status = Auction.CLOSED
                     auction.save()
-
+                    
                     return purchase
+                
+                else:
+                    auction.status = Auction.UNSOLD
+                    auction.save()
+                
             return None
 
         if auction.end_time < timezone.now() and auction.status == Auction.RUNNING:
@@ -341,6 +346,8 @@ class AuctionDetailView(TemplateView):
 
 
             purchase = close_auction_and_create_purchase(auction)
+
+
 
         context['purchase'] = purchase
         context['current_time'] = timezone.now()
@@ -400,6 +407,55 @@ class AuctionCancelView(View):
         return redirect(self.success_url)
 
 class AuctionRelistView(View):
+    model = Auction
+    template_name = 'auction_relist.html'
+    success_url = reverse_lazy('my_auctions')
+    form_class = AuctionCreateForm
+
+    def get_object(self):
+        # Load auction by (pk) from URL
+        pk = self.kwargs.get('pk')
+        return get_object_or_404(self.model, pk=pk)
+
+    def dispatch(self, request, *args, **kwargs):
+        auction = self.get_object()
+
+        # Check for 'Unsold' or 'Cancelled'
+        if auction.status not in [Auction.UNSOLD, Auction.CANCELLED]:
+            messages.error(request, "Only unsold or cancelled auction could be relisted.")
+            return redirect(self.success_url)
+
+        # Check for seller = owner
+        if auction.seller != request.user:
+            messages.error(request, "You do not have right to do that.")
+            return redirect(self.success_url)
+
+        return super().dispatch(request, *args, **kwargs)
+
+    def post(self, request, *args, **kwargs):
+        # Gets auction by pk
+        auction = self.get_object()
+
+        # Proceed data from form
+        form = self.form_class(request.POST, instance=auction)
+
+        if form.is_valid():
+            auction = form.save(commit=False)
+
+            # Update status and time
+            auction.status = Auction.RUNNING
+            auction.start_time = timezone.now()
+            auction.end_time = form.cleaned_data.get('end_time')
+
+            auction.save()
+
+            messages.success(request, "Auction has been relisted.")
+            return redirect(self.success_url)
+        else:
+            messages.error(request, "There was an error relisting the auction.")
+            return render(request, self.template_name, {'form': form, 'auction': auction})
+
+class AuctionRelistView(UpdateView):
     model = Auction
     template_name = 'auction_relist.html'
     success_url = reverse_lazy('my_auctions')
