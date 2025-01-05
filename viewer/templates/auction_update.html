@@ -18,8 +18,8 @@
 </form>
 {% endif %}
 <br>
-{% if auction.status == 'Closed' or auction.status == 'Cancelled' %}
-<!-- Form for auction cancel -->
+{% if auction.status == 'Closed' or auction.status == 'Unsold' %}
+<!-- Form for auction relist -->
 <a href="{% url 'auction_relist' auction.id %}" class="btn btn-primary">Relist Auction</a>
 {% endif %}
 

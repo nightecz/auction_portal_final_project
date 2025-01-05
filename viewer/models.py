@@ -56,11 +56,13 @@ class Auction(Model):
     RUNNING = 'Running'
     CLOSED = 'Closed'
     SOLD = 'Sold'
+    UNSOLD = 'Unsold'
     CANCELLED = 'Cancelled'
     STATUS_CHOICES = [
         (RUNNING, 'Running'),
         (CLOSED, 'Closed'),
         (SOLD, 'Sold'),
+        (UNSOLD, 'Unsold'),
         (CANCELLED, 'Cancelled')
     ]
 
