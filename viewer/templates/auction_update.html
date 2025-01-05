@@ -10,10 +10,17 @@
 </form>
 
 <br>
-
+{% if auction.status == 'Running' %}
 <!-- Form for auction cancel -->
 <form action="{% url 'auction_cancel' auction.id %}" method="get" style="display:inline;">
     {% csrf_token %}
     <button type="submit" class="btn btn-danger">Cancel Auction</button>
 </form>
+{% endif %}
+<br>
+{% if auction.status == 'Closed' or auction.status == 'Cancelled' %}
+<!-- Form for auction cancel -->
+<a href="{% url 'auction_relist' auction.id %}" class="btn btn-primary">Relist Auction</a>
+{% endif %}
+
 {% endblock %}
