@@ -7,6 +7,15 @@
     <link rel="stylesheet" href="{% static 'css/styles.css' %}">
 
 <div class="container">
+    {% if messages %}
+        <div class="d-flex justify-content-center mt-4">
+            <div class="alert alert-warning text-center" style="background-color: #fff3cd; color: #856404; border: 1px solid #ffeeba; max-width: 50%; padding: 15px;">
+                {% for message in messages %}
+                    {{ message }}
+                {% endfor %}
+            </div>
+        </div>
+    {% endif %}
     <!-- Main content: Headline -->
     <div class="text-center mb-4">
         <h1>Welcome to Auctions Portal Team 6!</h1>

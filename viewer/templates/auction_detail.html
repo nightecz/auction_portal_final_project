@@ -59,6 +59,7 @@
             </p>
             <p><strong>Starting Price:</strong> ${{ auction.starting_price }}</p>
             <p><strong>Current Price:</strong> ${{ auction.current_price }}</p>
+            <p><strong>Buy now price:</strong> ${{ auction.buy_now_price }}</p>
             <p><strong>Auction Ends:</strong> {{ auction.end_time }}</p>
 
                 <div class="container">
@@ -74,6 +75,14 @@
                             </form>
                         {% else %}
                             <p class="text-danger">Bidding is only available for auctions that are currently running.</p>
+                        {% endif %}
+                        {% if auction.buy_now_price and auction.status == "Running" %}
+                            <div class="mt-4">
+                                <form action="{% url 'buy_now' auction.id %}" method="post">
+                                    {% csrf_token %}
+                                    <button type="submit" class="btn btn-success">Buy Now for ${{ auction.buy_now_price }}</button>
+                                </form>
+                            </div>
                         {% endif %}
                     {% else %}
                         <p class="text-danger">You must <a href="{% url 'login' %}">log in</a> to place a bid.</p>
