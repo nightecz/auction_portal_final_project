@@ -155,6 +155,12 @@ class AuctionCreateView(FormView):
     form_class = AuctionCreateForm
     success_url = reverse_lazy('auctions')
 
+    def dispatch(self, request, *args, **kwargs):
+        if not request.user.is_authenticated:
+            messages.error(request, "You must be logged in to create an auction.")
+            return redirect('/')
+        return super().dispatch(request, *args, **kwargs)
+
     def form_valid(self, form):
         #Gets data from form
         print("Form cleaned_data:", form.cleaned_data)
@@ -499,8 +505,15 @@ class PlaceBidView(FormView):
             bidder=request.user,
             amount=bid_amount
         )
+
+        highest_bid = auction.bids.order_by('-amount').first()
+        if highest_bid and highest_bid.amount > auction.buy_now_price:
+            auction.buy_now_price = highest_bid.amount
+            auction.save()
+
         messages.success(request, "Your bid was placed.")
         return HttpResponseRedirect(reverse('auction_detail', kwargs={'id': auction_id}))
+
 
 
 @method_decorator(login_required, name='dispatch')
@@ -700,5 +713,41 @@ class WonAuctionsView(ListView):
         won_auctions_by_user = won_auctions.filter(purchase__buyer=self.request.user.profile)
 
         return won_auctions_by_user
+
+
+class BuyNowView(View):
+    def post(self, request, *args, **kwargs):
+        auction_id = self.kwargs['auction_id']
+        auction = get_object_or_404(Auction, pk=auction_id)
+
+        # Check if the auction is still running
+        if auction.status != "Running":
+            messages.error(request, "This auction is not available for purchase.")
+            return redirect('auction_detail', id=auction.id)
+
+        # Check if the auction has a Buy Now price
+        if not auction.buy_now_price:
+            messages.error(request, "This auction does not have a Buy Now option.")
+            return redirect('auction_detail', id=auction.id)
+
+        # Process Buy Now purchase if conditions are met
+        purchase = Purchase.objects.create(
+            auction=auction,
+            buyer=request.user.profile,
+            seller=auction.seller.profile,
+            winning_price=auction.buy_now_price
+        )
+
+        # Mark the purchase as confirmed by the buyer
+        purchase.buyer_confirmation = True
+        purchase.save()
+
+        # Link the purchase to the auction and mark it as closed
+        auction.purchase = purchase
+        auction.status = Auction.CLOSED
+        auction.save()
+
+        messages.success(request, "You have successfully purchased this auction!")
+        return redirect('auction_detail', id=auction.id)
 
 

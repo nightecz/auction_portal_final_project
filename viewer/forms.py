@@ -73,7 +73,7 @@ class AuctionCreateForm(ModelForm):
     )
     class Meta:
         model = Auction
-        fields = ['name', 'description', 'starting_price', 'end_time', 'categories', 'image1', 'image2', 'image3']
+        fields = ['name', 'description', 'starting_price','buy_now_price', 'end_time', 'categories', 'image1', 'image2', 'image3']
         widgets = {
             'description': Textarea(),
             'categories': CheckboxSelectMultiple(attrs={'class': 'form-control'}),
@@ -106,11 +106,11 @@ class AuctionCreateForm(ModelForm):
         return subcategories
 
     def save(self, commit=True):
-        auction = super().save(commit=False)  # Nejprve uložíme aukci bez okamžitého commitu do DB
+        auction = super().save(commit=False)
         if not auction.current_price:
-            auction.current_price = auction.starting_price  # Pokud není current_price, nastavíme ho na starting_price
+            auction.current_price = auction.starting_price
         if commit:
-            auction.save()  # Uložíme aukci do databáze
+            auction.save()
             self.save_m2m()
         return auction
 
