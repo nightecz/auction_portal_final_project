@@ -399,6 +399,55 @@ class AuctionCancelView(View):
         messages.success(request, "Auction have been cancelled.")
         return redirect(self.success_url)
 
+class AuctionRelistView(View):
+    model = Auction
+    template_name = 'auction_relist.html'
+    success_url = reverse_lazy('my_auctions')
+    form_class = AuctionCreateForm
+
+    def get_object(self):
+        # Load auction by (pk) from URL
+        pk = self.kwargs.get('pk')
+        return get_object_or_404(self.model, pk=pk)
+
+    def dispatch(self, request, *args, **kwargs):
+        auction = self.get_object()
+
+        # Check for 'Closed' or 'Cancelled'
+        if auction.status not in [Auction.CLOSED, Auction.CANCELLED]:
+            messages.error(request, "Only closed or cancelled auction could be relisted.")
+            return redirect(self.success_url)
+
+        # Check for seller = owner
+        if auction.seller != request.user:
+            messages.error(request, "You do not have right to do that.")
+            return redirect(self.success_url)
+
+        return super().dispatch(request, *args, **kwargs)
+
+    def post(self, request, *args, **kwargs):
+        # Gets auction by pk
+        auction = self.get_object()
+
+        # Proceed data from form
+        form = self.form_class(request.POST, instance=auction)
+
+        if form.is_valid():
+            auction = form.save(commit=False)
+
+            # Update status and time
+            auction.status = Auction.RUNNING
+            auction.start_time = timezone.now()
+            auction.end_time = form.cleaned_data.get('end_time')
+
+            auction.save()
+
+            messages.success(request, "Auction has been relisted.")
+            return redirect(self.success_url)
+        else:
+            messages.error(request, "There was an error relisting the auction.")
+            return render(request, self.template_name, {'form': form, 'auction': auction})
+
 @method_decorator(login_required, name='dispatch')
 class AuctionBiddingView(ListView):
     template_name = "auctions/bidding.html"
