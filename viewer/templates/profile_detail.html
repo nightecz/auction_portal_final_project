@@ -6,7 +6,8 @@
         <h2 class="h2">Profile</h2>
 <p><strong>Avatar:</strong></p>
 {% if profile.avatar %}
-    <img src="{{ profile.avatar.url }}" alt="Avatar" width="150">
+    <img src="{{ profile.avatar.url }}" alt="Avatar" class="img-thumbnail"
+         style="width: 100px; height: 120px; object-fit: center;">
 {% else %}
     <p>No avatar set.</p>  <!-- Zobrazí text, pokud není avatar -->
 {% endif %}
