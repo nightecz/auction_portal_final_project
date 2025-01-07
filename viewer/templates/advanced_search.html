@@ -78,7 +78,7 @@
     {% if auctions %}
         <table class="table table-bordered">
             <thead>
-                <tr>
+                <tr class="text-center">
                     <th>Item</th>
                     <th>Picture</th>
                     <th>Seller</th>
@@ -94,11 +94,14 @@
                 <tr>
                     <td><a href="{% url 'auction_detail' auction.id %}">{{ auction.name }}</a></td>
                     <td>
+                        <a href="{% url 'auction_detail' auction.id %}">
                         {% if auction.image1 %}
-                            <img src="{{ auction.image1.url }}" alt="{{ auction.name }}" class="img-thumbnail">
+                            <img src="{{ auction.image1.url }}" alt="{{ auction.name }}" class="img-thumbnail"
+                                 style="width: 100%; height: 120px; object-fit: cover;">
                         {% else %}
                             No image available
                         {% endif %}
+                        </a>
                     </td>
                     <td><a href="{% url 'advanced_search' %}?q={{ auction.seller.username }}">{{ auction.seller.username }}</a></td>
                     <td>

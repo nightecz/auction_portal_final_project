@@ -528,9 +528,26 @@ class AuctionBiddingView(ListView):
     model = Auction
     context_object_name = "auctions"
 
+    # getting auctions by bids, where user is also bidder + last bid from
     def get_queryset(self):
         # getting auctions by bids, where user is also bidder
-        return Auction.objects.filter(bids__bidder=self.request.user).distinct()
+        return Auction.objects.filter(status="Running", bids__bidder=self.request.user).distinct()
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+
+        # Gets info, if user is winning
+        auctions_with_status = []
+        for auction in self.get_queryset():
+            last_bid = auction.bids.order_by('-created_at').first()  # gets last bid
+            is_winning = last_bid and last_bid.bidder == self.request.user  # checking if last bid == user
+            auctions_with_status.append({
+                'auction': auction,
+                'is_winning': is_winning
+            })
+
+        context['auctions_with_status'] = auctions_with_status
+        return context
 
 class PlaceBidView(FormView):
     template_name = 'auction_detail.html'

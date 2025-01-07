@@ -4,7 +4,7 @@
 {% block content %}
 
 {% load static %}
-    <link rel="stylesheet" href="{% static 'css/styles.css' %}">
+<link rel="stylesheet" href="{% static 'css/styles.css' %}">
 
 <div class="container">
     {% if messages %}
@@ -76,22 +76,21 @@
                         <a href="{% url 'auction_detail' auction.id %}">
                         {% if auction.image1 %}
                         <img src="{{ auction.image1.url }}" class="card-img-top" alt="{{ auction.name }}"
-                             style="width: 100%; height: 120px; object-fit: center;">
+                             style="width: 100%; height: 120px; object-fit: cover;">
                         {% elif auction.image2 %}
                         <img src="{{ auction.image2.url }}" class="card-img-top" alt="{{ auction.name }}"
-                             style="width: 100%; height: 120px; object-fit: center;">
+                             style="width: 100%; height: 120px; object-fit: cover;">
                         {% elif auction.image3 %}
                         <img src="{{ auction.image3.url }}" class="card-img-top" alt="{{ auction.name }}"
-                             style="width: 100%; height: 120px; object-fit: center;">
+                             style="width: 100%; height: 120px; object-fit: cover;">
                         {% else %}
                         <img src="{% static 'images/default-auction-image.jpg' %}" class="card-img-top" alt="Default image"
-                             style="width: 100%; height: 120px; object-fit: center;">
+                             style="width: 100%; height: 120px; object-fit: cover;">
                         {% endif %}
                         <div class="card-body text-center">
                             <h6 class="card-title text-truncate">{{ auction.name|truncatechars:15 }}</h6>
-                            <p class="small text-muted mb-2">{{ auction.description|truncatechars:50 }}</p>
                             <p><strong>${{ auction.current_price }}</strong></p>
-                            <a href="{% url 'auction_detail' auction.id %}" class="btn btn-sm btn-primary">Details</a>
+                        </a>
                         </div>
                     </div>
                 </div>
@@ -99,6 +98,7 @@
                 <p>No auctions recently added.</p>
                 {% endfor %}
             </div>
+            <br>
             <h4>Auctions Ending Soon</h4>
             <div class="row row-cols-1 row-cols-sm-2 row-cols-md-3 row-cols-lg-4 g-5">
                 {% for auction in ending_soon_auctions %}
@@ -107,22 +107,21 @@
                         <a href="{% url 'auction_detail' auction.id %}">
                         {% if auction.image1 %}
                         <img src="{{ auction.image1.url }}" class="card-img-top" alt="{{ auction.name }}"
-                             style="width: 100%; height: 120px; object-fit: center;">
+                             style="width: 100%; height: 120px; object-fit: cover;">
                         {% elif auction.image2 %}
                         <img src="{{ auction.image2.url }}" class="card-img-top" alt="{{ auction.name }}"
-                             style="width: 100%; height: 120px; object-fit: center;">
+                             style="width: 100%; height: 120px; object-fit: cover;">
                         {% elif auction.image3 %}
                         <img src="{{ auction.image3.url }}" class="card-img-top" alt="{{ auction.name }}"
-                             style="width: 100%; height: 120px; object-fit: center;">
+                             style="width: 100%; height: 120px; object-fit: cover;">
                         {% else %}
                         <img src="{% static 'images/default-auction-image.jpg' %}" class="card-img-top" alt="Default image"
                              style="width: 100%; height: 120px; object-fit: center;">
                         {% endif %}
                         <div class="card-body text-center">
                             <h6 class="card-title text-truncate">{{ auction.name|truncatechars:15 }}</h6>
-                            <p class="small text-muted mb-2">{{ auction.description|truncatechars:50 }}</p>
                             <p><strong>${{ auction.current_price }}</strong></p>
-                            <a href="{% url 'auction_detail' auction.id %}" class="btn btn-sm btn-primary">Details</a>
+                            </a>
                         </div>
                     </div>
                 </div>
@@ -130,6 +129,7 @@
                 <p>No auctions ending soon.</p>
                 {% endfor %}
             </div>
+            <br>
             <h4>Auctions just ended</h4>
             <div class="row row-cols-1 row-cols-sm-2 row-cols-md-3 row-cols-lg-4 g-5">
                 {% for auction in ended_auctions %}
@@ -138,22 +138,21 @@
                         <a href="{% url 'auction_detail' auction.id %}">
                         {% if auction.image1 %}
                         <img src="{{ auction.image1.url }}" class="card-img-top" alt="{{ auction.name }}"
-                             style="width: 100%; height: 120px; object-fit: center;">
+                             style="width: 100%; height: 120px; object-fit: cover;">
                         {% elif auction.image2 %}
                         <img src="{{ auction.image2.url }}" class="card-img-top" alt="{{ auction.name }}"
-                             style="width: 100%; height: 120px; object-fit: center;">
+                             style="width: 100%; height: 120px; object-fit: cover;">
                         {% elif auction.image3 %}
                         <img src="{{ auction.image3.url }}" class="card-img-top" alt="{{ auction.name }}"
-                             style="width: 100%; height: 120px; object-fit: center;">
+                             style="width: 100%; height: 120px; object-fit: cover;">
                         {% else %}
                         <img src="{% static 'images/default-auction-image.jpg' %}" class="card-img-top" alt="Default image"
-                             style="width: 100%; height: 120px; object-fit: center;">
+                             style="width: 100%; height: 120px; object-fit: cover;">
                         {% endif %}
                         <div class="card-body text-center">
                             <h6 class="card-title text-truncate">{{ auction.name|truncatechars:15 }}</h6>
-                            <p class="small text-muted mb-2">{{ auction.description|truncatechars:50 }}</p>
                             <p><strong>${{ auction.current_price }}</strong></p>
-                            <a href="{% url 'auction_detail' auction.id %}" class="btn btn-sm btn-primary">Details</a>
+                            </a>
                         </div>
                     </div>
                 </div>
