@@ -27,10 +27,13 @@
     <tbody>
         <td><a href="{% url 'auction_detail' item.auction.id %}">{{ item.auction.name }}</a></td>
         <td>{% if item.auction.image1 %}
-        <img src="{{ item.auction.image1.url }}" alt="Auction Image" width="200px">
-        {% else %}
-        No image available
-        {% endif %}
+            <a href="{% url 'auction_detail' id=auction.seller.profile.id %}">
+            <img src="{{ item.auction.image1.url }}" alt="Auction Image" class="img-thumbnail"
+                         style="width: 100%; height: 120px; object-fit: cover;">
+            {% else %}
+            No image available
+            {% endif %}
+            </a>
         </td>
         <td>${{ item.auction.current_price }}</td>
         <td>{{ item.auction.end_time }}</td>

@@ -5,8 +5,8 @@
     <div class="card-header text-center">
         <h2 class="h2">Profile</h2>
 <p><strong>Avatar:</strong></p>
-{% if user.profile.avatar %}
-    <img src="{{ user.profile.avatar.url }}" alt="Avatar" width="150">
+{% if profile.avatar %}
+    <img src="{{ profile.avatar.url }}" alt="Avatar" width="150">
 {% else %}
     <p>No avatar set.</p>  <!-- Zobrazí text, pokud není avatar -->
 {% endif %}
