@@ -4,6 +4,10 @@
     Auction Search
 {% endblock %}
 
+{% load static %}
+    <link rel="stylesheet" href="{% static 'css/styles.css' %}">
+
+
 {% block content %}
     <h2>Search Results</h2>
     <form method="get" action="{% url 'advanced_search' %}" class="mb-4">
@@ -91,7 +95,7 @@
                     <td><a href="{% url 'auction_detail' auction.id %}">{{ auction.name }}</a></td>
                     <td>
                         {% if auction.image1 %}
-                            <img src="{{ auction.image1.url }}" alt="{{ auction.name }}" width="100px">
+                            <img src="{{ auction.image1.url }}" alt="{{ auction.name }}" class="img-thumbnail">
                         {% else %}
                             No image available
                         {% endif %}
