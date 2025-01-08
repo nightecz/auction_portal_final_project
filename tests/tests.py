@@ -8,6 +8,7 @@ from django.contrib.auth.models import User
 from django.utils.timezone import now
 
 from viewer.models import Profile, Auction
+from viewer.forms import SignUpForm
 
 os.environ['DJANGO_SETTINGS_MODULE'] = 'final_project.settings'
 django.setup()
@@ -69,3 +70,99 @@ class AuctionCreateTest(TestCase):
 
 class LogoutUserTest(TestCase):
     pass
+
+
+class TestSignUpFormValidator(TestCase):
+
+    def test_valid_phone_number(self):
+        form_data = self._get_valid_data(phone='+420200000000')
+        form = SignUpForm(data=form_data)
+        self.assertTrue(form.is_valid())
+
+    def test_invalid_phone_number_missing_plus(self):
+        form_data = self._get_valid_data(phone='420200000000')
+        form = SignUpForm(data=form_data)
+        self.assertFalse(form.is_valid())
+        self.assertIn('phone', form.errors)
+
+    def test_invalid_phone_number_too_few_digits(self):
+        form_data = self._get_valid_data(phone='+42020000000')  # 11 digits
+        form = SignUpForm(data=form_data)
+        self.assertFalse(form.is_valid())
+        self.assertIn('phone', form.errors)
+
+    def test_invalid_first_name_special_characters(self):
+        form_data = self._get_valid_data(first_name='Tomáš!')
+        form = SignUpForm(data=form_data)
+        self.assertFalse(form.is_valid())
+        self.assertIn('first_name', form.errors)
+
+    def test_invalid_last_name_digits(self):
+        form_data = self._get_valid_data(last_name='Nov8k')
+        form = SignUpForm(data=form_data)
+        self.assertFalse(form.is_valid())
+        self.assertIn('last_name', form.errors)
+
+    def test_invalid_street_special_characters(self):
+        form_data = self._get_valid_data(street='Na_hrázi')
+        form = SignUpForm(data=form_data)
+        self.assertFalse(form.is_valid())
+        self.assertIn('street', form.errors)
+
+    def test_invalid_city_special_characters(self):
+        form_data = self._get_valid_data(city='Horní-dolní')
+        form = SignUpForm(data=form_data)
+        self.assertFalse(form.is_valid())
+        self.assertIn('city', form.errors)
+
+    def test_invalid_zip_code_special_characters(self):
+        form_data = self._get_valid_data(zip_code='#55555')
+        form = SignUpForm(data=form_data)
+        self.assertFalse(form.is_valid())
+        self.assertIn('zip_code', form.errors)
+
+    def test_invalid_zip_code_too_few_digits(self):
+        form_data = self._get_valid_data(zip_code='4444')  # Too few digits
+        form = SignUpForm(data=form_data)
+        self.assertFalse(form.is_valid())
+        self.assertIn('zip_code', form.errors)
+
+    def test_invalid_country_special_characters(self):
+        form_data = self._get_valid_data(country='Česká-republika')
+        form = SignUpForm(data=form_data)
+        self.assertFalse(form.is_valid())
+        self.assertIn('country', form.errors)
+
+    def test_valid_email(self):
+        form_data = self._get_valid_data(email='test@example.com')
+        form = SignUpForm(data=form_data)
+        if not form.is_valid():
+            print(form.errors)
+        self.assertTrue(form.is_valid())
+
+    def test_invalid_email(self):
+        form_data = self._get_valid_data(email='invalid-email')
+        form = SignUpForm(data=form_data)
+
+        self.assertFalse(form.is_valid())
+        self.assertIn('email', form.errors)
+
+
+    # Helper method for valid data
+    def _get_valid_data(self, phone='+420200000000', first_name='Tomáš', last_name='Novák',
+                        street='Na hrázi', city='Praha', zip_code='11000', country='Česká republika', email='test@example.com'):
+        return {
+            'username': 'testuser',
+            'email': email,
+            'password1': 'SecurePass123!',
+            'password2': 'SecurePass123!',
+            'first_name': first_name,
+            'last_name': last_name,
+            'phone': phone,
+            'street': street,
+            'house_number': '123',
+            'city': city,
+            'zip_code': zip_code,
+            'country': country,
+            'prefer_communication': 'email',
+        }

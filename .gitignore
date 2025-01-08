@@ -691,3 +691,4 @@ GitHub.sublime-settings
 .history
 /viewer/migrations/0001_initial.py
 /viewer/migrations/0002_alter_auction_purchase_review.py
+/viewer/migrations/0003_auction_buy_now_price_alter_auction_purchase.py

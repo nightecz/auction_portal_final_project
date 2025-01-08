@@ -1,33 +1,51 @@
-import re
-from django.contrib.auth.forms import UserChangeForm
+import unicodedata
 from django.core.exceptions import ValidationError
-from django.forms.widgets import HiddenInput
+from django.core.validators import RegexValidator, EmailValidator
 
 from viewer.models import Profile, Bid, Purchase
 from django.forms import (
-    CharField, DateField, Form, IntegerField, ModelChoiceField, Textarea, TextInput, EmailInput, PasswordInput,
-    ModelForm, DateInput, NumberInput, CheckboxSelectMultiple, DateTimeInput, DecimalField, ChoiceField, ModelMultipleChoiceField
+    CharField, Textarea,
+    ModelForm, NumberInput, CheckboxSelectMultiple, DateTimeInput, DecimalField, ChoiceField, ModelMultipleChoiceField
 )
 from django.contrib.auth.forms import UserCreationForm
 from django.contrib.auth.models import User
-from django.contrib.auth.decorators import login_required
 from viewer.models import Auction, Category, Watchlist, Review
-from django.urls import reverse_lazy
-from django.shortcuts import redirect
+
 
 class SignUpForm(UserCreationForm):
     first_name = CharField(max_length=20, required=True, label='First name')
     last_name = CharField(max_length=20, required=True, label='Last name')
-    phone = CharField(max_length=20, required=True, label='Phone')
+    phone = CharField(max_length=20,
+                      required=True,
+                      label='Phone (in standard format with area code eg.: +420 999 999 999)',
+                      validators=[
+                            RegexValidator(
+                                regex=r'^\+\d{12}$', #regular expresion - have to contain + and 12 digits
+                                message="Phone number have to be in standard phone format with area code."
+                            )
+                        ]
+                    )
     street = CharField(max_length=20, required=True, label='Street')
-    house_number = CharField(max_length=20, required=True, label='Address House number')
+    house_number = CharField(max_length=20, required=True, label='House number')
     city = CharField(max_length=20, required=True, label='City')
-    zip_code = CharField(max_length=20, required=True, label='ZIP code')
+    zip_code = CharField(max_length=20, required=True, label='ZIP code',
+                         validators=[
+                            RegexValidator(
+                                regex=r'^\d{5}$', #regular expresion - have to consist of 5 digits.
+                                message="ZIP code must consist of exactly 5 digits."
+                            )
+                        ]
+                    )
     country = CharField(max_length=20, required=True, label='Country')
     prefer_communication = ChoiceField(
         choices=Profile.COMMUNICATION_CHOICES,
         required=True,
         label="Prefered communication via"
+    )
+    email = CharField(
+        required=True,
+        label='Email',
+        validators=[EmailValidator(message="Enter a valid email address.")] # Django core default validator
     )
 
     class Meta:
@@ -38,6 +56,41 @@ class SignUpForm(UserCreationForm):
         super().__init__(*args, **kwargs)
         for field_name in self.fields:
             self.fields[field_name].widget.attrs['class'] = 'form-control'
+
+    def normalize_name(self, name):
+        """Normalize name to ensure proper capitalization and handle diacritics."""
+        # Capitalize the first character and keep the rest unchanged
+        return name[:1].upper() + name[1:].lower()
+
+    def clean_first_name(self):
+        first_name = self.cleaned_data.get('first_name')
+        if not all(unicodedata.category(char).startswith('L') for char in first_name):
+            raise ValidationError("First name must contain only letters.")
+        return self.normalize_name(first_name)
+
+    def clean_last_name(self):
+        last_name = self.cleaned_data.get('last_name')
+        if not all(unicodedata.category(char).startswith('L') for char in last_name):
+            raise ValidationError("Last name must contain only letters.")
+        return self.normalize_name(last_name)
+
+    def clean_street(self):
+        street = self.cleaned_data.get('street')
+        if not all(unicodedata.category(char).startswith('L') or char.isspace() for char in street):
+            raise ValidationError("Street must contain only letters and spaces.")
+        return self.normalize_name(street)
+
+    def clean_city(self):
+        city = self.cleaned_data.get('city')
+        if not all(unicodedata.category(char).startswith('L') or char.isspace() for char in city):
+            raise ValidationError("City must contain only letters and spaces.")
+        return self.normalize_name(city)
+
+    def clean_country(self):
+        country = self.cleaned_data.get('country')
+        if not all(unicodedata.category(char).startswith('L') or char.isspace() for char in country):
+            raise ValidationError("Country must contain only letters and spaces.")
+        return self.normalize_name(country)
 
     def save(self, commit=True):
         user = super().save(commit=False)
