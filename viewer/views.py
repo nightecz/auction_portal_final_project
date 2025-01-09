@@ -609,7 +609,25 @@ class WatchlistView(ListView):
     model = Watchlist
 
     def get_queryset(self):
-        return Watchlist.objects.filter(user=self.request.user)
+        return Watchlist.objects.filter(
+            user=self.request.user,
+            auction__status="Running"
+        )
+
+    #Getting context status from Auctions for showing in Watchlist only "Running" auctions
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+
+        auctions_with_status = []
+        for watchlist_item in self.get_queryset():
+            auction = watchlist_item.auction
+            auctions_with_status.append({
+                'auction': auction,
+                'status': auction.status
+            })
+
+        context['auctions_with_status'] = auctions_with_status
+        return context
 
 class AddToWatchlistView(FormView):
     def post(self, request, *args, **kwargs):
@@ -842,7 +860,7 @@ class BuyNowView(View):
 
 class ProfileDetailView(DetailView):
     model = Profile
-    template_name = 'profile_detail.html'
+    template_name = 'profile/profile_detail.html'
     context_object_name = 'profile'
 
     # Gets id from URL due to (DetailView) only works with pk or URL

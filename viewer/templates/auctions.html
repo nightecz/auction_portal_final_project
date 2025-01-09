@@ -1,8 +1,6 @@
 {% extends 'base.html' %}
 
-{% block title %}
-    Auctions
-{% endblock %}
+{% block nadpis %} - Overview{% endblock %}
 
 {% block content %}
     <h2>live Auctions overview</h2>
@@ -95,7 +93,7 @@
                 {% if auction.seller != user %}
                     {% if auction.id in auction_ids_in_watchlist %}
                         <form action="{% url 'watchlist' %}" method="get">
-                            <button type="submit" class="btn btn-danger">Edit watchlist</button>
+                            <button type="submit" class="btn btn-danger">-</button>
                         </form>
                     {% else %}
                         <form method="post" action="{% url 'add_to_watchlist' auction.id %}">
@@ -104,7 +102,7 @@
                         </form>
                     {% endif %}
                 {% else %}
-                    <span>your own auction.</span>
+                    <button type="submit" class="btn btn-warning" disabled>+</button>
                 {% endif %}
             </td>
             {% endif %}

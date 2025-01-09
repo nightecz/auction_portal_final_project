@@ -1,27 +1,26 @@
 {% extends 'base.html' %}
-{% block nadpis %}-Profile{% endblock %}
+
+{% block nadpis %} - Profile detail{% endblock %}
+
 {% block content %}
 <div class="card">
     <div class="card-header text-center">
         <h2 class="h2">Profile</h2>
-<p><strong>Avatar:</strong></p>
 {% if profile.avatar %}
     <img src="{{ profile.avatar.url }}" alt="Avatar" class="img-thumbnail"
          style="width: 100px; height: 120px; object-fit: center;">
 {% else %}
     <p>No avatar set.</p>  <!-- Zobrazí text, pokud není avatar -->
 {% endif %}
+    <h4>Average Rating: {{ profile.calculate_average_rating|default:"No ratings yet" }}</h4>
+    <h5 class="card-title text-center">About user</h5>
     </div>
     <div class="card-body">
-        <h5 class="card-title">About user</h5>
-            <h4>Average Rating: {{ profile.calculate_average_rating|default:"No ratings yet" }}</h4>
-        <p class="card-text">
-        </p>
-        <p class="card-text">Username: {{ profile.user.username }}</p>
+        <p class="card-text"><strong>Username:</strong> {{ profile.user.username }}</p>
         {% if user.is_active %}
-            <p class="card-text">Stav: <span style="color: green">Active</span></p>
+            <p class="card-text"><strong>Status:</strong> <span style="color: green">Active</span></p>
         {% else %}
-            <p class="card-text">Stav: <span style="color: red">Not active</span></p>
+            <p class="card-text"><strong>Status:</strong> <span style="color: red">Not active</span></p>
         {% endif %}
         {% if back_to_auction_url %}
             <button><a href="{{ back_to_auction_url }}">Back to auction</a></button>
@@ -29,8 +28,8 @@
     </div>
 </div>
 </form>
-    <div class="card-footer text-muted">
-    Reviews:
+    <div class="card-footer">
+    <strong>Reviews</strong>:
     {% for review in profile.received_reviews.all %}
     <div class="card">
         <div class="card-header">
