@@ -1,6 +1,6 @@
 from decimal import Decimal
 
-from django.contrib.auth.decorators import login_required
+from django.contrib.auth.decorators import login_required, user_passes_test
 from django.contrib.auth.mixins import PermissionRequiredMixin, LoginRequiredMixin
 from django.core.exceptions import PermissionDenied
 from django.utils import timezone
@@ -21,7 +21,7 @@ from viewer.forms import SignUpForm, AuctionCreateForm, ProfileEditForm, BidForm
 from django.views.generic import FormView, ListView, TemplateView, UpdateView, DeleteView, DetailView
 from viewer.forms import SignUpForm, AuctionCreateForm, ProfileEditForm, BidForm, WatchlistForm, AuctionUpdateForm
 from django.urls import reverse_lazy, reverse
-from viewer.models import Watchlist, Auction, User, Profile, Bid, Category, Review, Purchase
+from viewer.models import Watchlist, Auction, User, Profile, Bid, Category, Review, Purchase, Archive
 from django.contrib.auth.forms import UserChangeForm
 
 
@@ -117,7 +117,7 @@ class AuctionView(ListView):
         category_id = self.request.GET.get('category')
 
         #Filtering only auctions in "running" status
-        queryset = queryset.filter(status="Running")
+        queryset = queryset.filter(status="Running").exclude(status="Archived")
 
         #Filtered by category
         if search_query:
@@ -238,7 +238,7 @@ class AuctionSearchView(ListView):
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        context['auction_status'] = Auction.STATUS_CHOICES
+        context['auction_status'] = [status for status in Auction.STATUS_CHOICES if status[0] != Auction.ARCHIVED]
         context['categories'] = Category.objects.select_related('parent').all()
         main_category = self.request.GET.get('main_category')
 
@@ -807,3 +807,59 @@ class BuyNowView(View):
         return redirect('auction_detail', id=auction.id)
 
 
+@method_decorator(user_passes_test(lambda u: u.is_superuser), name='dispatch')
+class ArchiveView(ListView):
+    template_name = "archive/archive.html"
+    model = Archive
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        purchase_id = self.request.GET.get('purchase')
+        if purchase_id:
+            try:
+                context['purchase'] = Purchase.objects.get(pk=purchase_id)
+            except Purchase.DoesNotExist:
+                context['purchase'] = None
+                messages.error(self.request, "Specified purchase does not exist.")
+        else:
+            context['purchase'] = None
+
+        context['buyers'] = Profile.objects.values_list('user__username', flat=True).distinct()
+        context['sellers'] = User.objects.values_list('username', flat=True).distinct()
+
+        return context
+
+    def get_queryset(self):
+        queryset = Archive.objects.all()
+
+        buyer = self.request.GET.get('buyer')
+        seller = self.request.GET.get('seller')
+
+        if buyer:
+            queryset = queryset.filter(auction__purchase__buyer__user__username__icontains=buyer)
+        if seller:
+            queryset = queryset.filter(auction__seller__username__icontains=seller)
+
+        return queryset
+
+@method_decorator(user_passes_test(lambda u: u.is_superuser), name='dispatch')
+class AddToArchiveView(View):
+    def post(self, request, *args, **kwargs):
+        auction_id = self.kwargs['auction_id']
+        auction = get_object_or_404(Auction, pk=auction_id)
+
+        archive_ready_statuses = {"Closed", "Cancelled", "Sold", "Unsold"}
+
+        if auction.status in archive_ready_statuses:
+
+            auction.status = Auction.ARCHIVED
+            auction.save()
+
+            Archive.objects.create(auction=auction)
+
+            messages.success(request, "Auction is successfully archived.")
+        else:
+            messages.error(request,
+                           "Auction is not archivation ready).")
+
+        return redirect('auctions')

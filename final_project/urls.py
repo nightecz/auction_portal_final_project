@@ -9,7 +9,7 @@ from viewer.views import (index, CustomLoginView, ProfileView, RegisterView, Auc
                           AddToWatchlistView, WatchlistDeleteView, AuctionSearchView, AuctionUpdateView,
                           ContactInfoView,
                           SellerConfirmView, BuyerConfirmView, AuctionCancelView, AuctionBiddingView, ReviewCreateView,
-                          UserSearchView, BuyNowView, AuctionRelistView)
+                          UserSearchView, BuyNowView, AuctionRelistView, AddToArchiveView, ArchiveView)
 
 
 urlpatterns = [
@@ -45,6 +45,9 @@ urlpatterns = [
     path('watchlist/', WatchlistView.as_view(), name='watchlist'),
     path('add-to-watchlist/<int:auction_id>/', AddToWatchlistView.as_view(), name='add_to_watchlist'),
     path('remove_from_watchlist/<int:pk>/', WatchlistDeleteView.as_view(), name='remove_from_watchlist'),
+
+    path('archive/', ArchiveView.as_view(), name='archive'),
+    path('add-to-archive/<int:auction_id>/', AddToArchiveView.as_view(), name='add_to_archive'),
 ]
 
 

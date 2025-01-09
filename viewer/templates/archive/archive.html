@@ -1,0 +1,64 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+<h2>Archive</h2>
+
+<div class="container">
+    {% if messages %}
+        <div class="alert alert-warning" role="alert">
+            {% for message in messages %}
+                {{ message }}
+            {% endfor %}
+        </div>
+    {% endif %}
+
+    <form method="get" action="{% url 'archive' %}">
+        <div class="form-group">
+            <label for="buyer">Buyer:</label>
+            <select id="buyer" name="buyer" class="form-control">
+                <option value="">-- Select Buyer --</option>
+                {% for buyer in buyers %}
+                    <option value="{{ buyer }}" {% if request.GET.buyer == buyer %}selected{% endif %}>{{ buyer }}</option>
+                {% endfor %}
+            </select>
+        </div>
+        <div class="form-group">
+            <label for="seller">Seller:</label>
+            <select id="seller" name="seller" class="form-control">
+                <option value="">-- Select Seller --</option>
+                {% for seller in sellers %}
+                    <option value="{{ seller }}" {% if request.GET.seller == seller %}selected{% endif %}>{{ seller }}</option>
+                {% endfor %}
+            </select>
+        </div>
+        <button type="submit" class="btn btn-primary">Filter</button>
+    </form>
+
+
+    <table class="table table-bordered">
+        <thead>
+            <tr>
+                <th>Item</th>
+                <th>Seller</th>
+                <th>Buyer</th>
+                <th>Final Price</th>
+                <th>Ended at</th>
+            </tr>
+        </thead>
+    {% for item in object_list %}
+        <tbody>
+            <td><a href="{% url 'auction_detail' item.auction.id %}">{{ item.auction.name }}</a></td>
+            <td>{{ item.auction.seller }}</td>
+            <td>{{ item.auction.purchase.buyer }}</td>
+            <td>{{ item.auction.current_price }}</td>
+            <td>{{ item.auction.end_time }}</td>
+        </tbody>
+        {% endfor %}
+    </table>
+    {% if not object_list %}
+        <p>No items in archive</p>
+    {% endif %}
+</div>
+
+{% endblock %}

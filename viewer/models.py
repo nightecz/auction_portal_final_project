@@ -58,12 +58,14 @@ class Auction(Model):
     SOLD = 'Sold'
     UNSOLD = 'Unsold'
     CANCELLED = 'Cancelled'
+    ARCHIVED = 'Archived'
     STATUS_CHOICES = [
         (RUNNING, 'Running'),
         (CLOSED, 'Closed'),
         (SOLD, 'Sold'),
         (UNSOLD, 'Unsold'),
-        (CANCELLED, 'Cancelled')
+        (CANCELLED, 'Cancelled'),
+        (ARCHIVED, 'Archived'),
     ]
 
     name = CharField(max_length=128)
@@ -106,6 +108,12 @@ class Auction(Model):
         if self.pk is None:
             self.current_price = self.starting_price
         super().save(*args, **kwargs)
+
+class Archive(Model):
+    auction = ForeignKey(Auction, on_delete=CASCADE, null=True)
+
+    def __str__(self):
+        return f"Archived: {self.auction.name if self.auction else 'No auction'}"
 
 
 class Watchlist(Model):

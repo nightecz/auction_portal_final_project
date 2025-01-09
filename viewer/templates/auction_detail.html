@@ -111,6 +111,14 @@
                         <span>Your own auction.</span>
                     {% endif %}
                 </div>
+                <div>
+                    {% if user.is_superuser and auction.status != 'Archived' %}
+                            <form method="post" action="{% url 'add_to_archive' auction.id %}">
+                                {% csrf_token %}
+                                <button type="submit" class="btn btn-warning">Archive Auction</button>
+                             </form>
+                    {% endif %}
+                </div>
             {% endif %}
             </div>
         </div>
