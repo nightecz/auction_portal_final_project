@@ -158,6 +158,18 @@ class AuctionCreateForm(ModelForm):
             raise ValidationError("You can select up to two subcategories.")
         return subcategories
 
+    def clean_starting_price(self):
+        starting_price = self.cleaned_data.get('starting_price')
+        if starting_price < 0.01:
+            raise ValidationError("Starting price must be greater than zero.")
+        return starting_price
+
+    def clean_buy_now_price(self):
+        buy_now_price = self.cleaned_data.get('buy_now_price')
+        if buy_now_price < 0.01:
+            raise ValidationError("Buy now price must be greater than zero.")
+        return buy_now_price
+
     def save(self, commit=True):
         auction = super().save(commit=False)
         if not auction.current_price:

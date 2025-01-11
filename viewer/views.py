@@ -806,7 +806,7 @@ class BuyNowView(View):
         messages.success(request, "You have successfully purchased this auction!")
         return redirect('auction_detail', id=auction.id)
 
-
+@method_decorator(login_required, name='dispatch')
 @method_decorator(user_passes_test(lambda u: u.is_superuser), name='dispatch')
 class ArchiveView(ListView):
     template_name = "archive/archive.html"
@@ -815,6 +815,7 @@ class ArchiveView(ListView):
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         purchase_id = self.request.GET.get('purchase')
+
         if purchase_id:
             try:
                 context['purchase'] = Purchase.objects.get(pk=purchase_id)
@@ -842,8 +843,16 @@ class ArchiveView(ListView):
 
         return queryset
 
+    def dispatch(self, request, *args, **kwargs):
+        print("Dispatch method reached")
+        if not request.user.is_superuser:
+            return redirect('index')
+        return super().dispatch(request, *args, **kwargs)
+
+@method_decorator(login_required, name='dispatch')
 @method_decorator(user_passes_test(lambda u: u.is_superuser), name='dispatch')
 class AddToArchiveView(View):
+
     def post(self, request, *args, **kwargs):
         auction_id = self.kwargs['auction_id']
         auction = get_object_or_404(Auction, pk=auction_id)
@@ -863,3 +872,9 @@ class AddToArchiveView(View):
                            "Auction is not archivation ready).")
 
         return redirect('auctions')
+
+    def dispatch(self, request, *args, **kwargs):
+        print("Dispatch method reached")
+        if not request.user.is_superuser:
+            return redirect('index')
+        return super().dispatch(request, *args, **kwargs)

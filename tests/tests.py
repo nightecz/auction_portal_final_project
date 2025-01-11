@@ -1,5 +1,5 @@
 import os
-from datetime import timedelta
+from datetime import timedelta, datetime
 
 import django
 from django.test import TestCase
@@ -7,8 +7,8 @@ from django.urls import reverse
 from django.contrib.auth.models import User
 from django.utils.timezone import now
 
-from viewer.models import Profile, Auction
-from viewer.forms import SignUpForm
+from viewer.models import Profile, Auction, Category
+from viewer.forms import SignUpForm, AuctionCreateForm
 
 os.environ['DJANGO_SETTINGS_MODULE'] = 'final_project.settings'
 django.setup()
@@ -165,4 +165,40 @@ class TestSignUpFormValidator(TestCase):
             'zip_code': zip_code,
             'country': country,
             'prefer_communication': 'email',
+        }
+
+class TestAuctionCreateFrorm(TestCase):
+    def setUp(self):
+        self.category = Category.objects.create(name="Electronics", parent=None)
+
+    def test_valid_starting_price(self):
+        form_data = self._get_valid_data(starting_price=100.01)
+        form = AuctionCreateForm(data=form_data)
+        self.assertTrue(form.is_valid())
+
+    def test_invalid_starting_price(self):
+        form_data = self._get_valid_data(starting_price=-100.01)
+        form = AuctionCreateForm(data=form_data)
+        self.assertFalse(form.is_valid())
+        self.assertIn('starting_price', form.errors)
+
+    def test_valid_buy_now_price(self):
+        form_data = self._get_valid_data(buy_now_price=100.01)
+        form = AuctionCreateForm(data=form_data)
+        self.assertTrue(form.is_valid())
+
+    def test_invalid_buy_now_price(self):
+        form_data = self._get_valid_data(buy_now_price=-100.01)
+        form = AuctionCreateForm(data=form_data)
+        self.assertFalse(form.is_valid())
+        self.assertIn('buy_now_price', form.errors)
+
+    def _get_valid_data(self, starting_price=100.00, buy_now_price=100.00):
+        return {
+            'name': 'Produkt',
+            'description': 'realy great Produkt',
+            'starting_price': starting_price,
+            'buy_now_price': buy_now_price,
+            'end_time': '2025-01-15T14:30',
+            'categories': [1],
         }
