@@ -51,7 +51,14 @@
         </div>
         <div class="col-md-6">
             <p><strong>Description:</strong> {{ auction.description }}</p>
-            <p><strong>Seller:</strong> {{ auction.seller.username }}</p>
+            <p><strong>Seller: </strong><a href="{% url 'profile_detail' id=auction.seller.profile.id %}">{{ auction.seller.username }}</a>
+            <small class="form-text text-muted">
+                {% if average_rating %}
+                    Average Rating: {{ average_rating|floatformat:1 }}
+                {% else %}
+                    No ratings yet
+                {% endif %}
+            </small></p>
             <p><strong>Categories:</strong>
                 {% for category in auction.categories.all %}
                     {{ category.name }}{% if not forloop.last %}, {% endif %}

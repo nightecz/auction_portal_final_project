@@ -7,7 +7,7 @@ from viewer.views import (index, CustomLoginView, ProfileView, RegisterView, Auc
                           AuctionCreateView, ProfileEditView, AuctionDetailView, AuctionSellingView, PlaceBidView,
                           WonAuctionsView,
                           AddToWatchlistView, WatchlistDeleteView, AuctionSearchView, AuctionUpdateView,
-                          ContactInfoView,
+                          ContactInfoView, ProfileDetailView,
                           SellerConfirmView, BuyerConfirmView, AuctionCancelView, AuctionBiddingView, ReviewCreateView,
                           UserSearchView, BuyNowView, AuctionRelistView, AddToArchiveView, ArchiveView)
 
@@ -21,6 +21,7 @@ urlpatterns = [
     path('register/', RegisterView.as_view(), name='register'),
     path('profile/', ProfileView.as_view(), name='profile'),
     path('profile/edit/', ProfileEditView.as_view(), name='profile_edit'),
+    path('profile/profile/<int:id>/', ProfileDetailView.as_view(), name='profile_detail'),
 
     path('auctions/', AuctionView.as_view(), name='auctions'),
     path('auctions/my_auctions/', AuctionSellingView.as_view(), name='my_auctions'),

@@ -1,8 +1,6 @@
 {% extends 'base.html' %}
 
-{% block title %}
-    Confirm Sale
-{% endblock %}
+{% block nadpis %} - Won auctions {% endblock %}
 
 {% block content %}
     <h1>My won auctions</h1>
@@ -21,7 +19,9 @@
             <td>
                 <a href="{% url 'auction_detail' auction.id %}">{{ auction.name }}</a>
             </td>
-            <td>{{ auction.seller }}</td>
+            <td>
+                <a href="{% url 'profile_detail' auction.seller.id %}">{{ auction.seller }}</a>
+            </td>
             <td>
                 {% if auction.purchase.buyer_confirmation %}
                     <span class="badge badge-success">Confirmed</span>

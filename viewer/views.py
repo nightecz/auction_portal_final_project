@@ -185,10 +185,14 @@ class AuctionSearchView(ListView):
     context_object_name = 'auctions'
     paginate_by = 10  # numbers of auctions per page
 
+
     def get_queryset(self):
         query = self.request.GET.get('q', '')
         auctions = Auction.objects.all()
-        status = self.request.GET.get('status', 'Running')  # gets status from GET parameter, default in search is status 'Running'
+        # Status "Running" by default if not changed by user
+        status = self.request.GET.get('status')
+        if not status:
+            status = 'Running'
 
         # Filtering by user task (keyword)
         if query:
@@ -228,11 +232,18 @@ class AuctionSearchView(ListView):
             auctions = auctions.filter(seller__profile__city__icontains=city)
 
         # Sorting by end_time or start_time
-        sort_by = self.request.GET.get('sort_by')
-        if sort_by == 'end_time':
+        sort_by_time = self.request.GET.get('sort_by_time')
+        if sort_by_time == 'end_time':
             auctions = auctions.order_by('end_time')
-        elif sort_by == 'start_time':
+        elif sort_by_time == 'start_time':
             auctions = auctions.order_by('-start_time')
+
+        # Sorting by price
+        sort_by_price = self.request.GET.get('sort_by_price')
+        if sort_by_price == 'highest':
+            auctions = auctions.order_by('-current_price')
+        elif sort_by_price == 'lowest':
+            auctions = auctions.order_by('current_price')
 
         return auctions
 
@@ -296,9 +307,16 @@ class AuctionDetailView(TemplateView):
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
+        # Getting auction by ID
         auction_id = self.kwargs.get('id')
         auction = Auction.objects.get(pk=auction_id)
         context['auction'] = auction
+
+        # Getting profile of seller
+        seller_profile = auction.seller.profile if hasattr(auction.seller, 'profile') else None
+
+        # Getting average_rating into context
+        context['average_rating'] = seller_profile.calculate_average_rating() if seller_profile else None
 
         if self.request.user.is_authenticated:
             user_watchlist = Watchlist.objects.filter(user=self.request.user)
@@ -510,9 +528,26 @@ class AuctionBiddingView(ListView):
     model = Auction
     context_object_name = "auctions"
 
+    # getting auctions by bids, where user is also bidder + last bid from
     def get_queryset(self):
         # getting auctions by bids, where user is also bidder
-        return Auction.objects.filter(bids__bidder=self.request.user).distinct()
+        return Auction.objects.filter(status="Running", bids__bidder=self.request.user).distinct()
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+
+        # Gets info, if user is winning
+        auctions_with_status = []
+        for auction in self.get_queryset():
+            last_bid = auction.bids.order_by('-created_at').first()  # gets last bid
+            is_winning = last_bid and last_bid.bidder == self.request.user  # checking if last bid == user
+            auctions_with_status.append({
+                'auction': auction,
+                'is_winning': is_winning
+            })
+
+        context['auctions_with_status'] = auctions_with_status
+        return context
 
 class PlaceBidView(FormView):
     template_name = 'auction_detail.html'
@@ -554,6 +589,7 @@ class PlaceBidView(FormView):
             messages.error(request, "You cannot place another bid until someone else bids.")
             return redirect(reverse('auction_detail', kwargs={'id': auction_id}))
 
+
         auction.current_price = bid_amount
         auction.save()
 
@@ -578,7 +614,25 @@ class WatchlistView(ListView):
     model = Watchlist
 
     def get_queryset(self):
-        return Watchlist.objects.filter(user=self.request.user)
+        return Watchlist.objects.filter(
+            user=self.request.user,
+            auction__status="Running"
+        )
+
+    #Getting context status from Auctions for showing in Watchlist only "Running" auctions
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+
+        auctions_with_status = []
+        for watchlist_item in self.get_queryset():
+            auction = watchlist_item.auction
+            auctions_with_status.append({
+                'auction': auction,
+                'status': auction.status
+            })
+
+        context['auctions_with_status'] = auctions_with_status
+        return context
 
 class AddToWatchlistView(FormView):
     def post(self, request, *args, **kwargs):
@@ -805,6 +859,27 @@ class BuyNowView(View):
 
         messages.success(request, "You have successfully purchased this auction!")
         return redirect('auction_detail', id=auction.id)
+
+
+class ProfileDetailView(DetailView):
+    model = Profile
+    template_name = 'profile/profile_detail.html'
+    context_object_name = 'profile'
+
+    # Gets id from URL due to (DetailView) only works with pk or URL
+    def get_object(self, queryset=None):
+        return Profile.objects.get(id=self.kwargs['id'])
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['reviews'] = self.object.received_reviews.all()
+
+        # Gets previous URL as a referer
+        referer = self.request.META.get('HTTP_REFERER')
+        if referer:
+            context['back_to_auction_url'] = referer
+
+        return context
 
 @method_decorator(login_required, name='dispatch')
 @method_decorator(user_passes_test(lambda u: u.is_superuser), name='dispatch')

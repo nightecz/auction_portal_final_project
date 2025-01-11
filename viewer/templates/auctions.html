@@ -1,8 +1,6 @@
 {% extends 'base.html' %}
 
-{% block title %}
-    Auctions
-{% endblock %}
+{% block nadpis %} - Overview{% endblock %}
 
 {% block content %}
     <h2>live Auctions overview</h2>
@@ -52,7 +50,7 @@
 
     <table class="table table-bordered">
         <thead>
-        <tr>
+        <tr class="text-center">
             <th>Item</th>
             <th>Picture</th>
             <th>City</th>
@@ -72,11 +70,14 @@
                 <a href="{% url 'auction_detail' auction.id %}">{{ auction.name }}</a>
             </td>
             <td>
+                <a href="{% url 'auction_detail' auction.id %}">
                 {% if auction.image1 %}
-                    <img src="{{ auction.image1.url }}" alt="Auction Image" width="200px">
+                    <img src="{{ auction.image1.url }}" alt="{{ auction.name }}" class="img-thumbnail"
+                         style="width: 100%; height: 120px; object-fit: cover;">
                 {% else %}
                     No image available
                 {% endif %}
+                </a>
             </td>
             <td>{{ auction.seller.profile.city }}</td>
             <td>
@@ -84,7 +85,7 @@
                     {{ category.name }}{% if not forloop.last %}, {% endif %}
                 {% endfor %}
             </td>
-            <td>{{ auction.current_price }}</td>
+            <td>${{ auction.current_price }}</td>
 <!--            <td>{{ auction.get_status_display }}</td>-->
             <td>{{ auction.end_time }}</td>
             {% if user.is_authenticated %}
@@ -92,7 +93,7 @@
                 {% if auction.seller != user %}
                     {% if auction.id in auction_ids_in_watchlist %}
                         <form action="{% url 'watchlist' %}" method="get">
-                            <button type="submit" class="btn btn-danger">Edit watchlist</button>
+                            <button type="submit" class="btn btn-danger">-</button>
                         </form>
                     {% else %}
                         <form method="post" action="{% url 'add_to_watchlist' auction.id %}">
@@ -101,7 +102,7 @@
                         </form>
                     {% endif %}
                 {% else %}
-                    <span>your own auction.</span>
+                    <button type="submit" class="btn btn-warning" disabled>+</button>
                 {% endif %}
             </td>
             {% endif %}

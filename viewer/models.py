@@ -1,3 +1,5 @@
+from decimal import Decimal
+
 from django.contrib.auth.models import User
 from django.core.validators import MinValueValidator, MaxValueValidator, FileExtensionValidator
 from django.db.models import (
@@ -96,7 +98,7 @@ class Auction(Model):
                        choices=STATUS_CHOICES,
                        default=RUNNING,
                     )
-    buy_now_price = DecimalField(max_digits=10, decimal_places=2, null=True, blank=True)
+    buy_now_price = DecimalField(max_digits=10, decimal_places=2, null=True, blank=True,)
 
 
 

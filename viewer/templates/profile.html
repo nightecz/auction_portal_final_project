@@ -1,54 +1,55 @@
 {% extends 'base.html' %}
 'street', 'house_number', 'city', 'zip_code', 'country']
-{% block nadpis %}-Profile{% endblock %}
+{% block nadpis %} - Profile{% endblock %}
 {% block content %}
 <div class="card">
     <div class="card-header text-center">
         <h2 class="h2">Profile</h2>
-<p><strong>Avatar:</strong></p>
 {% if user.profile.avatar %}
-    <img src="{{ user.profile.avatar.url }}" alt="Avatar" width="150">
+    <img src="{{ user.profile.avatar.url }}" alt="Avatar" class="img-thumbnail"
+         style="width: 100px; height: 120px; object-fit: center;">
 {% else %}
     <p>No avatar set.</p>  <!-- Zobrazí text, pokud není avatar -->
 {% endif %}
+    <h4 class="card-title text-center">Average Rating: {{ profile.calculate_average_rating|default:"No ratings yet" }}</h4>
     </div>
     <div class="card-body">
-        <h5 class="card-title">About user</h5>
-        <h4>Average Rating: {{ profile.calculate_average_rating|default:"No ratings yet" }}</h4>
         <p class="card-text">
-    Premium account:
+    <strong>Premium account</strong>:
     {% if profile.is_premium %}
         <span style="color: green">YES</span>
     {% else %}
         <span style="color: red">NO</span>
     {% endif %}
         </p>
-        <p class="card-text">Username: {{ user.username }}</p>
-        <p class="card-text">Email: {{ user.email }}</p>
-        <p class="card-text">Name: {{ profile.first_name }} {{ profile.last_name }}</p>
-        <p class="card-text">Phone number: {{ profile.phone }}</p>
-        <p class="card-text">Street: {{ profile.street }}</p>
-        <p class="card-text">House number: {{ profile.house_number }}</p>
-        <p class="card-text">City: {{ profile.city }}</p>
-        <p class="card-text">Zip code: {{ profile.zip_code }}</p>
-        <p class="card-text">Country: {{ profile.country }}</p>
-        <p class="card-text">Prefer communication: {{ profile.prefer_communication }}</p>
+        <p class="card-text"><strong>Username:</strong> {{ user.username }}</p>
+        <p class="card-text"><strong>Email:</strong> {{ user.email }}</p>
+        <p class="card-text"><strong>Name:</strong> {{ profile.first_name }} {{ profile.last_name }}</p>
+        <p class="card-text"><strong>Phone number:</strong> {{ profile.phone }}</p>
+        <p class="card-text"><strong>Street:</strong> {{ profile.street }}</p>
+        <p class="card-text"><strong>House number:</strong> {{ profile.house_number }}</p>
+        <p class="card-text"><strong>City:</strong> {{ profile.city }}</p>
+        <p class="card-text"><strong>Zip code:</strong> {{ profile.zip_code }}</p>
+        <p class="card-text"><strong>Country: </strong>{{ profile.country }}</p>
+        <p class="card-text"><strong>Prefer communication:</strong> {{ profile.prefer_communication }}</p>
         {% if user.is_staff == 1 %}
-            <p class="card-text">Role: Admin</p>
+            <p class="card-text"><strong>Role:</strong> Admin</p>
         {% else %}
-            <p class="card-text">Role: User</p>
+            <p class="card-text"><strong>Role:</strong> User</p>
         {% endif %}
         {% if user.is_active %}
-            <p class="card-text">Stav: <span style="color: green">Active</span></p>
+            <p class="card-text"><strong>Status:</strong> <span style="color: green">Active</span></p>
         {% else %}
-        <p class="card-text">Stav: <span style="color: red">Not active</span></p>
+        <p class="card-text"><strong>Status:</strong> <span style="color: red">Not active</span></p>
         {% endif %}
-        <p class="card-text">Last login: {{ user.last_login|date:'H:i:s M d, Y' }}</p>
+        <p class="card-text"><strong>Last login:</strong> {{ user.last_login|date:'H:i:s M d, Y' }}</p>
+        <br>
+        <a href="{% url 'profile_edit' %}"><button type="button" class="btn btn-dark">Change Profile</button></a>
     </div>
-  <a href="{% url 'profile_edit' %}"><button>Change Profile</button></a>
+    <br>
 </form>
-    <div class="card-footer text-muted">
-    Reviews:
+    <div class="card-footer">
+    <strong>Reviews:</strong>
     {% for review in profile.received_reviews.all %}
     <div class="card">
         <div class="card-header">
