@@ -33,7 +33,7 @@ class Profile(Model):
         FileExtensionValidator(allowed_extensions=['jpg', 'jpeg', 'png'])
     ])
     created_at = DateTimeField(auto_now_add=True)
-    is_premium = BooleanField(default=False)  # Premium user
+    is_premium = BooleanField(default=False)  # for Premium user
     prefer_communication = CharField(
         max_length=10,
         choices=COMMUNICATION_CHOICES,

@@ -167,7 +167,7 @@ class TestSignUpFormValidator(TestCase):
             'prefer_communication': 'email',
         }
 
-class TestAuctionCreateFrorm(TestCase):
+class TestAuctionCreateForm(TestCase):
     def setUp(self):
         self.category = Category.objects.create(name="Electronics", parent=None)
 
