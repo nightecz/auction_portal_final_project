@@ -29,7 +29,7 @@ body { /* background image */
     display: flex;
     justify-content: center;
     align-items: center;
-
+}
 
 .nav-link {
     color: #ac9697; /* active link change colour to */
@@ -39,3 +39,8 @@ body { /* background image */
 .navbar-link { /* change if you point with mouse */
     color: #f5d7f6;
 }
+
+.container {
+    background: azure;
+}
+
