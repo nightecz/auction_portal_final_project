@@ -4,6 +4,10 @@
     {{ auction.name }} - Auction Detail
 {% endblock %}
 
+{% block extra_head %}
+    <meta http-equiv="refresh" content="5">
+{% endblock %}
+
 {% block content %}
     {% if messages %}
         <div class="alert alert-warning" role="alert">
@@ -66,7 +70,11 @@
             </p>
             <p><strong>Starting Price:</strong> ${{ auction.starting_price }}</p>
             <p><strong>Current Price:</strong> ${{ auction.current_price }}</p>
-            <p><strong>Buy now price:</strong> ${{ auction.buy_now_price }}</p>
+            {% if auction.buy_now_price %}
+               <p><strong>Buy now price:</strong> ${{ auction.buy_now_price }}</p>
+            {% else %}
+                <p>This auction have no buy now possibility.</p>
+            {% endif %}
             <p><strong>Auction Ends:</strong> {{ auction.end_time }}</p>
 
                 <div class="container">

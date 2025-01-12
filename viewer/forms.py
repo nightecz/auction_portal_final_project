@@ -1,6 +1,9 @@
+from datetime import datetime, timedelta
+
 import unicodedata
 from django.core.exceptions import ValidationError
 from django.core.validators import RegexValidator, EmailValidator
+from django.utils.timezone import now
 
 from viewer.models import Profile, Bid, Purchase
 from django.forms import (
@@ -166,9 +169,19 @@ class AuctionCreateForm(ModelForm):
 
     def clean_buy_now_price(self):
         buy_now_price = self.cleaned_data.get('buy_now_price')
+        if buy_now_price is None:
+            return 0
         if buy_now_price < 0.01:
             raise ValidationError("Buy now price must be greater than zero.")
         return buy_now_price
+
+    def clean_end_time(self):
+        end_time = self.cleaned_data.get('end_time')
+        if end_time < now():
+            raise ValidationError("End time you are trying to put in, is already gone.")
+        if end_time > now() + timedelta(days=30):
+            raise ValidationError("Duration of the action cannot be more than 30 days.")
+        return end_time
 
     def save(self, commit=True):
         auction = super().save(commit=False)

@@ -74,6 +74,24 @@ class LogoutUserTest(TestCase):
 
 class TestSignUpFormValidator(TestCase):
 
+    def _get_valid_data(self, phone='+420200000000', first_name='Tomáš', last_name='Novák',
+                        street='Na hrázi', city='Praha', zip_code='11000', country='Česká republika', email='test@example.com'):
+        return {
+            'username': 'testuser',
+            'email': email,
+            'password1': 'SecurePass123!',
+            'password2': 'SecurePass123!',
+            'first_name': first_name,
+            'last_name': last_name,
+            'phone': phone,
+            'street': street,
+            'house_number': '123',
+            'city': city,
+            'zip_code': zip_code,
+            'country': country,
+            'prefer_communication': 'email',
+        }
+
     def test_valid_phone_number(self):
         form_data = self._get_valid_data(phone='+420200000000')
         form = SignUpForm(data=form_data)
@@ -148,28 +166,19 @@ class TestSignUpFormValidator(TestCase):
         self.assertIn('email', form.errors)
 
 
-    # Helper method for valid data
-    def _get_valid_data(self, phone='+420200000000', first_name='Tomáš', last_name='Novák',
-                        street='Na hrázi', city='Praha', zip_code='11000', country='Česká republika', email='test@example.com'):
-        return {
-            'username': 'testuser',
-            'email': email,
-            'password1': 'SecurePass123!',
-            'password2': 'SecurePass123!',
-            'first_name': first_name,
-            'last_name': last_name,
-            'phone': phone,
-            'street': street,
-            'house_number': '123',
-            'city': city,
-            'zip_code': zip_code,
-            'country': country,
-            'prefer_communication': 'email',
-        }
-
 class TestAuctionCreateFrorm(TestCase):
     def setUp(self):
         self.category = Category.objects.create(name="Electronics", parent=None)
+
+    def _get_valid_data(self, starting_price=100.00, buy_now_price=100.00, end_time='2025-01-15T14:30'):
+        return {
+            'name': 'Produkt',
+            'description': 'realy great Produkt',
+            'starting_price': starting_price,
+            'buy_now_price': buy_now_price,
+            'end_time': end_time,
+            'categories': [1],
+        }
 
     def test_valid_starting_price(self):
         form_data = self._get_valid_data(starting_price=100.01)
@@ -193,12 +202,20 @@ class TestAuctionCreateFrorm(TestCase):
         self.assertFalse(form.is_valid())
         self.assertIn('buy_now_price', form.errors)
 
-    def _get_valid_data(self, starting_price=100.00, buy_now_price=100.00):
-        return {
-            'name': 'Produkt',
-            'description': 'realy great Produkt',
-            'starting_price': starting_price,
-            'buy_now_price': buy_now_price,
-            'end_time': '2025-01-15T14:30',
-            'categories': [1],
-        }
+    def test_valid_end_time(self):
+        form_data = self._get_valid_data(end_time='2025-01-15T14:30')
+        form = AuctionCreateForm(data=form_data)
+        self.assertTrue(form.is_valid())
+
+    def test_invalid_pass_end_time(self):
+        form_data = self._get_valid_data(end_time='2024-01-15T14:30')
+        form = AuctionCreateForm(data=form_data)
+        self.assertFalse(form.is_valid())
+        self.assertIn('end_time', form.errors)
+
+    def test_invalid_to_far_end_time(self):
+        form_data = self._get_valid_data(end_time='2025-03-18T14:30')
+        form = AuctionCreateForm(data=form_data)
+        self.assertFalse(form.is_valid())
+        self.assertIn('end_time', form.errors)
+

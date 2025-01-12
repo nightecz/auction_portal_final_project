@@ -598,15 +598,20 @@ class PlaceBidView(FormView):
             amount=bid_amount
         )
 
+
         highest_bid = auction.bids.order_by('-amount').first()
-        if highest_bid and highest_bid.amount > auction.buy_now_price:
-            auction.buy_now_price = highest_bid.amount
-            auction.save()
+
+        if auction.buy_now_price > 0:
+            if highest_bid and highest_bid.amount is not None:
+                if highest_bid.amount > auction.buy_now_price:
+                    auction.buy_now_price = highest_bid.amount
+                    auction.save()
+
+                    messages.success(request, "You made direct buy for {auction.buy_now_price}.")
+                    return HttpResponseRedirect(reverse('auction_detail', kwargs={'id': auction_id}))
 
         messages.success(request, "Your bid was placed.")
         return HttpResponseRedirect(reverse('auction_detail', kwargs={'id': auction_id}))
-
-
 
 @method_decorator(login_required, name='dispatch')
 class WatchlistView(ListView):
