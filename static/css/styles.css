@@ -1,5 +1,5 @@
-/* index.html */
-/* advanced_search.html */
+
+/* advanced_search.html and the thumbnail design*/
 .img-thumbnail {
   border: 1px solid #ddd;
   border-radius: 2px;
@@ -8,7 +8,7 @@
   width: 15px;
 }
 
-body {
+body { /* background image */
     background-image: url('/static/web_images/background.png');
     background-size: cover;
     background-repeat: no-repeat;
@@ -16,7 +16,7 @@ body {
     background-position: center;
 }
 
-.navbar {
+.navbar { /* navbar coloring and design */
     background-color: #F6F5D7;
     margin:0%;
     padding: 0%;
@@ -25,17 +25,11 @@ body {
     height: 60px;
 }
 
-.navbar-nav {
+.navbar-nav { /* centralize in the middle */
     display: flex;
     justify-content: center;
     align-items: center;
 
-.footer{
-    background-color: #F6F5D7;
-    margin:0%;
-    padding: 0%;
-    border: 1px solid rgb(0, 0, 0);
-}
 
 .nav-link {
     color: #ac9697; /* active link change colour to */

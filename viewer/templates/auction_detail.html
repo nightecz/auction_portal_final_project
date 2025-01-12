@@ -22,26 +22,26 @@
                     <div class="carousel-inner">
                         {% if auction.image1 %}
                             <div class="carousel-item active">
-                                <img src="{{ auction.image1.url }}" class="d-block w-75 mx-auto" alt="Auction Image 1" style="max-height: 400px; object-fit: contain;">
+                                <img src="{{ auction.image1.url }}" class="d-block w-75 mx-auto" alt="Auction Image 1" style="max-height: 400px; object-fit: contain; border-radius: 5%; padding: 10px;">
                             </div>
                         {% endif %}
                         {% if auction.image2 %}
                             <div class="carousel-item {% if not auction.image1 %}active{% endif %}">
-                                <img src="{{ auction.image2.url }}" class="d-block w-75 mx-auto" alt="Auction Image 2" style="max-height: 400px; object-fit: contain;">
+                                <img src="{{ auction.image2.url }}" class="d-block w-75 mx-auto" alt="Auction Image 2" style="max-height: 400px; object-fit: contain; border-radius: 5%; padding: 10px;">
                             </div>
                         {% endif %}
                         {% if auction.image3 %}
                             <div class="carousel-item {% if not auction.image1 and not auction.image2 %}active{% endif %}">
-                                <img src="{{ auction.image3.url }}" class="d-block w-75 mx-auto" alt="Auction Image 3" style="max-height: 400px; object-fit: contain;">
+                                <img src="{{ auction.image3.url }}" class="d-block w-75 mx-auto" alt="Auction Image 3" style="max-height: 400px; object-fit: contain; border-radius: 5%; padding: 10px;">
                             </div>
                         {% endif %}
                     </div>
                     <button class="carousel-control-prev" type="button" data-bs-target="#auctionCarousel" data-bs-slide="prev">
-                        <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+                        <span class="carousel-control-prev-icon" aria-hidden="true" style="background-color: black"></span>
                         <span class="visually-hidden">Previous</span>
                     </button>
                     <button class="carousel-control-next" type="button" data-bs-target="#auctionCarousel" data-bs-slide="next">
-                        <span class="carousel-control-next-icon" aria-hidden="true"></span>
+                        <span class="carousel-control-next-icon" aria-hidden="true" style="background-color: black"></span>
                         <span class="visually-hidden">Next</span>
                     </button>
                 {% else %}
@@ -152,8 +152,9 @@
         <a href="{% url 'review_form' %}?purchase={{ purchase.id }}" class="btn btn-primary">Write review</a>
     {% endif %}
 </div>
-
-<h2 class="mt-5">Bid History</h2>
+<div style="background-color: white; border: 1px solid #ddd; border-radius: 5px; display: flex; align-items: center; justify-content: center; height: 80px;">
+    <h2 class="mt-5">Bid History</h2>
+</div>
 {% if auction.bids.all %}
     <table class="table table-striped">
         <thead>
@@ -174,7 +175,9 @@
         </tbody>
     </table>
 {% else %}
-    <p>No bids yet. Be the first to bid!</p>
+<div style="background-color: white; border: 1px solid #ddd; border-radius: 5px; display: flex; align-items: center; justify-content: center; height: 80px;">
+    <p><strong>No bids yet. Be the first to bid!</strong></p>
+</div>
 {% endif %}
 </div>
 
