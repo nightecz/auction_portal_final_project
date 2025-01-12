@@ -1,9 +1,41 @@
-/* index.html */
-/* advanced_search.html */
+
+/* advanced_search.html and the thumbnail design*/
 .img-thumbnail {
   border: 1px solid #ddd;
   border-radius: 2px;
   padding: 5px;
   height: 10px;
   width: 15px;
+}
+
+body { /* background image */
+    background-image: url('/static/web_images/background.png');
+    background-size: cover;
+    background-repeat: no-repeat;
+    background-attachment: fixed;
+    background-position: center;
+}
+
+.navbar { /* navbar coloring and design */
+    background-color: #F6F5D7;
+    margin:0%;
+    padding: 0%;
+    border: 1px solid rgb(0, 0, 0);
+    text-align: center;
+    height: 60px;
+}
+
+.navbar-nav { /* right side centralize in the middle */
+    display: flex;
+    justify-content: center;
+    align-items: center;
+
+
+.nav-link {
+    color: #ac9697; /* active link change colour to */
+    font-weight: bold;
+}
+
+.navbar-link { /* change if you point with mouse */
+    color: #f5d7f6;
 }
