@@ -4,6 +4,11 @@
 {% block content %}
 
 {% load static %}
+
+<head>
+    <link rel="stylesheet" href="{% static '/css/styles.css' %}">
+</head>
+
 <div class="container">
     {% if messages %}
         <div class="d-flex justify-content-center mt-4">

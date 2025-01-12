@@ -44,3 +44,22 @@ body { /* background image */
     background: azure;
 }
 
+a {
+    color: black !important;
+    text-decoration: none !important;
+}
+
+a:hover {
+    color: grey !important;
+    text-decoration: none !important;
+}
+
+.subcategory-link {
+    color: black !important;
+    text-decoration: none !important;
+}
+
+.subcategory-link:hover {
+    color: black !important;
+    text-decoration: none !important;
+}
