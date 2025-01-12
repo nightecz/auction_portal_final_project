@@ -166,7 +166,26 @@ class TestSignUpFormValidator(TestCase):
         self.assertIn('email', form.errors)
 
 
-class TestAuctionCreateFrorm(TestCase):
+    # Helper method for valid data
+    def _get_valid_data(self, phone='+420200000000', first_name='Tomáš', last_name='Novák',
+                        street='Na hrázi', city='Praha', zip_code='11000', country='Česká republika', email='test@example.com'):
+        return {
+            'username': 'testuser',
+            'email': email,
+            'password1': 'SecurePass123!',
+            'password2': 'SecurePass123!',
+            'first_name': first_name,
+            'last_name': last_name,
+            'phone': phone,
+            'street': street,
+            'house_number': '123',
+            'city': city,
+            'zip_code': zip_code,
+            'country': country,
+            'prefer_communication': 'email',
+        }
+
+class TestAuctionCreateForm(TestCase):
     def setUp(self):
         self.category = Category.objects.create(name="Electronics", parent=None)
 

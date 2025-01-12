@@ -20,7 +20,7 @@ class SignUpForm(UserCreationForm):
     last_name = CharField(max_length=20, required=True, label='Last name')
     phone = CharField(max_length=20,
                       required=True,
-                      label='Phone (in standard format with area code eg.: +420 999 999 999)',
+                      label='Phone (in standard format with area code eg.: +420999999999)',
                       validators=[
                             RegexValidator(
                                 regex=r'^\+\d{12}$', #regular expresion - have to contain + and 12 digits
