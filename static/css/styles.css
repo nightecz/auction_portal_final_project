@@ -25,7 +25,7 @@ body { /* background image */
     height: 60px;
 }
 
-.navbar-nav { /* centralize in the middle */
+.navbar-nav { /* right side centralize in the middle */
     display: flex;
     justify-content: center;
     align-items: center;
