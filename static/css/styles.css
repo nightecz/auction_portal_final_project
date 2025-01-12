@@ -7,3 +7,41 @@
   height: 10px;
   width: 15px;
 }
+
+body {
+    background-image: url('/static/web_images/background.png');
+    background-size: cover;
+    background-repeat: no-repeat;
+    background-attachment: fixed;
+    background-position: center;
+}
+
+.navbar {
+    background-color: #F6F5D7;
+    margin:0%;
+    padding: 0%;
+    border: 1px solid rgb(0, 0, 0);
+    text-align: center;
+    height: 60px;
+}
+
+.navbar-nav {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+
+.footer{
+    background-color: #F6F5D7;
+    margin:0%;
+    padding: 0%;
+    border: 1px solid rgb(0, 0, 0);
+}
+
+.nav-link {
+    color: #ac9697; /* active link change colour to */
+    font-weight: bold;
+}
+
+.navbar-link { /* change if you point with mouse */
+    color: #f5d7f6;
+}
