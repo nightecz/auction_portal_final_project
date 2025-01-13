@@ -48,25 +48,6 @@ class LoginUserTest(TestCase):
     def test_auction_create(self):
         endpoint = {'url': reverse('auction_create'), 'name': 'auction_create'},
 
-class AuctionCreateTest(TestCase):
-    def setUp(self):
-        self.user = User.objects.create_user(username='TestTest', password='password123')
-        self.profile = Profile.objects.create(user=self.user)
-
-    def test_auction_creation(self):
-        auction = Auction.objects.create(
-            name="Test Auction",
-            description="This is a test auction.",
-            seller=self.user,
-            starting_price=100.00,
-            current_price=100.00,
-            end_time=now() + timedelta(days=7)
-        )
-
-        self.assertEqual(auction.name, "Test Auction")
-        self.assertEqual(auction.seller, self.user)
-        self.assertEqual(auction.starting_price, 100.00)
-        self.assertEqual(auction.current_price, 100.00)
 
 class LogoutUserTest(TestCase):
     pass

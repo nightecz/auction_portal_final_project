@@ -169,10 +169,13 @@ class AuctionCreateForm(ModelForm):
 
     def clean_buy_now_price(self):
         buy_now_price = self.cleaned_data.get('buy_now_price')
+        starting_price = self.cleaned_data.get('starting_price')
         if buy_now_price is None:
             return 0
         if buy_now_price < 0.01:
             raise ValidationError("Buy now price must be greater than zero.")
+        if buy_now_price is not None and buy_now_price < starting_price:
+            raise ValidationError("Buy now price must be greater than starting price.")
         return buy_now_price
 
     def clean_end_time(self):
