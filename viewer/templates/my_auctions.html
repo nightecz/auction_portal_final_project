@@ -36,7 +36,7 @@
             {% for auction in object_list %}
                     <div class="card-100">
                         <div class="card-header">
-                            <h6><a href="{% url 'auction_detail' auction.id %}"</a>{{ auction.name }}</h6>
+                            <h3><a href="{% url 'auction_detail' auction.id %}"</a>{{ auction.name }}</h3>
                             <a href="{% url 'auction_detail' auction.id %}">
                             {% if auction.image1 %}
                                 <img src="{{ auction.image1.url }}" alt="Auction Image" class="img-thumbnail"

@@ -6,9 +6,11 @@
 }
 
 html, body {
-    height: auto;
+    display: flex;
+    height: 100%;
     margin: 0;
     padding: 0;
+    flex-direction: column;
 }
 
 body {
@@ -84,11 +86,11 @@ header {
 section {
     background-color: rgba(244, 215, 147, 0.85);
     width: 80%;
-    flex-grow: 1;
+    flex: 1;
     display: flex;
     flex-direction: column;
     align-items: center;
-    justify-content: space-between;
+    justify-content: center;
     padding-bottom: 4vh;
 }
 
@@ -180,6 +182,7 @@ footer{
 }
 
 .message{
+    padding: 1rem;
     display: flex;
     width: 80%;
     height: 3rem;
@@ -854,4 +857,12 @@ form{
 
 td .btn-danger, td .btn-info{
     margin-right: 0;
+}
+.errorlist li{
+    padding: 1.5rem;
+}
+.errorlist.nonfield{
+    display: flex;
+    align-items: center;
+    justify-content: center;
 }
