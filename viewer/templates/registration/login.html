@@ -3,8 +3,8 @@
 {% block nadpis %} - Login{% endblock %}
 
 {%  block content %}
+<h2>Please login</h2>
 <div class="info-box">
-    <h2>Please login</h2>
     <form method="post">
         {% csrf_token %}
         {{ form.as_p }}
