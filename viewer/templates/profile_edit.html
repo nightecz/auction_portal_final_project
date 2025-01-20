@@ -1,11 +1,13 @@
 {% extends 'base.html' %}
 
 {% block content %}
-  <h2>Change Your Profile</h2>
-  <form method="POST" enctype="multipart/form-data">
-    {% csrf_token %}
-    {{ form.as_p }}
-    <button type="submit">Update</button>
-  </form>
-  <h3>For other changes, please contact us!</h3>
+<div class="info-box">
+    <h2>Change Your Profile</h2>
+    <form method="POST" enctype="multipart/form-data">
+      {% csrf_token %}
+      {{ form.as_p }}
+      <button class="search-btn" type="submit">Update</button>
+    </form>
+    <h3>For other changes, please contact us!</h3>
+</div>
 {% endblock %}

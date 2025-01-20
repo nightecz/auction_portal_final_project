@@ -12,29 +12,29 @@
             {% endfor %}
         </div>
     {% endif %}
-
+</div>
+<div class="filter">
     <form method="get" action="{% url 'archive' %}">
-        <div class="form-group">
-            <label for="buyer">Buyer:</label>
-            <select id="buyer" name="buyer" class="form-control">
-                <option value="">-- Select Buyer --</option>
-                {% for buyer in buyers %}
-                    <option value="{{ buyer }}" {% if request.GET.buyer == buyer %}selected{% endif %}>{{ buyer }}</option>
-                {% endfor %}
-            </select>
-        </div>
-        <div class="form-group">
-            <label for="seller">Seller:</label>
-            <select id="seller" name="seller" class="form-control">
-                <option value="">-- Select Seller --</option>
-                {% for seller in sellers %}
-                    <option value="{{ seller }}" {% if request.GET.seller == seller %}selected{% endif %}>{{ seller }}</option>
-                {% endfor %}
-            </select>
-        </div>
-        <button type="submit" class="btn btn-primary">Filter</button>
-    </form>
+        <div class="container">
+                <label for="buyer">Buyer:</label>
+                <select id="buyer" name="buyer" class="form-select">
+                    <option value="">-- Select Buyer --</option>
+                    {% for buyer in buyers %}
+                        <option value="{{ buyer }}" {% if request.GET.buyer == buyer %}selected{% endif %}>{{ buyer }}</option>
+                    {% endfor %}
+                </select>
 
+                <label for="seller">Seller:</label>
+                <select id="seller" name="seller" class="form-select">
+                    <option value="">-- Select Seller --</option>
+                    {% for seller in sellers %}
+                        <option value="{{ seller }}" {% if request.GET.seller == seller %}selected{% endif %}>{{ seller }}</option>
+                    {% endfor %}
+                </select>
+            <button type="submit" class="search-btn">Filter</button>
+        </div>
+    </form>
+</div>
 
     <table class="table table-bordered">
         <thead>

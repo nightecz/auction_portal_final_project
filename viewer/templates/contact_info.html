@@ -6,8 +6,8 @@
 
 {% block content %}
     <h1>You confirmed auction: {{ purchase.auction.name }}</h1>
-    <div class="container my-4">
-        <h2 class="my-4">Here you can have Buyer Contact Information</h2>
+    <h2>Here you can have Buyer Contact Information</h2>
+    <div class="info-box">
         <p><strong>Name:</strong> {{ buyer_contact_info.name }}</p>
         <p><strong>Email:</strong> {{ buyer_contact_info.email }}</p>
         <p><strong>Phone:</strong> {{ buyer_contact_info.phone }}</p>
@@ -19,6 +19,7 @@
             <li><strong>ZIP Code:</strong> {{ buyer_contact_info.zip_code }}</li>
             <li><strong>Country:</strong> {{ buyer_contact_info.country }}</li>
         </ul>
-        <a href="{% url 'auction_detail' purchase.auction.id %}" class="btn btn-primary my-4">Back to Auction</a>
+
     </div>
+    <a href="{% url 'auction_detail' purchase.auction.id %}" class="search-btn">Back to Auction</a>
 {% endblock %}

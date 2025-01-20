@@ -3,24 +3,25 @@
 {% block content %}
 
 <h1>Update Auction</h1>
-<form method="post" enctype="multipart/form-data">
-    {% csrf_token %}
-    {{ form.as_p }}
-    <button type="submit">Update</button>
-</form>
+<div class="create-box">
+    <form method="post" enctype="multipart/form-data">
+        {% csrf_token %}
+        {{ form.as_p }}
+        <button class="search-btn" type="submit">Update</button>
+    </form>
 
-<br>
-{% if auction.status == 'Running' %}
-<!-- Form for auction cancel -->
-<form action="{% url 'auction_cancel' auction.id %}" method="get" style="display:inline;">
-    {% csrf_token %}
-    <button type="submit" class="btn btn-danger">Cancel Auction</button>
-</form>
-{% endif %}
-<br>
-{% if auction.status == 'Closed' or auction.status == 'Unsold' %}
-<!-- Form for auction relist -->
-<a href="{% url 'auction_relist' auction.id %}" class="btn btn-primary">Relist Auction</a>
-{% endif %}
-
+    <br>
+    {% if auction.status == 'Running' %}
+    <!-- Form for auction cancel -->
+    <form action="{% url 'auction_cancel' auction.id %}" method="get" style="display:inline;">
+        {% csrf_token %}
+        <button type="submit" class="btn-warning">Cancel Auction</button>
+    </form>
+    {% endif %}
+    <br>
+    {% if auction.status == 'Closed' or auction.status == 'Unsold' %}
+    <!-- Form for auction relist -->
+    <a href="{% url 'auction_relist' auction.id %}" class="btn-warning">Relist Auction</a>
+    {% endif %}
+</div>
 {% endblock %}

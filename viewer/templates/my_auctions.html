@@ -3,42 +3,40 @@
 {% block nadpis %} - My Sellings{% endblock %}
 
 {% block extra_head %}
-    <meta http-equiv="refresh" content="5">
+    <meta http-equiv="refresh" content="15">
 {% endblock %}
 
 {% block content %}
-
-<div class="container">
     {% if messages %}
-        <div class="alert alert-warning" role="alert">
+        <div class="message" role="alert">
             {% for message in messages %}
                 {{ message }}
             {% endfor %}
         </div>
     {% endif %}
+<div class="info-box>">
+    <div class="info-box">
+                <h2>My Auctions</h2>
+        <form method="get">
+            <label for="status">Filter by auction status:</label>
+            <select id="status" name="status" class="form-select">
+                <option value="">-- All --</option>
+                <option value="Running" {% if request.GET.status == "Running" %}selected{% endif %}>Running</option>
+                <option value="Closed" {% if request.GET.status == "Closed" %}selected{% endif %}>Closed</option>
+                <option value="Sold" {% if request.GET.status == "Sold" %}selected{% endif %}>Sold</option>
+                <option value="Cancelled" {% if request.GET.status == "Cancelled" %}selected{% endif %}>Cancelled</option>
+            </select>
+            <button type="submit" class="search-btn">Filter</button>
+        </form>
+    </div>
+    <div class="info-box">
 
-<form method="get" class="mb-4">
-    <label for="status">Filter by auction status:</label>
-    <select id="status" name="status" class="form-select">
-        <option value="">-- All --</option>
-        <option value="Running" {% if request.GET.status == "Running" %}selected{% endif %}>Running</option>
-        <option value="Closed" {% if request.GET.status == "Closed" %}selected{% endif %}>Closed</option>
-        <option value="Sold" {% if request.GET.status == "Sold" %}selected{% endif %}>Sold</option>
-        <option value="Cancelled" {% if request.GET.status == "Cancelled" %}selected{% endif %}>Cancelled</option>
-    </select>
-    <button type="submit" class="btn btn-primary mt-2">Filter</button>
-</form>
-
-<div class="container">
-    <h2 class="text-center">My Auctions</h2>
 
     {% if object_list %}
-        <div class="row g-3">
             {% for auction in object_list %}
-                <div class="col-sm-6 col-md-4">
-                    <div class="card h-100">
-                        <div class="card-header text-center p-2">
-                            <h6 class="card-title mb-1 text-truncate" style="max-width: 200px text-center"><a href="{% url 'auction_detail' auction.id %}"</a>{{ auction.name }}</h6>
+                    <div class="card-100">
+                        <div class="card-header">
+                            <h6><a href="{% url 'auction_detail' auction.id %}"</a>{{ auction.name }}</h6>
                             <a href="{% url 'auction_detail' auction.id %}">
                             {% if auction.image1 %}
                                 <img src="{{ auction.image1.url }}" alt="Auction Image" class="img-thumbnail"
@@ -54,7 +52,7 @@
                             {% endif %}
                             </a>
                         </div>
-                        <div class="card-body p-2">
+                        <div class="card-body">
                             <p class="card-text text-truncate" style="max-height: 40px; overflow: hidden;">{{ auction.description }}</p>
                             <p class="card-text mb-1"><small>Start: ${{ auction.starting_price }}</small></p>
                             <p class="card-text mb-1"><small>Current: ${{ auction.current_price }}</small></p>
@@ -71,16 +69,15 @@
                                     <p class="card-text mb-1"><small>No purchase made yet.</small></p>
                                 {% endif %}</p>
                         </div>
-                        <div class="card-footer p-2 text-center">
-                            <a href="{% url 'auction_detail' auction.id %}" class="btn btn-sm btn-primary">View</a>
-                            <a href="{% url 'auction_update' auction.id %}" class="btn btn-sm btn-info">Edit</a>
+                        <div class="card-footer">
+                            <a href="{% url 'auction_detail' auction.id %}" class="search-btn">View</a>
+                            <a href="{% url 'auction_update' auction.id %}" class="btn-info">Edit</a>
                         </div>
                     </div>
-                </div>
             {% endfor %}
-        </div>
     {% else %}
         <p class="text-center">You have no active auctions to sell at the moment.</p>
     {% endif %}
+    </div>
 </div>
 {% endblock %}

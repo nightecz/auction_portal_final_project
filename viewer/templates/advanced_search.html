@@ -10,27 +10,27 @@
     <h2>Search Results</h2>
     <form method="get" action="{% url 'advanced_search' %}" class="mb-4">
         <div class="row">
-            <div class="col-md-3">
+            <div class="col">
                 <input type="text" name="q" class="form-control" placeholder="Search by keyword..." value="{{ request.GET.q }}">
             </div>
-            <div class="col-md-3">
+            <div class="col">
                 <input type="text" name="city" class="form-control" placeholder="Filter by city..." value="{{ request.GET.city }}">
             </div>
-            <div class="col-md-2">
+            <div class="col">
                 <select name="sort_by_time" class="form-select">
                     <option value="">Sort by time...</option>
                     <option value="created_at" {% if request.GET.sort_by == 'created_at' %}selected{% endif %}>Newest</option>
                     <option value="end_time" {% if request.GET.sort_by == 'end_time' %}selected{% endif %}>Ending soon</option>
                 </select>
             </div>
-            <div class="col-md-2">
+            <div class="col">
                 <select name="sort_by_price" class="form-select">
                     <option value="">Sort by price...</option>
                     <option value="highest" {% if request.GET.sort_by == 'current_price' %}selected{% endif %}>Highest</option>
                     <option value="lowest" {% if request.GET.sort_by == 'current_price' %}selected{% endif %}>Lowest</option>
                 </select>
             </div>
-            <div class="col-md-2">
+            <div class="col">
                 <select id="status" name="status" class="form-select">
                     <option value="">Status</option>
                     {% for status_choice in auction_status %}
@@ -42,7 +42,7 @@
             </div>
         </div>
         <div class="row">
-            <div class="col-md-4">
+            <div class="col">
                 <select id="main-category" name="main_category" class="form-select">
                     <option value="">Filter by Category</option>
                     {% for category in categories %}
@@ -55,7 +55,7 @@
                     {% endfor %}
                 </select>
             </div>
-            <div class="col-md-4">
+            <div class="col">
                 <select id="sub-category" name="sub_category" class="form-select">
                     <option value="">Subcategory</option>
                     {% for sub_category in sub_categories %}
@@ -67,8 +67,8 @@
                 </select>
                 <small class="form-text text-muted">Please select a main category first and "Search" to see subcategories.</small>
             </div>
-            <div class="col-md-4">
-                <button type="submit" class="btn btn-primary">Search</button>
+            <div class="col">
+                <button type="submit" class="search-btn">Search</button>
             </div>
         </div>
     </form>

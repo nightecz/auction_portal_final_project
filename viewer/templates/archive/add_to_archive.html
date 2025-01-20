@@ -5,6 +5,6 @@
     <form method="POST" action="{% url 'watchlist_create' %}">
         {% csrf_token %}
         {{ form }}
-        <button type="submit" class="btn btn-primary">Add to Archive</button>
+        <button type="submit" class="search-btn">Add to Archive</button>
     </form>
 {% endblock %}
