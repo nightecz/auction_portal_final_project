@@ -29,31 +29,26 @@
             <button type="submit" class="search-btn">Filter</button>
         </form>
     </div>
-    <div class="info-box">
-
-
+    <div class="card-box">
     {% if object_list %}
             {% for auction in object_list %}
-                    <div class="card-100">
+                    <div class="card-auto">
                         <div class="card-header">
                             <h3><a href="{% url 'auction_detail' auction.id %}"</a>{{ auction.name }}</h3>
                             <a href="{% url 'auction_detail' auction.id %}">
                             {% if auction.image1 %}
-                                <img src="{{ auction.image1.url }}" alt="Auction Image" class="img-thumbnail"
-                         style="width: 100%; height: 120px; object-fit: cover;">
+                                <img src="{{ auction.image1.url }}" alt="Auction Image" class="card-img-top">
                              {% elif auction.image2 %}
-                                <img src="{{ auction.image2.url }}" alt="Auction Image" class="img-thumbnail"
-                         style="width: 100%; height: 120px; object-fit: cover;">
+                                <img src="{{ auction.image2.url }}" alt="Auction Image" class="card-img-top">
                             {% elif auction.image3 %}
-                                <img src="{{ auction.image3.url }}" alt="Auction Image" class="img-thumbnail"
-                         style="width: 100%; height: 120px; object-fit: cover;">
+                                <img src="{{ auction.image3.url }}" alt="Auction Image" class="card-img-top">
                             {% else %}
-                            No image available
+                            <div class="no-img"> <p>No image available</p></div>
                             {% endif %}
                             </a>
                         </div>
                         <div class="card-body">
-                            <p class="card-text text-truncate" style="max-height: 40px; overflow: hidden;">{{ auction.description }}</p>
+                            <h4>{{ auction.description }}</h4>
                             <p class="card-text mb-1"><small>Start: ${{ auction.starting_price }}</small></p>
                             <p class="card-text mb-1"><small>Current: ${{ auction.current_price }}</small></p>
                             <p class="card-text mb-1"><small>Ends: {{ auction.end_time|date:"D, M d, Y H:i" }}</small></p>

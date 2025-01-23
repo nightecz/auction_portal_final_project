@@ -550,8 +550,8 @@ class AuctionBiddingView(ListView):
         # Gets info, if user is winning
         auctions_with_status = []
         for auction in self.get_queryset():
-            last_bid = auction.bids.order_by('-created_at').first()  # gets last bid
-            is_winning = last_bid and last_bid.bidder == self.request.user  # checking if last bid == user
+            last_bid = auction.bids.order_by('-created_at').first()  # Poslední příhoz
+            is_winning = last_bid and last_bid.bidder == self.request.user  # Uživatel vyhrává?
             auctions_with_status.append({
                 'auction': auction,
                 'is_winning': is_winning

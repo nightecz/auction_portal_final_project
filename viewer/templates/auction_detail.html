@@ -67,12 +67,10 @@
     <div class="bidding-box">
         {% if user.is_authenticated %}
             {% if auction.seller == user %}
-                <!-- Hláška pro vlastníka aukce -->
                 <div class="message">
                     <p class="text-info"><strong>Your own auction.</strong></p>
                 </div>
             {% else %}
-                <!-- Možnost přihazování pro ostatní uživatele -->
                 {% if auction.status == 'Running' %}
                     <form method="post" action="{% url 'place_bid' %}?auction={{ auction.id }}" class="mt-4">
                         {% csrf_token %}
@@ -95,7 +93,6 @@
                     </div>
                 {% endif %}
             {% endif %}
-            <!-- Watchlist handling -->
 
         {% else %}
             <p class="text-danger">You must <a href="{% url 'login' %}">log in</a> to place a bid.</p>
@@ -103,21 +100,18 @@
     </div>
     <div class="handling">
         {% if auction.seller != user %}
-                <div>
-                    {% if auction.id in auction_ids_in_watchlist %}
-                        <p>This auction is in your watchlist.</p>
-                        <form action="{% url 'watchlist' %}" method="get">
-                            <button type="submit" class="btn btn-danger">Edit watchlist</button>
-                        </form>
-                    {% else %}
-                        <form method="post" action="{% url 'add_to_watchlist' auction.id %}">
-                            {% csrf_token %}
-                            <button type="submit" class="btn btn-info">Add to watchlist</button>
-                        </form>
-                    {% endif %}
-                </div>
+                {% if auction.id in auction_ids_in_watchlist %}
+                    <p>This auction is in your watchlist.</p>
+                    <form action="{% url 'watchlist' %}" method="get">
+                        <button type="submit" class="btn btn-danger">Edit watchlist</button>
+                    </form>
+                {% else %}
+                    <form method="post" action="{% url 'add_to_watchlist' auction.id %}">
+                        {% csrf_token %}
+                        <button type="submit" class="btn btn-info">Add to watchlist</button>
+                    </form>
+                {% endif %}
             {% endif %}
-            <!-- Superuser options -->
             {% if user.is_superuser and auction.status != 'Archived' %}
                 <form method="post" action="{% url 'add_to_archive' auction.id %}">
                     {% csrf_token %}

@@ -8,9 +8,11 @@
 html, body {
     display: flex;
     height: 100%;
+    width: 100%;
     margin: 0;
     padding: 0;
     flex-direction: column;
+    align-items: center;
 }
 
 body {
@@ -21,14 +23,10 @@ body {
     background-image: url(/static/web_images/background.png);
     padding-top: 2vw;
     padding-bottom: 2vw;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
     background-position: center;
     background-size: cover;
     background-attachment: fixed;
     background-repeat: no-repeat;
-    height: 100%;
 }
 
 h1{
@@ -40,6 +38,7 @@ h2{
     font-size: 1.6rem;
     margin-top: 1em;
     margin-bottom: 1em;
+    text-align: center;
 }
 h2 a{
     color: #A94A4A;
@@ -94,7 +93,6 @@ section {
     padding-bottom: 4vh;
 }
 
-
 .container{
     display: flex;
     width: 100%;
@@ -106,15 +104,19 @@ section {
     display: flex;
     flex-direction: column;
     align-items: center;
+    text-align: center;
+}
+.logo-box{
+    max-height: 100%;
 }
 
 .logo{
-  width: 5em;
-  position: absolute;
-  left: 50%;
-  bottom: 50%;
-  transform: translateX(-50%) translateY(50%);
-  text-decoration: none;
+    width: 5em;
+    position: absolute;
+    left: 50%;
+    bottom: 50%;
+    transform: translateX(-50%) translateY(50%);
+    text-decoration: none;
 }
 
 .menu {
@@ -145,7 +147,7 @@ section {
     top: 100%;
     right: 0;
     background-color: #fff;
-    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.9);
     list-style: none;
     margin: 0;
     padding: 0;
@@ -153,6 +155,7 @@ section {
     z-index: 10;
     border-radius: 1vw;
     overflow: hidden;
+    border: 3px solid #ccc;
 }
 
 .menu-btn, .dropdown-menu a, .dropdown-menu li {
@@ -205,7 +208,8 @@ footer{
     width: 100%;
     display: flex;
     flex-direction: column;
-    align-items: start;
+    align-items: center;
+    text-align: center;
 }
 
 .content {
@@ -270,6 +274,7 @@ footer{
 .card{
     width: 30%;
     display: flex;
+    height: auto;
     flex-direction: column;
     align-items: center;
     justify-content: center;
@@ -278,9 +283,10 @@ footer{
     border: 3px solid #ccc;
 }
 
-.card-100{
-    width: 100%;
+.card-auto{
+    width: auto;
     display: flex;
+    height: auto;
     flex-direction: column;
     align-items: center;
     justify-content: center;
@@ -400,15 +406,18 @@ input, .form-control{
     background-color: rgba(169, 74, 74, 0.7);
     display: flex;
     height: 6vh;
-    color: #FFF6DA;
+    color: #FFF6DA !important;
     font-weight: bold;
     font-size: 1rem;
-    padding: 0.6rem 1rem;
+    padding: 1rem 1rem !important;
     border: 3px solid #9e9b9b;
     cursor: pointer;
     align-items: center;
     margin-right: 1rem;
     border-radius: 0.5rem;
+}
+.search-btn a{
+    color: #FFF6DA;
 }
 
 .search-btn:hover {
@@ -523,7 +532,6 @@ table a:hover {
     border: 3px solid #9e9b9b;
     cursor: pointer;
     align-items: center;
-    margin-right: 1rem;
     border-radius: 0.5rem;
 }
 
@@ -572,20 +580,6 @@ input.form-control, select.form-select {
     height: 6vh;
 }
 
-button.search-btn {
-    background-color: rgba(169, 74, 74, 0.7);
-    display: flex;
-    height: 6vh;
-    color: #FFF6DA;
-    font-weight: bold;
-    font-size: 1rem;
-    padding: 0.6rem 1rem;
-    border: 3px solid #9e9b9b;
-    cursor: pointer;
-    align-items: center;
-    margin-right: 1rem;
-    border-radius: 0.5rem;
-}
 
 button.search-btn:hover {
     background-color: rgba(169, 74, 74, 1);
@@ -723,7 +717,6 @@ label{
 .handling{
     display: flex;
     flex-direction: column;
-    margin-left: 2vw;
     width: 80%;
     justify-content: space-between;
     gap: 1vh;
@@ -731,6 +724,7 @@ label{
 
 .handling p{
     margin: 0;
+    text-align: center;
 }
 
 .handling .message{
@@ -768,7 +762,7 @@ label{
     color: #dc3545;
 }
 
-.info-box{
+.info-box, .card-box{
     display: flex;
     flex-direction: column;
     align-items: center;
@@ -782,15 +776,23 @@ label{
     padding: 1rem;
 }
 
-.info-box li{
+.card-box{
+    flex-direction: row;
+    gap:clamp(1vw, 2vw, 3vw);
+    flex-wrap: wrap;
+
+
+}
+
+.info-box li, .card-box li{
    list-style: none;
 }
-.info-box ul{
+.info-box ul, .card-box ul{
    margin-top: 0;
     margin-bottom: 3rem;
 }
 
-.info-box p{
+.info-box p, .card-box p{
    margin: 1rem;
 }
 
@@ -812,6 +814,11 @@ input[type="file"]::-webkit-file-upload-button {
     width: 100%;
     height: 120px;
     object-fit: cover;
+}
+
+.no-img{
+    width: 100%;
+    height: 120px;
 }
 
 form{
@@ -865,4 +872,121 @@ td .btn-danger, td .btn-info{
     display: flex;
     align-items: center;
     justify-content: center;
+}
+
+@media (max-width: 1600px) {
+    header, header ul {
+        flex-direction: column;
+        height: auto;
+        align-items: center;
+        width: 90%;
+    }
+    section, footer{
+        width: 90%;
+    }
+    .logo{
+        position: unset;
+        transform: none;
+        height: auto;
+    }
+    .dropdown-menu {
+        width: 30vw;
+        right: -35vw
+    }
+}
+
+@media (max-width: 1060px){
+    .menu{
+        width: 100%;
+    }
+    .dropdown-menu{
+        width: 60vw;
+    }
+    .container{
+        flex-direction: column;
+        align-items: center;
+        gap: 3vh;
+    }
+    .browse100{
+        margin: unset;
+        flex-direction: column;
+    }
+    .search-box{
+        width: 100%;
+        flex-direction: column;
+        gap: 2vh;
+        padding: 1vh;
+    }
+    .cat-search{
+        width: 100%;
+        flex-direction: column;
+        align-items: center;
+    }
+    table{
+        width: 100%;
+        display: block;
+        overflow-x: auto;
+        -webkit-overflow-scrolling: touch;
+    }
+    .content{
+        flex-direction: column;
+    }
+    .browse{
+        width: 100%;
+    }
+}
+@media (max-width: 800px){
+    .row{
+        width: 100%;
+    }
+    .detail-box{
+        display: flex;
+        flex-direction: column;
+        width: 100%;
+    }
+    .image-box{
+        flex-direction: column;
+    }
+    .image-box img{
+        width: 90%;
+    }
+    .info-box, .card-box{
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+    }
+    .card-auto{
+        width: 90%;
+    }
+    .auction-cards{
+        flex-direction: column;
+    }
+    .card{
+        width: 90%;
+    }
+    .info-box{
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        margin: unset;
+        padding: unset;
+    }
+    .info-box, .info-box p .info-box form,
+    .card-box, .card-box p .card-box form,
+    .create-box, .create-box p, .create-box form{
+        margin: unset;
+        margin-top: 1vh;
+        margin-bottom: 1vh;
+    }
+    .bidding-box{
+        flex-direction: column;
+        width: 90%;
+    }
+    .create-box input, .create-box textarea{
+        width: 100%;
+    }
+    .message{
+        height: auto;
+    }
+
 }
