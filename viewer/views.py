@@ -560,6 +560,33 @@ class AuctionBiddingView(ListView):
         context['auctions_with_status'] = auctions_with_status
         return context
 
+# Optimization - self standing function will be called up on different places as method for direct buy.
+def process_direct_buy(auction, bid_amount, request):
+    highest_bid = auction.bids.order_by('-amount').first()
+    if highest_bid and highest_bid.amount >= auction.buy_now_price:
+        winning_price = highest_bid.amount
+    else:
+        winning_price = auction.buy_now_price
+
+    # purchase creating
+    purchase = Purchase.objects.create(
+        auction=auction,
+        buyer=request.user.profile,
+        seller=auction.seller.profile,
+        winning_price=winning_price
+    )
+
+    # Mark the purchase as confirmed by the buyer
+    purchase.buyer_confirmation = True
+    purchase.save()
+
+    # Link the purchase to the auction and mark it as closed
+    auction.purchase = purchase
+    auction.status = Auction.CLOSED
+    auction.save()
+
+    messages.success(request, f"You made a direct buy for {purchase.winning_price}.")
+
 class PlaceBidView(FormView):
     template_name = 'auction_detail.html'
     form_class = BidForm
@@ -617,23 +644,7 @@ class PlaceBidView(FormView):
             if highest_bid and highest_bid.amount is not None:
                 if highest_bid.amount >= auction.buy_now_price:
 
-                    purchase = Purchase.objects.create(
-                        auction=auction,
-                        buyer=request.user.profile,
-                        seller=auction.seller.profile,
-                        winning_price=auction.buy_now_price
-                    )
-
-                    # Mark the purchase as confirmed by the buyer
-                    purchase.buyer_confirmation = True
-                    purchase.save()
-
-                    # Link the purchase to the auction and mark it as closed
-                    auction.purchase = purchase
-                    auction.status = Auction.CLOSED
-                    auction.save()
-
-                    messages.success(request, "You made direct buy for {auction.buy_now_price}.")
+                    process_direct_buy(auction, highest_bid.amount, request)
                     return HttpResponseRedirect(reverse('auction_detail', kwargs={'id': auction_id}))
 
         messages.success(request, "Your bid was placed.")
@@ -873,21 +884,8 @@ class BuyNowView(View):
 
 
         # Process Buy Now purchase if conditions are met
-        purchase = Purchase.objects.create(
-            auction=auction,
-            buyer=request.user.profile,
-            seller=auction.seller.profile,
-            winning_price=auction.buy_now_price
-        )
-
-        # Mark the purchase as confirmed by the buyer
-        purchase.buyer_confirmation = True
-        purchase.save()
-
-        # Link the purchase to the auction and mark it as closed
-        auction.purchase = purchase
-        auction.status = Auction.CLOSED
-        auction.save()
+        process_direct_buy(auction, auction.buy_now_price, request)
+        return HttpResponseRedirect(reverse('auction_detail', kwargs={'id': auction_id}))
 
         messages.success(request, "You have successfully purchased this auction!")
         return redirect('auction_detail', id=auction.id)
