@@ -1,5 +1,14 @@
 {% extends "base.html" %}
 {% block content %}
+
+{% if messages %}
+        <div class="message" role="alert">
+            {% for message in messages %}
+                {{ message }}
+            {% endfor %}
+        </div>
+    {% endif %}
+
 <h2>Relist auction: </h2>
 <div class="create-box">
     <form method="post" enctype="multipart/form-data">
