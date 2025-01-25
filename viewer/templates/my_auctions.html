@@ -31,7 +31,7 @@
     <div class="card-box">
         {% if object_list %}
             {% for auction in object_list %}
-                <div class="card-auto">
+                <div class="card-box-my-auction">
                     <div class="card-header">
                         <h3><a href="{% url 'auction_detail' auction.id %}">{{ auction.name }}</a></h3>
                         <a href="{% url 'auction_detail' auction.id %}">

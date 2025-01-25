@@ -4,7 +4,7 @@
     <h1>Are you sure you want to cancel the auction "{{ object.name }}"?</h1>
     <form method="post">
         {% csrf_token %}
-        <button type="submit" class="search-btn">Yes, cancel it!</button>
+        <button type="submit" class="btn-center">Yes, cancel it!</button>
     </form>
 <br>
     <button onclick="window.location.href='{% url 'my_auctions' %}'" class="btn btn-warning">Back</button>

@@ -113,6 +113,9 @@ section {
 }
 
 .logo{
+    background-color: lightgray;
+    border: 5px solid black;
+    padding: 2px;
     width: 5em;
     position: absolute;
     left: 50%;
@@ -137,7 +140,7 @@ section {
     text-decoration: none;
     padding: 0.2vw 0.6vw;
     display: inline-block;
-    color: black;
+    color: #d3d3d3;
 }
 
 .menu a.active {
@@ -188,10 +191,14 @@ section {
 footer{
     height: 4vw;
     background-color: rgba(169, 74, 74, 0.7);
-    width: 80%;
+    color: #FFF6DA;
+    text-align: center;
+    padding: 1.5rem;
+    font-size: 1.2rem;
     display: flex;
-    align-items: center;
     justify-content: center;
+    align-items: center;
+    flex-direction: column;
 }
 
 .message{
@@ -248,6 +255,27 @@ footer{
     padding: 0.4vw;
     height: auto;
     max-height: 60vh;
+    border-radius: 10px;
+    transition: all 0.3s ease;
+    margin-left: 2rem;
+}
+
+.browse:hover {
+    background-color: rgba(255, 255, 255, 1);
+}
+
+.browse a {
+    text-decoration: none;
+    color: #333;
+    padding: 0.5rem;
+    border-radius: 5px;
+    margin: 0.3rem 0;
+    transition: background-color 0.3s ease;
+}
+
+.browse a:hover {
+    background-color: #4e781b;
+    color: white;
 }
 
 .browse100 {
@@ -286,25 +314,70 @@ footer{
 }
 
 .auction-cards{
+    width: 100%;
+    max-width: 1200px;
+    overflow: hidden;
     display: flex;
     margin-top: 1vh;
     margin-bottom: 3vh;
     justify-content: space-between;
     align-items: start;
-    margin-left: 6vw;
+    margin-left: auto;
+    margin-right: auto;
     flex-wrap: wrap;
+    gap: 20px;
+}
+
+.auction-cards img {
+    width: 100%;
+    height: 150px;
+    object-fit: cover;
+    border-bottom: 1px solid #ddd;
+}
+
+.auction-title {
+    text-align: center;
+    font-size: 2rem;
+    font-weight: bold;
+    color: #333;
+    text-transform: uppercase;
+    letter-spacing: 2px;
+    margin-bottom: 2rem;
+    position: relative;
+}
+
+.auction-title::after {
+    content: '';
+    display: block;
+    width: 100px;
+    height: 4px;
+    background-color: #ff6600;
+    margin: 10px auto 0;
+    border-radius: 2px;
+}
+
+.auction-price {
+    text-align: center;
+    font-size: 1.8rem;
+    font-weight: bold;
+    color: #4e781b;
+    background: #f9f9f9;
+    padding: 1px 1rem;
+    border: 2px solid #4e781b;
+    border-radius: 10px;
+    display: inline-block;
+    margin-bottom: 10px;
+    margin-top: 10px;
 }
 
 .card{
-    width: 30%;
-    display: flex;
-    height: auto;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    background: #889E73;
-    margin-bottom: 3vh;
-    border: 3px solid #ccc;
+    width: calc(25% - 20px);
+    border: 1px solid #ddd;
+    border-radius: 10px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    overflow: hidden;
+    background-color: #fff;
+    text-align: center;
 }
 
 .card-auto{
@@ -446,7 +519,6 @@ form h2 {
     background-color: rgba(169, 74, 74, 0.7);
     display: flex;
     height: 6vh;
-    color: #FFF6DA !important;
     font-weight: bold;
     font-size: 1rem;
     padding: 1rem 1rem !important;
@@ -462,7 +534,7 @@ form h2 {
 
 .search-btn:hover {
     background-color: rgba(169, 74, 74, 1);
-    color: #FFF6DA;
+    color: black;
     text-decoration: none;
 }
 
@@ -542,6 +614,21 @@ table a:hover {
     border-radius: 0.5rem;
 }
 
+.btn-center{
+    background-color: rgba(169, 74, 74, 0.7);
+    display: flex;
+    height: 6vh;
+    color: #FFF6DA !important;
+    font-weight: bold;
+    font-size: 1rem;
+    padding: 1rem 1rem !important;
+    border: 3px solid #9e9b9b;
+    cursor: pointer;
+    align-items: center;
+    border-radius: 0.5rem;
+    margin: 0 auto; /* save the center */
+}
+
 .btn-info {
     background-color: rgba(82, 206, 227, 0.6);
     display: flex;
@@ -560,6 +647,7 @@ table a:hover {
 
 .btn-info:hover {
     background-color: rgba(82, 206, 227, 1);
+    color: black;
 }
 
 .btn-danger {
@@ -805,12 +893,19 @@ label{
     padding: 1rem;
 }
 
+.card-box-my-auction{
+    width: calc(22.33% - 10px);
+    background-color: #fff;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    margin-bottom: 20px;
+}
+
 .card-box{
     flex-direction: row;
     gap:clamp(1vw, 2vw, 3vw);
     flex-wrap: wrap;
-
-
 }
 
 .info-box li, .card-box li{
