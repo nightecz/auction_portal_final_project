@@ -1,11 +1,12 @@
 {% extends "base.html" %}
 
 {% block content %}
-
-<form method="post">
-    {% csrf_token %}
-    {{ form.as_p }}
-    <button type="submit" class="btn btn-primary">Submit Review</button>
-</form>
-
+<h2>Rate your purchase partner:</h2>
+<div class="info-box">
+    <form method="post">
+        {% csrf_token %}
+        {{ form.as_p }}
+        <button type="submit" class="search-btn">Submit Review</button>
+    </form>
+</div>
 {% endblock %}

@@ -1,11 +1,13 @@
 {% extends "base.html" %}
 {% block nadpis %} - Create auction{% endblock %}
 {% block content %}
-<h2>Create Auction</h2>
-<form method="POST" enctype="multipart/form-data">
-    {% csrf_token %}
-    {{ form.as_p }}
-    <button type="submit" class="btn btn-primary">Create Auction</button>
-</form>
+<h1>Create Auction</h1>
+<div class="create-box">
+    <form method="POST" enctype="multipart/form-data">
+        {% csrf_token %}
+        {{ form.as_p }}
+        <button type="submit" class="search-btn">Create Auction</button>
+    </form>
+</div>
 {% endblock %}
 

@@ -1,40 +1,48 @@
+{% extends 'base.html' %}
+
 {% block content %}
-<h2 class="mb-4 text-center">Login</h2>
+<h2>Login</h2>
+
+        {% if messages %}
+            {% for message in messages %}
+                <div class="message">{{ message }}</div>
+            {% endfor %}
+        {% endif %}
 
 {% if user.is_authenticated %}
-    Already login.
+    Already logged in.
 {% else %}
-<form method="post" class="w-50 mx-auto">
-    {% csrf_token %}
-    {% if messages %}
-        {% for message in messages %}
-            <div class="alert  alert-danger">{{ message }}</div>
-        {% endfor %}
-    {% endif %}
-    <div class="mb-3">
-        <label class="form-label" for="username">Username</label>
-        <input type="text" name="username" id="username" class="form-control" required>
-    </div>
-    <div class="mb-3">
-        <label class="form-label" for="password">Password</label>
-        <input type="password" name="password" id="password" class="form-control" required>
-        {% if field.errors %}
-        <div class="text-danger">
-            {{ field.errors }}
+    <form method="post">
+        {% csrf_token %}
+
+
+        <div>
+            <label for="username">Username</label>
+            <input type="text" name="username" id="username" class="form-control" required>
         </div>
-        {% endif %}
-    </div>
-    <button type="submit" class="btn btn-primary w-100">Login</button>
-</form>
+
+        <div>
+            <label for="password">Password</label>
+            <input type="password" name="password" id="password" class="form-control" required>
+            {% if field.errors %}
+                <div class="text-danger">
+                    {{ field.errors }}
+                </div>
+            {% endif %}
+        </div>
+
+        <button type="submit" class="search-btn">Login</button>
+    </form>
 {% endif %}
 
 <div class="container">
     {% if messages %}
-        <div class="alert alert-warning" role="alert">
+        <div class="message" role="alert">
             {% for message in messages %}
                 {{ message }}
             {% endfor %}
         </div>
     {% endif %}
+</div>
 
 {% endblock %}

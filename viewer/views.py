@@ -159,6 +159,17 @@ class AuctionCreateView(FormView):
         if not request.user.is_authenticated:
             messages.error(request, "You must be logged in to create an auction.")
             return redirect('/')
+
+        profile = request.user.profile
+        if not profile.is_premium:
+            user_auctions_count = Auction.objects.filter(seller=request.user).count()
+            if user_auctions_count >= 10:
+                messages.error(
+                    request,
+                    "You cannot create more than 10 auctions as a non-premium user. Upgrade to premium to create more auctions."
+                )
+                return redirect('index')
+
         return super().dispatch(request, *args, **kwargs)
 
     def form_valid(self, form):
@@ -539,8 +550,8 @@ class AuctionBiddingView(ListView):
         # Gets info, if user is winning
         auctions_with_status = []
         for auction in self.get_queryset():
-            last_bid = auction.bids.order_by('-created_at').first()  # gets last bid
-            is_winning = last_bid and last_bid.bidder == self.request.user  # checking if last bid == user
+            last_bid = auction.bids.order_by('-created_at').first()  # Poslední příhoz
+            is_winning = last_bid and last_bid.bidder == self.request.user  # Uživatel vyhrává?
             auctions_with_status.append({
                 'auction': auction,
                 'is_winning': is_winning
@@ -604,7 +615,7 @@ class PlaceBidView(FormView):
         if auction.buy_now_price > 0:
             if highest_bid and highest_bid.amount is not None:
                 if highest_bid.amount > auction.buy_now_price:
-                    auction.buy_now_price = highest_bid.amount
+                    auction.buy_now_price = Decimal(1.1) * highest_bid.amount
                     auction.save()
 
                     messages.success(request, "You made direct buy for {auction.buy_now_price}.")
@@ -844,6 +855,7 @@ class BuyNowView(View):
         if not auction.buy_now_price:
             messages.error(request, "This auction does not have a Buy Now option.")
             return redirect('auction_detail', id=auction.id)
+
 
         # Process Buy Now purchase if conditions are met
         purchase = Purchase.objects.create(

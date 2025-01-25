@@ -1,10 +1,12 @@
 {% extends "base.html" %}
 {% block content %}
 <h2>Relist auction: </h2>
-<form method="post" enctype="multipart/form-data">
-    {% csrf_token %}
-    {{ form.as_p }}
-    <button type="submit" class="btn btn-primary">Relist now!</button>
-</form>
-<a href="{% url 'my_auctions' %}">Back to my auctions</a>
+<div class="create-box">
+    <form method="post" enctype="multipart/form-data">
+        {% csrf_token %}
+        {{ form.as_p }}
+        <button type="submit" class="search-btn">Relist now!</button>
+    </form>
+    <a href="{% url 'my_auctions' %}">Back to my auctions</a>
+</div>
 {% endblock %}
