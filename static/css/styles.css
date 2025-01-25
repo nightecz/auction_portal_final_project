@@ -59,8 +59,9 @@ p{
 
 
 a {
-    color: #f6edd7;
+    color: #A94A4A;
     text-decoration: none;
+    font-weight: bold;
 }
 
 a:hover {
@@ -91,6 +92,7 @@ section {
     align-items: center;
     justify-content: center;
     padding-bottom: 4vh;
+    gap: 1vh;
 }
 
 .container{
@@ -135,6 +137,14 @@ section {
     text-decoration: none;
     padding: 0.2vw 0.6vw;
     display: inline-block;
+    color: black;
+}
+
+.menu a.active {
+    font-weight: bold;
+    color: #fff;
+    border: 2px solid #fff;
+    border-radius: 0.5vw;
 }
 
 .dropdown:hover .dropdown-menu {
@@ -198,6 +208,16 @@ footer{
     margin-top: 0.6vh;
 }
 
+.message a{
+    color: black;
+    font-weight: bold;
+}
+
+.message a:hover {
+    color: #FFF6DA;
+    text-decoration: none;
+}
+
 .message:empty {
     display: none;
 }
@@ -222,19 +242,20 @@ footer{
 .browse {
     display: flex;
     flex-direction: column;
-    background-color: rgba(136, 158, 115, 0.5);
-    width: 16%;
+    background-color: rgba(255, 255, 255, 0.8);
+    width: 20%;
     border: 3px solid #ccc;
     padding: 0.4vw;
     height: auto;
+    max-height: 60vh;
 }
 
 .browse100 {
     display: flex;
-    background-color: rgba(136, 158, 115, 0.5);
+    background-color: rgba(255, 255, 255, 0.8);
     width: auto;
     border: 3px solid #ccc;
-    padding: 0.4vw;
+    padding: 1vw;
     height: auto;
     align-items: center;
     justify-content: center;
@@ -259,6 +280,9 @@ footer{
     font-size: 0.8rem;
     margin-left: 1rem;
     font-weight: bold;
+}
+.subcategories.active {
+    display: block;
 }
 
 .auction-cards{
@@ -324,6 +348,30 @@ footer{
     gap: 1rem;
 }
 
+.card-header a {
+    color: white;
+    text-decoration: none;
+}
+
+.card-header img{
+    height: 120px;
+    width: 100%;
+    object-fit: cover;
+    object-position: center;
+}
+
+.card-header a:hover {
+    text-decoration: underline;
+}
+
+.card-footer a {
+    text-decoration: none;
+}
+
+.card-footer a:hover {
+    background-color: rgba(255, 255, 255, 0.8);text-decoration: underline;
+}
+
 .card-footer .btn-info,
 .card-footer .search-btn{
     width: 80%;
@@ -347,6 +395,10 @@ footer{
     margin: 0;
 }
 
+.categories-search a{
+    color: black;
+}
+
 .categories-search .list-inline-item {
     position: relative;
 }
@@ -356,8 +408,6 @@ footer{
     list-style: none;
     padding-left: 1.5rem;
     margin-top: 0.5rem;
-    background: rgba(136, 158, 115, 0.1);
-    border-left: 2px solid rgba(136, 158, 115, 0.5);
 }
 
 .list-inline-item.active .subcategories {
@@ -373,8 +423,16 @@ footer{
 }
 .search-box{
     display: flex;
-    justify-content: space-between;
+    flex-direction: row;
     align-items: center;
+    width: 60%;
+    margin: 3rem;
+    background-color: rgba(255, 255, 255, 0.8);
+    border: 3px solid #ccc;
+    margin-bottom: 2vh;
+    margin-top: 3vh;
+    border-radius: 1rem;
+    padding: 1rem;
 }
 
 form h2 {
@@ -382,24 +440,6 @@ form h2 {
     font-weight: bold;
     margin-bottom: 2vw;
     color: #A94A4A;
-}
-
-input, .form-control{
-    background-color: rgba(169, 74, 74, 0.2);
-    display: flex;
-    width: auto;
-    height: auto;
-    color: #FFF6DA;
-    font-weight: bold;
-    font-size: 1rem;
-    padding: 0.6rem 1rem;
-    border: 3px solid #ccc;
-    cursor: pointer;
-    text-align: center;
-    align-items: center;
-    justify-content: center;
-    margin-right: 1rem;
-    border-radius: 0.5rem;
 }
 
 .search-btn {
@@ -437,7 +477,9 @@ input::placeholder {
 
 .cat-search{
     display: flex;
-    gap: 0.1vw
+    align-items: start;
+    width: 100%;
+    gap: 0.3vw;
 }
 
 .adv-search{
@@ -559,7 +601,7 @@ table a:hover {
 }
 
 
-input.form-control, select.form-select {
+input, input.form-control, select.form-select, textarea, form select {
     background-color: rgba(169, 74, 74, 0.2);
     color: rgba(46, 72, 78, 0.7);
     font-weight: bold;
@@ -570,6 +612,7 @@ input.form-control, select.form-select {
     display: inline-block;
     margin-right: 1vw;
     border-radius: 0.5rem;
+    width: 100%;
 }
 
 input.form-control::placeholder, select.form-select::placeholder {
@@ -593,7 +636,7 @@ button.search-btn:focus {
 }
 
 select.form-select {
-    width: 40%;
+    width: 100%;
 }
 
 select.form-select option {
@@ -602,6 +645,7 @@ select.form-select option {
 
 .form-text {
     font-size: 0.9rem;
+    text-wrap: wrap;
     color: #A94A4A;
 }
 
@@ -639,7 +683,7 @@ label{
     display: flex;
     width: 80%;
     height: 3rem;
-    background-color: rgba(136, 158, 115, 0.9);
+    background-color: rgba(255, 255, 255, 0.8);
     align-items: center;
     justify-content: center;
     text-align: center;
@@ -662,25 +706,27 @@ label{
 
 .bidding-box {
     display: flex;
-    background-color: rgba(136, 158, 115, 0.5);
-    width: auto;
+    background-color: rgba(255, 255, 255, 0.8);
+    width: 80%;
     border: 3px solid #ccc;
-    padding: 0.4vw;
+    padding: 1vw 10vw;
     height: auto;
     justify-content: center;
     margin-bottom: 1vh;
+    border-radius: 1rem;
 }
 
 .image-box {
     display: flex;
-    background-color: rgba(136, 158, 115, 0.2);
-    width: auto;
+    background-color: rgba(255, 255, 255, 0.8);
+    width: 80%;
     border: 3px solid #ccc;
     padding: 1vw;
     height: auto;
     align-items: center;
     justify-content: space-between;
     margin-bottom: 3vh;
+    border-radius: 1rem;
 }
 
 .image-box img{
@@ -695,9 +741,10 @@ label{
     align-items: center;
     justify-content: center;
     width: auto;
+    max-width: 100%;
     border: 3px solid #ccc;
     border-radius: 1vw;
-    padding: 1vw;
+    padding: 1vh 6vw;
     height: auto;
     margin-top: 3vh;
     margin-bottom: 3vh;
@@ -736,24 +783,6 @@ label{
     width: 100%;
 }
 
-.card-header a {
-    color: white;
-    text-decoration: none;
-}
-
-.card-header a:hover {
-    text-decoration: underline;
-}
-
-.card-footer a {
-    color: #007bff;
-    text-decoration: none;
-}
-
-.card-footer a:hover {
-    text-decoration: underline;
-}
-
 .text-success {
     color: #28a745;
 }
@@ -766,9 +795,9 @@ label{
     display: flex;
     flex-direction: column;
     align-items: center;
-    width: auto;
+    width: 80%;
     margin: 3rem;
-    background-color: rgba(136, 158, 115, 1);
+    background-color: rgba(255, 255, 255, 0.8);
     border: 3px solid #ccc;
     margin-bottom: 2vh;
     margin-top: 3vh;
@@ -824,8 +853,18 @@ input[type="file"]::-webkit-file-upload-button {
 form{
     display: flex;
     flex-direction: column;
-    align-items: center;
+    align-items: start;
     justify-content: center;
+    width: 100%;
+    gap: 1vh;
+}
+
+.user-search{
+    display: flex;
+    flex-direction: row;
+}
+td form{
+    align-items: center;
 }
 
 .logout{
@@ -838,7 +877,7 @@ form{
     align-items: center;
     width: auto;
     margin: 3rem;
-    background-color: rgba(136, 158, 115, 1);
+    background-color: rgba(255, 255, 255, 0.8);
     border: 3px solid #ccc;
     margin-bottom: 2vh;
     margin-top: 3vh;
@@ -851,7 +890,6 @@ form{
 }
 .create-box ul{
    margin-top: 0;
-    margin-bottom: 3rem;
 }
 
 .create-box p{
@@ -920,7 +958,6 @@ td .btn-danger, td .btn-info{
     .cat-search{
         width: 100%;
         flex-direction: column;
-        align-items: center;
     }
     table{
         width: 100%;
@@ -954,6 +991,7 @@ td .btn-danger, td .btn-info{
         flex-direction: column;
         align-items: center;
         justify-content: center;
+        width: 80%;
     }
     .card-auto{
         width: 90%;
@@ -964,13 +1002,6 @@ td .btn-danger, td .btn-info{
     .card{
         width: 90%;
     }
-    .info-box{
-        flex-direction: column;
-        align-items: center;
-        justify-content: center;
-        margin: unset;
-        padding: unset;
-    }
     .info-box, .info-box p .info-box form,
     .card-box, .card-box p .card-box form,
     .create-box, .create-box p, .create-box form{
@@ -980,7 +1011,8 @@ td .btn-danger, td .btn-info{
     }
     .bidding-box{
         flex-direction: column;
-        width: 90%;
+        padding: 2vh 6vw;
+        gap: 2vh;
     }
     .create-box input, .create-box textarea{
         width: 100%;

@@ -20,50 +20,49 @@
         <h1>{{ auction.name }}</h1>
         <p>Status:</p> <h2>{{ auction.get_status_display }}</h2>
     </div>
-    <div class="row">
-        <div class="image-box">
-            {% if auction.image1 or auction.image2 or auction.image3 %}
-                {% if auction.image1 %}
-                    <img src="{{ auction.image1.url }}">
-                {% endif %}
-                {% if auction.image2 %}
-                    <img src="{{ auction.image2.url }}">
-                {% endif %}
-                {% if auction.image3 %}
-                    <img src="{{ auction.image3.url }}">
-                {% endif %}
-            {% else %}
-                <p class="text-danger">No images available for this auction.</p>
+
+    <div class="image-box">
+        {% if auction.image1 or auction.image2 or auction.image3 %}
+            {% if auction.image1 %}
+                <img src="{{ auction.image1.url }}">
             {% endif %}
-        </div>
-    </div>
-    <div class="row">
-        <div class="detail-box">
-            <p><strong>Description:</strong> {{ auction.description }}</p>
-            <p><strong>Seller: </strong><a href="{% url 'profile_detail' id=auction.seller.profile.id %}">{{ auction.seller.username }}</a>
-                <small class="form-text text-muted">
-                    {% if average_rating %}
-                        Average Rating: {{ average_rating|floatformat:1 }}
-                    {% else %}
-                        No ratings yet
-                    {% endif %}
-                </small>
-            </p>
-            <p><strong>Categories:</strong>
-                {% for category in auction.categories.all %}
-                    {{ category.name }}{% if not forloop.last %}, {% endif %}
-                {% endfor %}
-            </p>
-            <p><strong>Starting Price:</strong> ${{ auction.starting_price }}</p>
-            <p><strong>Current Price:</strong> ${{ auction.current_price }}</p>
-            {% if auction.buy_now_price %}
-                <p><strong>Buy now price:</strong> ${{ auction.buy_now_price }}</p>
-            {% else %}
-                <p>This auction has no buy now possibility.</p>
+            {% if auction.image2 %}
+                <img src="{{ auction.image2.url }}">
             {% endif %}
-            <p><strong>Auction Ends:</strong> {{ auction.end_time }}</p>
-        </div>
+            {% if auction.image3 %}
+                <img src="{{ auction.image3.url }}">
+            {% endif %}
+        {% else %}
+            <p class="text-danger">No images available for this auction.</p>
+        {% endif %}
     </div>
+
+    <div class="info-box">
+        <p><strong>Description:</strong> {{ auction.description }}</p>
+        <p><strong>Seller: </strong><a href="{% url 'profile_detail' id=auction.seller.profile.id %}">{{ auction.seller.username }}</a></p>
+        <p><strong>Rating: </strong>
+                {% if average_rating %}
+                    Average Rating: {{ average_rating|floatformat:1 }}
+                {% else %}
+                    No ratings yet
+                {% endif %}
+        </p>
+
+        <p><strong>Categories:</strong>
+            {% for category in auction.categories.all %}
+                {{ category.name }}{% if not forloop.last %}, {% endif %}
+            {% endfor %}
+        </p>
+        <p><strong>Starting Price:</strong> ${{ auction.starting_price }}</p>
+        <p><strong>Current Price:</strong> ${{ auction.current_price }}</p>
+        {% if auction.buy_now_price %}
+            <p><strong>Buy now price:</strong> ${{ auction.buy_now_price }}</p>
+        {% else %}
+            <p>This auction has no buy now possibility.</p>
+        {% endif %}
+        <p><strong>Auction Ends:</strong> {{ auction.end_time }}</p>
+    </div>
+
     <div class="bidding-box">
         {% if user.is_authenticated %}
             {% if auction.seller == user %}
@@ -74,7 +73,7 @@
                 {% if auction.status == 'Running' %}
                     <form method="post" action="{% url 'place_bid' %}?auction={{ auction.id }}" class="mt-4">
                         {% csrf_token %}
-                        <div class="mb-3">
+                        <div>
                             <label for="bidAmount" class="form-label"><strong>Place Your Bid:</strong></label>
                             <input type="number" name="bid_amount" id="bidAmount" class="form-control" step="0.1" min="{{ auction.current_price|floatformat:1 }}" required>
                         </div>
@@ -103,16 +102,16 @@
                 {% if auction.id in auction_ids_in_watchlist %}
                     <p>This auction is in your watchlist.</p>
                     <form action="{% url 'watchlist' %}" method="get">
-                        <button type="submit" class="btn btn-danger">Edit watchlist</button>
+                        <button type="submit" class="search-btn">Edit watchlist</button>
                     </form>
                 {% else %}
                     <form method="post" action="{% url 'add_to_watchlist' auction.id %}">
                         {% csrf_token %}
-                        <button type="submit" class="btn btn-info">Add to watchlist</button>
+                        <button type="submit" class="search-btn">Add to watchlist</button>
                     </form>
                 {% endif %}
             {% endif %}
-            {% if user.is_superuser and auction.status != 'Archived' %}
+            {% if user.is_superuser and auction.status != 'Running' and auction.status != 'Archived' %}
                 <form method="post" action="{% url 'add_to_archive' auction.id %}">
                     {% csrf_token %}
                     <button type="submit" class="btn-danger">Archive Auction</button>
@@ -121,7 +120,10 @@
         {% if user.is_authenticated and auction.status == 'Closed' %}
             {% if purchase %}
                 {% if purchase.buyer == request.user.profile and not purchase.buyer_confirmation %}
-                    <a href="{% url 'buyer_confirmation' purchase.id %}" class="btn-warning">Confirm purchase</a>
+
+                <a href="{% url 'buyer_confirmation' purchase.id %}">
+                    <button class="btn-warning">Confirm purchase</button>
+                </a>
                 {% endif %}
                 {% if purchase.seller == request.user.profile and purchase.buyer_confirmation and not purchase.seller_confirmation %}
                     <form method="post" action="{% url 'seller_confirmation' purchase.id %}">
@@ -132,10 +134,16 @@
             {% endif %}
         {% endif %}
         {% if auction.status == 'Sold' and purchase.seller == request.user.profile %}
-            <a href="{% url 'contact_info' purchase.id %}" class="btn-info">View Buyer Contact Info</a>
-            <a href="{% url 'review_form' %}?purchase={{ purchase.id }}" class="search-btn">Write review</a>
+            <a href="{% url 'contact_info' purchase.id %}">
+                <button class="btn-warning">View Buyer Contact Info</button>
+            </a>
+            <a href="{% url 'review_form' %}?purchase={{ purchase.id }}">
+                <button class="search-btn">Write review</button>
+            </a>
         {% elif auction.status == 'Sold' and purchase.buyer == request.user.profile %}
-            <a href="{% url 'review_form' %}?purchase={{ purchase.id }}" class="search-btn">Write review</a>
+            <a href="{% url 'review_form' %}?purchase={{ purchase.id }}">
+                <button class="search-btn">Write review</button>
+            </a>
         {% endif %}
     </div>
     <div class="big-label">

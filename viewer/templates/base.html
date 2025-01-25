@@ -19,18 +19,36 @@
 <body>
 <header>
         <ul class="menu">
-            <li><a href="{% url 'index' %}">Home</a></li>
-            <li><a href="{% url 'auctions' %}">Auctions</a></li>
+            <li>
+                <a href="{% url 'index' %}" class="{% if request.resolver_match.url_name == 'index' %}active{% endif %}">
+                    Home
+                </a>
+            </li>
+            <li>
+                <a href="{% url 'auctions' %}" class="{% if request.resolver_match.url_name == 'auctions' %}active{% endif %}">
+                    Auctions
+                </a>
+            </li>
             {% if user.is_authenticated %}
-            <li><a href="{% url 'auction_create' %}">Create Auction</a></li>
+                <li>
+                    <a href="{% url 'auction_create' %}" class="{% if request.resolver_match.url_name == 'auction_create' %}active{% endif %}">
+                        Create Auction
+                    </a>
+                </li>
             {% endif %}
             {% if user.is_superuser %}
-            <li><a href="{% url 'archive' %}">Archive</a></li>
+                <li>
+                    <a href="{% url 'archive' %}" class="{% if request.resolver_match.url_name == 'archive' %}active{% endif %}">
+                        Archive
+                    </a>
+                </li>
             {% endif %}
         </ul>
+
         <a href="{% url 'index' %}" class="logo-box">
             <img class="logo" src="{% static 'web_images/logo.png' %}" alt="Auctions Logo">
         </a>
+
         <ul class="menu">
             {% if user.is_authenticated %}
             <li class="dropdown">

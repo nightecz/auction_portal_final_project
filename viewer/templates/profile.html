@@ -2,7 +2,6 @@
 'street', 'house_number', 'city', 'zip_code', 'country']
 {% block nadpis %} - Profile{% endblock %}
 {% block content %}
-<div>
         <div class="info-box">
             <h2 class="h2">Profile</h2>
     {% if user.profile.avatar %}
@@ -61,5 +60,4 @@
             {% endfor %}
         </div>
     </div>
-</div>
 {% endblock %}
