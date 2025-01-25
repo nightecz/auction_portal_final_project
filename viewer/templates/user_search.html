@@ -4,8 +4,8 @@
 
 {% block content %}
     <h2>Search for user</h2>
-    <form method="get" action="{% url 'user_search' %}" class="mb-4">
-        <div class="row">
+<div class="search-box">
+    <form class="user-search" method="get" action="{% url 'user_search' %}" class="mb-4">
             <div class="col">
                 <input type="text" name="q" class="form-control" placeholder="Search by keyword..." value="{{ request.GET.q }}">
             </div>
@@ -19,8 +19,8 @@
             <div class="col">
                 <button type="submit" class="search-btn">Search</button>
             </div>
-        </div>
     </form>
+</div>
 
     {% if profiles %}
         <table class="table table-bordered">

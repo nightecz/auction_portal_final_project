@@ -33,8 +33,7 @@
         <td><a href="{% url 'auction_detail' item.auction.id %}">{{ item.auction.name }}</a></td>
         <td>{% if item.auction.image1 %}
             <a href="{% url 'auction_detail' item.auction.id %}">
-            <img src="{{ item.auction.image1.url }}" alt="Auction Image" class="img-thumbnail"
-                         style="width: 100%; height: 120px; object-fit: cover;">
+            <img src="{{ item.auction.image1.url }}" alt="Auction Image" class="card-img-top">
             {% else %}
             No image available
             {% endif %}
