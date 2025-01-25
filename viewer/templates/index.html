@@ -39,7 +39,7 @@
 <div class="content">
     <div class="browse">
         <h3>Categories:</h3>
-        <ul class="categories">
+        <ul class="categories-search">
             {% for category in main_categories %}
             <li>
                 <a href="{% url 'auctions' %}?category={{ category.id }}">

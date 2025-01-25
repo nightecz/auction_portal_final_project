@@ -612,10 +612,25 @@ class PlaceBidView(FormView):
 
         highest_bid = auction.bids.order_by('-amount').first()
 
+        # If buy now price is reached by bidding direct buy is activated
         if auction.buy_now_price > 0:
             if highest_bid and highest_bid.amount is not None:
-                if highest_bid.amount > auction.buy_now_price:
-                    auction.buy_now_price = Decimal(1.1) * highest_bid.amount
+                if highest_bid.amount >= auction.buy_now_price:
+
+                    purchase = Purchase.objects.create(
+                        auction=auction,
+                        buyer=request.user.profile,
+                        seller=auction.seller.profile,
+                        winning_price=auction.buy_now_price
+                    )
+
+                    # Mark the purchase as confirmed by the buyer
+                    purchase.buyer_confirmation = True
+                    purchase.save()
+
+                    # Link the purchase to the auction and mark it as closed
+                    auction.purchase = purchase
+                    auction.status = Auction.CLOSED
                     auction.save()
 
                     messages.success(request, "You made direct buy for {auction.buy_now_price}.")
