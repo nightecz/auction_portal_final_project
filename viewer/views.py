@@ -550,8 +550,8 @@ class AuctionBiddingView(ListView):
         # Gets info, if user is winning
         auctions_with_status = []
         for auction in self.get_queryset():
-            last_bid = auction.bids.order_by('-created_at').first()  # Poslední příhoz
-            is_winning = last_bid and last_bid.bidder == self.request.user  # Uživatel vyhrává?
+            last_bid = auction.bids.order_by('-created_at').first()  # gets last bid
+            is_winning = last_bid and last_bid.bidder == self.request.user  # checking if last bid == user
             auctions_with_status.append({
                 'auction': auction,
                 'is_winning': is_winning
@@ -561,12 +561,16 @@ class AuctionBiddingView(ListView):
         return context
 
 # Optimization - self standing function will be called up on different places as method for direct buy.
-def process_direct_buy(auction, bid_amount, request):
+def process_direct_buy(auction, highest_bid ,request):
     highest_bid = auction.bids.order_by('-amount').first()
     if highest_bid and highest_bid.amount >= auction.buy_now_price:
         winning_price = highest_bid.amount
     else:
         winning_price = auction.buy_now_price
+
+        # in case of direct buy current price will change on buy now price
+        auction.current_price = auction.buy_now_price
+        auction.save()
 
     # purchase creating
     purchase = Purchase.objects.create(
