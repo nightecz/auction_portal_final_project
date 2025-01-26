@@ -5,7 +5,7 @@
 {% endblock %}
 
 {% block extra_head %}
-    <meta http-equiv="refresh" content="10">
+    <meta http-equiv="refresh" content="60">
 {% endblock %}
 
 {% block content %}
@@ -18,7 +18,9 @@
     {% endif %}
     <div class="status-info">
         <h1>{{ auction.name }}</h1>
-        <p>Status:</p> <h2>{{ auction.get_status_display }}</h2>
+        <div class="status-row">
+            <p>Status:</p> <h2>{{ auction.get_status_display }}</h2>
+        </div>
     </div>
 
     <div class="image-box">
@@ -98,7 +100,7 @@
         {% endif %}
     </div>
     <div class="handling">
-        {% if auction.seller != user %}
+        {% if auction.seller != user and auction.status == 'Running' %}
                 {% if auction.id in auction_ids_in_watchlist %}
                     <p>This auction is in your watchlist.</p>
                     <form action="{% url 'watchlist' %}" method="get">

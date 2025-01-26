@@ -166,7 +166,7 @@ class AuctionCreateView(FormView):
             if user_auctions_count >= 10:
                 messages.error(
                     request,
-                    "You cannot create more than 10 auctions as a non-premium user. Upgrade to premium to create more auctions."
+                    "You cannot create more than 10 auctions as a non-premium user. Upgrade to premium to create more auctions. Write us on: email@email.com"
                 )
                 return redirect('index')
 
@@ -419,7 +419,7 @@ class AuctionUpdateView(UpdateView):
 
 class AuctionCancelView(View):
     model = Auction
-    template_name = 'auction_cancel.html'
+    template_name = 'auctions/auction_cancel.html'
     success_url = reverse_lazy('my_auctions')
 
     def get(self, request, pk):
@@ -435,6 +435,55 @@ class AuctionCancelView(View):
         messages.success(request, "Auction have been cancelled.")
         return redirect(self.success_url)
 
+class AuctionRelistView(View):
+    model = Auction
+    template_name = 'auction_relist.html'
+    success_url = reverse_lazy('my_auctions')
+    form_class = AuctionCreateForm
+
+    def get_object(self):
+        # Load auction by (pk) from URL
+        pk = self.kwargs.get('pk')
+        return get_object_or_404(self.model, pk=pk)
+
+    def dispatch(self, request, *args, **kwargs):
+        auction = self.get_object()
+
+        # Check for 'Unsold' or 'Cancelled'
+        if auction.status not in [Auction.UNSOLD, Auction.CANCELLED]:
+            messages.error(request, "Only unsold or cancelled auction could be relisted.")
+            return redirect(self.success_url)
+
+        # Check for seller = owner
+        if auction.seller != request.user:
+            messages.error(request, "You do not have right to do that.")
+            return redirect(self.success_url)
+
+        return super().dispatch(request, *args, **kwargs)
+
+    def post(self, request, *args, **kwargs):
+        # Gets auction by pk
+        auction = self.get_object()
+
+        # Proceed data from form
+        form = self.form_class(request.POST, instance=auction)
+
+        if form.is_valid():
+            auction = form.save(commit=False)
+
+            # Update status and time
+            auction.status = Auction.RUNNING
+            auction.start_time = timezone.now()
+            auction.end_time = form.cleaned_data.get('end_time')
+
+            auction.save()
+
+            messages.success(request, "Auction has been relisted.")
+            return redirect(self.success_url)
+        else:
+            messages.error(request, "There was an error relisting the auction.")
+            return render(request, self.template_name, {'form': form, 'auction': auction})
+
 class AuctionRelistView(UpdateView):
     model = Auction
     template_name = 'auction_relist.html'
@@ -449,7 +498,7 @@ class AuctionRelistView(UpdateView):
     def dispatch(self, request, *args, **kwargs):
         auction = self.get_object()
 
-        # Check for 'Closed' or 'Cancelled'
+        # Check for 'Unsold' or 'Cancelled'
         if auction.status not in [Auction.UNSOLD, Auction.CANCELLED]:
             messages.error(request, "Only unsold or cancelled auction could be relisted.")
             return redirect(self.success_url)
@@ -501,8 +550,8 @@ class AuctionBiddingView(ListView):
         # Gets info, if user is winning
         auctions_with_status = []
         for auction in self.get_queryset():
-            last_bid = auction.bids.order_by('-created_at').first()  # Poslední příhoz
-            is_winning = last_bid and last_bid.bidder == self.request.user  # Uživatel vyhrává?
+            last_bid = auction.bids.order_by('-created_at').first()  # gets last bid
+            is_winning = last_bid and last_bid.bidder == self.request.user  # checking if last bid == user
             auctions_with_status.append({
                 'auction': auction,
                 'is_winning': is_winning
@@ -512,12 +561,16 @@ class AuctionBiddingView(ListView):
         return context
 
 # Optimization - self standing function will be called up on different places as method for direct buy.
-def process_direct_buy(auction, bid_amount, request):
+def process_direct_buy(auction, highest_bid ,request):
     highest_bid = auction.bids.order_by('-amount').first()
     if highest_bid and highest_bid.amount >= auction.buy_now_price:
         winning_price = highest_bid.amount
     else:
         winning_price = auction.buy_now_price
+
+        # in case of direct buy current price will change on buy now price
+        auction.current_price = auction.buy_now_price
+        auction.save()
 
     # purchase creating
     purchase = Purchase.objects.create(

@@ -2,14 +2,6 @@
 
 {% block content %}
 
-{% if messages %}
-        <div class="message" role="alert">
-            {% for message in messages %}
-                {{ message }}
-            {% endfor %}
-        </div>
-    {% endif %}
-
 <h1>Update Auction</h1>
 <div class="create-box">
     <form method="post" enctype="multipart/form-data">
@@ -27,7 +19,7 @@
     </form>
     {% endif %}
     <br>
-    {% if auction.status == 'Unsold' or auction.status == 'Cancelled' %}
+    {% if auction.status == 'Cancelled' or auction.status == 'Unsold' %}
     <!-- Form for auction relist -->
     <a href="{% url 'auction_relist' auction.id %}" class="btn-warning">Relist Auction</a>
     {% endif %}
