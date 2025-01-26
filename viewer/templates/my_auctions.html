@@ -32,7 +32,7 @@
         {% if object_list %}
             {% for auction in object_list %}
                 {% if auction.status != 'Archived' %}
-                    <div class="card-auto">
+                    <div class="card">
                         <div class="card-header">
                             <h3><a href="{% url 'auction_detail' auction.id %}">{{ auction.name }}</a></h3>
                             <a href="{% url 'auction_detail' auction.id %}">
@@ -65,7 +65,7 @@
                         </div>
                         <div class="card-footer">
                             <a href="{% url 'auction_detail' auction.id %}" class="search-btn">View</a>
-                            <a href="{% url 'auction_update' auction.id %}" class="btn-info">Edit</a>
+                            <a href="{% url 'auction_update' auction.id %}" class="search-btn">Edit</a>
                         </div>
                     </div>
                 {% endif %}

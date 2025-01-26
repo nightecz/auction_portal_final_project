@@ -3,8 +3,7 @@
 {% block nadpis %} - Profile detail{% endblock %}
 
 {% block content %}
-<div class="card">
-    <div class="card-header text-center">
+<div class="profile-info-box">
         <h2 class="h2">Profile</h2>
 {% if profile.avatar %}
     <img src="{{ profile.avatar.url }}" alt="Avatar" class="img-thumbnail"
@@ -14,7 +13,6 @@
 {% endif %}
     <h4>Average Rating: {{ profile.calculate_average_rating|default:"No ratings yet" }}</h4>
     <h5 class="card-title text-center">About user</h5>
-    </div>
     <div class="card-body">
         <p class="card-text"><strong>Username:</strong> {{ profile.user.username }}</p>
         {% if user.is_active %}
@@ -22,16 +20,18 @@
         {% else %}
             <p class="card-text"><strong>Status:</strong> <span style="color: red">Not active</span></p>
         {% endif %}
+    </div>
+    <div class="card-footer">
         {% if back_to_auction_url %}
-            <button><a href="{{ back_to_auction_url }}">Back to auction</a></button>
+            <button class="search-btn"><a href="{{ back_to_auction_url }}">Back to auction</a></button>
         {% endif %}
     </div>
 </div>
 </form>
-    <div class="card-footer">
-    <strong>Reviews</strong>:
+    <div class="info-box">
+    <h3>Reviews:</h3>
     {% for review in profile.received_reviews.all %}
-    <div class="card">
+    <div class="card-100">
         <div class="card-header">
             <small>By: {{ review.reviewer.user.username }} ({{ review.created|date:'H:i:s M d, Y' }})</small>
         </div>
