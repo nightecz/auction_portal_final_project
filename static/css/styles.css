@@ -755,6 +755,19 @@ label{
     margin: 0;
 }
 
+.container {
+    background: azure;
+}
+
+a {
+    color: black !important;
+    text-decoration: none !important;
+}
+
+a:hover {
+    color: grey !important;
+    text-decoration: none !important;
+}
 .filter{
     display: flex;
     justify-content: center;
@@ -1021,4 +1034,12 @@ td .btn-danger, td .btn-info{
         height: auto;
     }
 
+.subcategory-link {
+    color: black !important;
+    text-decoration: none !important;
+}
+
+.subcategory-link:hover {
+    color: black !important;
+    text-decoration: none !important;
 }
