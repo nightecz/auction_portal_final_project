@@ -491,7 +491,7 @@ footer{
     color: black;
     font-weight: bolder;
     width: 100%;
-    white-space: nowrap;
+    white-space: wrap;
     overflow: hidden;
     text-overflow: ellipsis;
 }
@@ -1229,6 +1229,9 @@ td .btn-danger, td .btn-info{
     .dropdown-menu {
         width: 30vw;
         right: -20vw
+    }
+    .card-footer .search-btn{
+    width: 100%;
     }
 }
 
