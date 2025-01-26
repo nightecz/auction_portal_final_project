@@ -1,11 +1,12 @@
 import os
-from datetime import timedelta, datetime
+from datetime import timedelta, datetime, timezone
 
 import django
 from django.test import TestCase
+from django.test.utils import freeze_time
 from django.urls import reverse
 from django.contrib.auth.models import User
-from django.utils.timezone import now
+from django.utils import timezone
 
 from viewer.models import Profile, Auction, Category
 from viewer.forms import SignUpForm, AuctionCreateForm
@@ -165,45 +166,46 @@ class TestSignUpFormValidator(TestCase):
             'country': country,
             'prefer_communication': 'email',
         }
-
+@freeze_time("2025-01-01T00:00")
 class TestAuctionCreateForm(TestCase):
     def setUp(self):
         self.category = Category.objects.create(name="Electronics", parent=None)
 
-    def _get_valid_data(self, starting_price=100.00, buy_now_price=100.00, end_time='2025-01-15T14:30'):
+    def _get_valid_data(self, starting_price=100.00, buy_now_price=120.00, end_time='2025-01-15T14:30'):
         return {
             'name': 'Produkt',
             'description': 'realy great Produkt',
             'starting_price': starting_price,
             'buy_now_price': buy_now_price,
             'end_time': end_time,
-            'categories': [1],
+            'categories': [self.category.id],
         }
 
     def test_valid_starting_price(self):
-        form_data = self._get_valid_data(starting_price=100.01)
+        form_data = self._get_valid_data(starting_price=100.00, buy_now_price=120.00)  # buy_now_price > starting_price
         form = AuctionCreateForm(data=form_data)
         self.assertTrue(form.is_valid())
 
     def test_invalid_starting_price(self):
-        form_data = self._get_valid_data(starting_price=-100.01)
+        form_data = self._get_valid_data(starting_price=0)
         form = AuctionCreateForm(data=form_data)
         self.assertFalse(form.is_valid())
         self.assertIn('starting_price', form.errors)
 
     def test_valid_buy_now_price(self):
-        form_data = self._get_valid_data(buy_now_price=100.01)
+        form_data = self._get_valid_data(starting_price=100.00, buy_now_price=120.00)  # buy_now_price > starting_price
         form = AuctionCreateForm(data=form_data)
         self.assertTrue(form.is_valid())
 
     def test_invalid_buy_now_price(self):
-        form_data = self._get_valid_data(buy_now_price=-100.01)
+        form_data = self._get_valid_data(buy_now_price=-100.10)
         form = AuctionCreateForm(data=form_data)
         self.assertFalse(form.is_valid())
         self.assertIn('buy_now_price', form.errors)
 
     def test_valid_end_time(self):
-        form_data = self._get_valid_data(end_time='2025-01-15T14:30')
+        form_data = self._get_valid_data(
+            end_time='2025-01-26T14:30')
         form = AuctionCreateForm(data=form_data)
         self.assertTrue(form.is_valid())
 
@@ -219,3 +221,6 @@ class TestAuctionCreateForm(TestCase):
         self.assertFalse(form.is_valid())
         self.assertIn('end_time', form.errors)
 
+        # Debugging
+        print("Form data:", form_data)  # Show data in form
+        print("Form errors:", form.errors)  # Show errors

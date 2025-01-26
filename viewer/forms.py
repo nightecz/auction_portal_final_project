@@ -1,8 +1,10 @@
 from datetime import datetime, timedelta
+from decimal import Decimal
 
 import unicodedata
 from django.core.exceptions import ValidationError
 from django.core.validators import RegexValidator, EmailValidator
+from django.utils import timezone
 from django.utils.timezone import now
 
 from viewer.models import Profile, Bid, Purchase
@@ -170,20 +172,34 @@ class AuctionCreateForm(ModelForm):
     def clean_buy_now_price(self):
         buy_now_price = self.cleaned_data.get('buy_now_price')
         starting_price = self.cleaned_data.get('starting_price')
+
         if buy_now_price is None:
-            return 0
+            return Decimal(0.0)
+
+        if starting_price is None:
+            raise ValidationError("Starting price must be set before setting Buy Now price.")
+
         if buy_now_price < 0.01:
             raise ValidationError("Buy now price must be greater than zero.")
+
         if buy_now_price is not None and buy_now_price < starting_price:
             raise ValidationError("Buy now price must be greater than starting price.")
+
         return buy_now_price
 
     def clean_end_time(self):
         end_time = self.cleaned_data.get('end_time')
-        if end_time < now():
-            raise ValidationError("End time you are trying to put in, is already gone.")
-        if end_time > now() + timedelta(days=30):
-            raise ValidationError("Duration of the action cannot be more than 30 days.")
+        now = timezone.now()  # Use timezone-aware now()
+
+        # Convert end_time to timezone-aware datetime if it is naive
+        if end_time and timezone.is_naive(end_time):
+            end_time = timezone.make_aware(end_time, timezone.get_current_timezone())
+
+        if end_time < now:
+            raise ValidationError("You are trying to put in time that already pass.")
+
+        if end_time > now + timedelta(days=30):
+            raise ValidationError("Duration of auction can not be more than 30 days.")
         return end_time
 
     def save(self, commit=True):
