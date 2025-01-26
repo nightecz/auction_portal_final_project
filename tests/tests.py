@@ -22,6 +22,8 @@ class UrlsTests(TestCase):
             {'url': reverse('login'), 'name': 'login'},
             {'url': reverse('register'), 'name': 'register'},
             {'url': reverse('auctions'), 'name': 'auctions'},
+            {'url': reverse('advanced_search'), 'name': 'advanced_search'},
+            {'url': reverse('user_search'), 'name': 'user_search'}
         ]
 
         for endpoint in endpoints:
@@ -51,7 +53,9 @@ class LoginUserTest(TestCase):
 
 
 class LogoutUserTest(TestCase):
-    pass
+    def test_logout(self):
+        response = self.client.post(reverse('logout'), {
+        })
 
 
 class TestSignUpFormValidator(TestCase):
