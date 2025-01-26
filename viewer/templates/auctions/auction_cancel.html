@@ -2,10 +2,14 @@
 
 {% block content %}
     <h1>Are you sure you want to cancel the auction "{{ object.name }}"?</h1>
+    <div class="create-box">
     <form method="post">
         {% csrf_token %}
         <button type="submit" class="search-btn">Yes, cancel it!</button>
     </form>
 <br>
-    <button onclick="window.location.href='{% url 'my_auctions' %}'" class="btn btn-primary">Back</button>
+        <div class="button-info">
+            <button onclick="window.location.href='{% url 'my_auctions' %}'" class="btn btn-info">Back</button>
+        </div>
+    </div>
 {% endblock %}

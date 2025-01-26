@@ -16,7 +16,7 @@
         <h1>Welcome to Auctions Portal Team 6!</h1>
     </div>
     {% if unconfirmed_sales_count > 0 %}
-        <div class="message">
+        <div class="message-confirmation">
             <p>
                 You have {{ unconfirmed_sales_count }} unconfirmed sales. Please visit:
                 <a href="{% url 'my_auctions' %}">My Auctions</a> and confirm them.
@@ -24,7 +24,7 @@
         </div>
     {% endif %}
     {% if unconfirmed_purchases_count > 0 %}
-        <div class="message">
+        <div class="message-confirmation">
             <p>
                 You have won {{unconfirmed_purchases_count}} auctions. Please visit:
                 <a href="{% url 'won_auctions' %}">Won Auctions</a> and confirm your interest in purchase.
@@ -37,7 +37,7 @@
     <h2>Browse auctions by category or <a href="{% url 'auctions' %}">View All Auctions</a>.</h2>
 </div>
 <div class="content">
-    <div class="browse">
+    <div class="browse-index">
         <h3>Categories:</h3>
         <ul class="categories-search">
             {% for category in main_categories %}
@@ -59,7 +59,7 @@
         </ul>
     </div>
     <div class="overview">
-        <h4>Recently Added Auctions</h4>
+        <h4 class="auction-title">Recently Added Auctions</h4>
         <div class="auction-cards">
             {% for auction in recent_auctions %}
             <a class="card" href="{% url 'auction_detail' auction.id %}">
@@ -76,7 +76,7 @@
                                 <img src="{% static 'images/default-auction-image.jpg' %}" alt="Default image">
                             {% endif %}
                     </div>
-                    <div class="card-body">
+                    <div class="auction-price">
                         <p><strong>${{ auction.current_price }}</strong></p>
                     </div>
                 </a>
@@ -84,7 +84,7 @@
             <p>No auctions recently added.</p>
             {% endfor %}
         </div>
-        <h4>Auctions Ending Soon</h4>
+        <h4 class="auction-title">Auctions Ending Soon</h4>
         <div class="auction-cards">
             {% for auction in ending_soon_auctions %}
             <a class="card" href="{% url 'auction_detail' auction.id %}">
@@ -101,7 +101,7 @@
                                 <img src="{% static 'images/default-auction-image.jpg' %}" alt="Default image">
                             {% endif %}
                     </div>
-                    <div class="card-body">
+                    <div class="auction-price">
                         <p><strong>${{ auction.current_price }}</strong></p>
                     </div>
                 </a>
@@ -109,7 +109,7 @@
             <p>No auctions ending soon.</p>
             {% endfor %}
         </div>
-        <h4>Auctions Just Ended</h4>
+        <h4 class="auction-title">Auctions Just Ended</h4>
         <div class="auction-cards">
             {% for auction in ended_auctions %}
                 <a class="card" href="{% url 'auction_detail' auction.id %}">
@@ -126,7 +126,7 @@
                                 <img src="{% static 'images/default-auction-image.jpg' %}" alt="Default image">
                             {% endif %}
                     </div>
-                    <div class="card-body">
+                    <div class="auction-price">
                         <p><strong>${{ auction.current_price }}</strong></p>
                     </div>
                 </a>

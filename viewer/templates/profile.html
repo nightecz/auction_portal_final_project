@@ -2,7 +2,7 @@
 'street', 'house_number', 'city', 'zip_code', 'country']
 {% block nadpis %} - Profile{% endblock %}
 {% block content %}
-        <div class="info-box">
+        <div class="profile-info-box">
             <h2 class="h2">Profile</h2>
     {% if user.profile.avatar %}
         <img src="{{ user.profile.avatar.url }}" alt="Avatar" class="img-thumbnail"
@@ -43,7 +43,10 @@
             {% endif %}
             <p class="card-text"><strong>Last login:</strong> {{ user.last_login|date:'H:i:s M d, Y' }}</p>
             <br>
-            <a href="{% url 'profile_edit' %}"><button type="button" class="search-btn">Change Profile</button></a>
+            <div class="handling">
+                <a href="{% url 'profile_edit' %}"><div class="profile-btn-change">Change Profile</div></a>
+            </div>
+
         </div>
         <br>
     </form>

@@ -166,7 +166,7 @@ class AuctionCreateView(FormView):
             if user_auctions_count >= 10:
                 messages.error(
                     request,
-                    "You cannot create more than 10 auctions as a non-premium user. Upgrade to premium to create more auctions."
+                    "You cannot create more than 10 auctions as a non-premium user. Upgrade to premium to create more auctions. Write us on: email@email.com"
                 )
                 return redirect('index')
 
@@ -419,7 +419,7 @@ class AuctionUpdateView(UpdateView):
 
 class AuctionCancelView(View):
     model = Auction
-    template_name = 'auction_cancel.html'
+    template_name = 'auctions/auction_cancel.html'
     success_url = reverse_lazy('my_auctions')
 
     def get(self, request, pk):
@@ -498,9 +498,9 @@ class AuctionRelistView(UpdateView):
     def dispatch(self, request, *args, **kwargs):
         auction = self.get_object()
 
-        # Check for 'Closed' or 'Cancelled'
-        if auction.status not in [Auction.CLOSED, Auction.CANCELLED]:
-            messages.error(request, "Only closed or cancelled auction could be relisted.")
+        # Check for 'Unsold' or 'Cancelled'
+        if auction.status not in [Auction.UNSOLD, Auction.CANCELLED]:
+            messages.error(request, "Only unsold or cancelled auction could be relisted.")
             return redirect(self.success_url)
 
         # Check for seller = owner
