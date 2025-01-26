@@ -101,6 +101,7 @@ class SignUpForm(UserCreationForm):
         user = super().save(commit=False)
         user.first_name = self.cleaned_data['first_name']
         user.last_name = self.cleaned_data['last_name']
+
         if commit:
             user.save()
 
@@ -112,7 +113,9 @@ class SignUpForm(UserCreationForm):
             city=self.cleaned_data['city'],
             zip_code=self.cleaned_data['zip_code'],
             country=self.cleaned_data['country'],
-            prefer_communication=self.cleaned_data['prefer_communication']
+            prefer_communication=self.cleaned_data['prefer_communication'],
+            first_name=self.cleaned_data['first_name'],
+            last_name=self.cleaned_data['last_name']
         )
 
         return user
@@ -165,7 +168,7 @@ class AuctionCreateForm(ModelForm):
 
     def clean_starting_price(self):
         starting_price = self.cleaned_data.get('starting_price')
-        if starting_price < 0.01:
+        if starting_price < 0.001:
             raise ValidationError("Starting price must be greater than zero.")
         return starting_price
 

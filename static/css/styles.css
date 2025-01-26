@@ -191,6 +191,7 @@ section {
 footer{
     height: 4vw;
     background-color: rgba(169, 74, 74, 0.7);
+    width: 80%;
     color: #FFF6DA;
     text-align: center;
     padding: 1.5rem;
@@ -1073,7 +1074,7 @@ label{
 .info-box, .card-box{
     display: flex;
     flex-direction: column;
-    align-items: left;
+    align-items: start;
     width: 80%;
     margin: 3rem;
     background-color: rgba(255, 255, 255, 0.8);
@@ -1082,6 +1083,8 @@ label{
     margin-top: 3vh;
     border-radius: 1rem;
     padding: 1rem;
+    word-wrap: break-word;
+    overflow-wrap: break-word;
 }
 
 .info-box .handling{
@@ -1103,15 +1106,15 @@ label{
 }
 
 .info-box li, .card-box li{
-   list-style: none;
+    list-style: none;
 }
 .info-box ul, .card-box ul{
-   margin-top: 0;
+    margin-top: 0;
     margin-bottom: 3rem;
 }
 
 .info-box p, .card-box p{
-   margin: 1rem;
+    max-width: 100%;
 }
 
 input[type="file"]::-webkit-file-upload-button {
@@ -1317,4 +1320,13 @@ td .btn-danger, td .btn-info{
         height: auto;
     }
 
+}
+
+#id_categories, #id_subcategories{
+    display: flex;
+    flex-direction: column;
+    align-items: start;
+    width: 100%;
+    text-wrap: nowrap;
+    padding-left: 2vw;
 }
