@@ -7,6 +7,13 @@
 {% endblock %}
 
 {% block content %}
+    {% if messages %}
+        <div class="message" role="alert">
+            {% for message in messages %}
+                {{ message }}
+            {% endfor %}
+        </div>
+    {% endif %}
     <h2>live Auctions overview</h2>
 <div class="container">
     <div class="browse">

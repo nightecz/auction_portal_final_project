@@ -31,7 +31,17 @@ class SignUpForm(UserCreationForm):
                         ]
                     )
     street = CharField(max_length=20, required=True, label='Street')
-    house_number = CharField(max_length=20, required=True, label='House number')
+    house_number = CharField(max_length=20,
+                             required=True,
+                             label='House number',
+                             validators=[
+                                 RegexValidator(
+                                     regex=r'^\d{1,6}(/(\d{1,2}[a-z]?|[a-z]))?$',  # regular expresion - only specific formats allowed
+                                     message="House number have to be in common formats (eg.: 123, 123a, 123/45, 123/45a or 123/a) with lower case only."
+                                 )
+                             ]
+                        )
+
     city = CharField(max_length=20, required=True, label='City')
     zip_code = CharField(max_length=20, required=True, label='ZIP code',
                          validators=[

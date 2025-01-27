@@ -59,9 +59,9 @@ class LogoutUserTest(TestCase):
 
 
 class TestSignUpFormValidator(TestCase):
-
+    # Helper method for valid data
     def _get_valid_data(self, phone='+420200000000', first_name='Tomáš', last_name='Novák',
-                        street='Na hrázi', city='Praha', zip_code='11000', country='Česká republika', email='test@example.com'):
+                        street='Na hrázi', house_number='123/45', city='Praha', zip_code='11000', country='Česká republika', email='test@example.com'):
         return {
             'username': 'testuser',
             'email': email,
@@ -71,7 +71,7 @@ class TestSignUpFormValidator(TestCase):
             'last_name': last_name,
             'phone': phone,
             'street': street,
-            'house_number': '123',
+            'house_number': house_number,
             'city': city,
             'zip_code': zip_code,
             'country': country,
@@ -119,6 +119,41 @@ class TestSignUpFormValidator(TestCase):
         self.assertFalse(form.is_valid())
         self.assertIn('city', form.errors)
 
+    def test_valid_house_number(self):
+        form_data = self._get_valid_data(house_number='123/45')
+        form = SignUpForm(data=form_data)
+        self.assertTrue(form.is_valid())
+
+    def test_invalid_hn_special_characters(self):
+        form_data = self._get_valid_data(house_number='#55555')
+        form = SignUpForm(data=form_data)
+        self.assertFalse(form.is_valid())
+        self.assertIn('house_number', form.errors)
+
+    def test_invalid_hn_nothing_after_slash(self):
+        form_data = self._get_valid_data(house_number='444/')
+        form = SignUpForm(data=form_data)
+        self.assertFalse(form.is_valid())
+        self.assertIn('house_number', form.errors)
+
+    def test_invalid_hn_nothing_before_slash(self):
+        form_data = self._get_valid_data(house_number='/444')
+        form = SignUpForm(data=form_data)
+        self.assertFalse(form.is_valid())
+        self.assertIn('house_number', form.errors)
+
+    def test_invalid_hn_not_started_with_digits(self):
+        form_data = self._get_valid_data(house_number='a')
+        form = SignUpForm(data=form_data)
+        self.assertFalse(form.is_valid())
+        self.assertIn('house_number', form.errors)
+
+    def test_invalid_hn_capitals(self):
+        form_data = self._get_valid_data(house_number='123A')
+        form = SignUpForm(data=form_data)
+        self.assertFalse(form.is_valid())
+        self.assertIn('house_number', form.errors)
+
     def test_invalid_zip_code_special_characters(self):
         form_data = self._get_valid_data(zip_code='#55555')
         form = SignUpForm(data=form_data)
@@ -152,24 +187,7 @@ class TestSignUpFormValidator(TestCase):
         self.assertIn('email', form.errors)
 
 
-    # Helper method for valid data
-    def _get_valid_data(self, phone='+420200000000', first_name='Tomáš', last_name='Novák',
-                        street='Na hrázi', city='Praha', zip_code='11000', country='Česká republika', email='test@example.com'):
-        return {
-            'username': 'testuser',
-            'email': email,
-            'password1': 'SecurePass123!',
-            'password2': 'SecurePass123!',
-            'first_name': first_name,
-            'last_name': last_name,
-            'phone': phone,
-            'street': street,
-            'house_number': '123',
-            'city': city,
-            'zip_code': zip_code,
-            'country': country,
-            'prefer_communication': 'email',
-        }
+
 @freeze_time("2025-01-01T00:00")
 class TestAuctionCreateForm(TestCase):
     def setUp(self):

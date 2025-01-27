@@ -85,10 +85,10 @@
                     <p class="text-danger">Bidding is only available for auctions that are currently running.</p>
                 {% endif %}
                 {% if auction.buy_now_price and auction.status == "Running" %}
-                    <div>
-                        <label><strong>or buy now:</strong></label>
+                    <div class="buy_now">
                         <form action="{% url 'buy_now' auction.id %}" method="post">
                             {% csrf_token %}
+                            <label><strong>or buy now:</strong></label>
                             <button type="submit" class="search-btn">Buy Now for ${{ auction.buy_now_price }}</button>
                         </form>
                     </div>
