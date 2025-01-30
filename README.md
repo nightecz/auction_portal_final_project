@@ -38,7 +38,7 @@ media/: Uploaded files such as avatars and auction images
 ## Visuals ORM
 Depending on what you are making, it can be a good idea to include screenshots or even a video (you'll frequently see GIFs rather than actual videos). Tools like ttygif can help, but check out Asciinema for a more sophisticated method.
 
-![Screenshot](https://github.com/nightecz/auction_portal_final_projetct/image.png/)
+![Screenshot](https://github.com/nightecz/auction_portal_final_project/blob/develop/image.png/)
 
 
 ## Requirements
