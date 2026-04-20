@@ -43,7 +43,7 @@ Depending on what you are making, it can be a good idea to include screenshots o
 
 ## Requirements
 tools needed to run the project:
-Python: 3.10+
+Python: 3.12+
 Django: 4.x
 SQLite (or other database)
 Other libraries can be found in the requirements.txt file.
@@ -51,11 +51,13 @@ Other libraries can be found in the requirements.txt file.
 ## How to install a Installation
 Within a particular ecosystem, there may be a common way of installing things, such as using Yarn, NuGet, or Homebrew. However, consider the possibility that whoever is reading your README is a novice and would like more guidance. Listing specific steps helps remove ambiguity and gets people to using your project as quickly as possible. If it only runs in a specific context like a particular programming language version or operating system or has dependencies that have to be installed manually, also add a Requirements subsection.
 
+Before 
+
 1) Clone the repository:
 git clone https://gitlab.com/user_name/project_name.git
 cd project_name
 
-2) Create and activate the virtual environment:
+2) Create and activate the virtual environment (in a root file:
 python -m venv venv
 For MacOS: source venv/bin/activate
 For Windows: venv\Scripts\activate
@@ -63,7 +65,9 @@ For Windows: venv\Scripts\activate
 3) Install the required libraries:
 pip install -r requirements.txt
 
-4) Perform the database migration:
+4a) Create migration
+py manage.py makemigrations  
+4b) Perform the database migration:
 python manage.py migrate
 
 5) Start the server:
@@ -73,6 +77,9 @@ python manage.py runserver
 To run tests used command:
 python manage.py test
 
+## Create superuser
+python manage.py createsuperuser
+
 ## Roadmap
 - More details into auctions
 - Better management for auctions picture
@@ -81,6 +88,8 @@ python manage.py test
 - Multi-language Support
 - Add Changelog
 - Cookies
+- JavaScrit:
+- - while creating auctions - the subauctions would changed due to root category
 
 
 ## Contributing
