@@ -16,10 +16,8 @@ from django.shortcuts import render, redirect
 from django.db.models import Q
 from django.utils.decorators import method_decorator
 from django.views import View
-from django.views.generic import FormView, ListView, TemplateView
-from viewer.forms import SignUpForm, AuctionCreateForm, ProfileEditForm, BidForm, PurchaseForm, ReviewForm
 from django.views.generic import FormView, ListView, TemplateView, UpdateView, DeleteView, DetailView
-from viewer.forms import SignUpForm, AuctionCreateForm, ProfileEditForm, BidForm, WatchlistForm, AuctionUpdateForm
+from viewer.forms import SignUpForm, AuctionCreateForm, ProfileEditForm, BidForm, WatchlistForm, AuctionUpdateForm, ReviewForm
 from django.urls import reverse_lazy, reverse
 from viewer.models import Watchlist, Auction, User, Profile, Bid, Category, Review, Purchase, Archive
 from django.contrib.auth.forms import UserChangeForm
@@ -83,7 +81,7 @@ class CustomLoginView(LoginView):
             return redirect('/')
         return super().dispatch(request, *args, **kwargs)
 
-class ProfileView(TemplateView):
+class ProfileView(LoginRequiredMixin, TemplateView):
     template_name = 'profile.html'
 
     def get_context_data(self, **kwargs):
@@ -91,7 +89,7 @@ class ProfileView(TemplateView):
         context['profile'] = self.request.user.profile
         return context
 
-class ProfileEditView(View):
+class ProfileEditView(LoginRequiredMixin, View):
     template_name = 'profile_edit.html'
     form_class = ProfileEditForm
     success_url = reverse_lazy('profile')
@@ -272,8 +270,6 @@ class AuctionSearchView(ListView):
 
         return context
 
-from django.utils import timezone
-
 class UserSearchView(ListView):
     template_name = 'user_search.html'
     model = Profile
@@ -320,7 +316,7 @@ class AuctionDetailView(TemplateView):
         context = super().get_context_data(**kwargs)
         # Getting auction by ID
         auction_id = self.kwargs.get('id')
-        auction = Auction.objects.get(pk=auction_id)
+        auction = get_object_or_404(Auction, pk=auction_id)
         context['auction'] = auction
 
         # Getting profile of seller
@@ -342,39 +338,10 @@ class AuctionDetailView(TemplateView):
         except Purchase.DoesNotExist:
             purchase = None
 
-        def close_auction_and_create_purchase(auction):
-            if auction.status == Auction.CLOSED and not auction.purchases.exists():
-                if auction.bids.exists():
-                    highest_bid = auction.bids.latest('created_at')
-
-                    purchase = Purchase.objects.create(
-                        auction=auction,
-                        buyer=highest_bid.bidder.profile,
-                        seller=auction.seller.profile,
-                        winning_price=highest_bid.amount
-                    )
-                    purchase.save()
-
-                    auction.purchase = purchase
-                    auction.save()
-
-                    auction.status = Auction.CLOSED
-                    auction.save()
-                    
-                    return purchase
-                
-                else:
-                    auction.status = Auction.UNSOLD
-                    auction.save()
-                
-            return None
-
         if auction.end_time < timezone.now() and auction.status == Auction.RUNNING:
             auction.status = Auction.CLOSED
             auction.save()
-
-
-            purchase = close_auction_and_create_purchase(auction)
+            purchase = auction.close_and_create_purchase()
 
 
 
@@ -434,55 +401,6 @@ class AuctionCancelView(View):
         auction.save()
         messages.success(request, "Auction have been cancelled.")
         return redirect(self.success_url)
-
-class AuctionRelistView(View):
-    model = Auction
-    template_name = 'auction_relist.html'
-    success_url = reverse_lazy('my_auctions')
-    form_class = AuctionCreateForm
-
-    def get_object(self):
-        # Load auction by (pk) from URL
-        pk = self.kwargs.get('pk')
-        return get_object_or_404(self.model, pk=pk)
-
-    def dispatch(self, request, *args, **kwargs):
-        auction = self.get_object()
-
-        # Check for 'Unsold' or 'Cancelled'
-        if auction.status not in [Auction.UNSOLD, Auction.CANCELLED]:
-            messages.error(request, "Only unsold or cancelled auction could be relisted.")
-            return redirect(self.success_url)
-
-        # Check for seller = owner
-        if auction.seller != request.user:
-            messages.error(request, "You do not have right to do that.")
-            return redirect(self.success_url)
-
-        return super().dispatch(request, *args, **kwargs)
-
-    def post(self, request, *args, **kwargs):
-        # Gets auction by pk
-        auction = self.get_object()
-
-        # Proceed data from form
-        form = self.form_class(request.POST, instance=auction)
-
-        if form.is_valid():
-            auction = form.save(commit=False)
-
-            # Update status and time
-            auction.status = Auction.RUNNING
-            auction.start_time = timezone.now()
-            auction.end_time = form.cleaned_data.get('end_time')
-
-            auction.save()
-
-            messages.success(request, "Auction has been relisted.")
-            return redirect(self.success_url)
-        else:
-            messages.error(request, "There was an error relisting the auction.")
-            return render(request, self.template_name, {'form': form, 'auction': auction})
 
 class AuctionRelistView(UpdateView):
     model = Auction
@@ -561,7 +479,7 @@ class AuctionBiddingView(ListView):
         return context
 
 # Optimization - self standing function will be called up on different places as method for direct buy.
-def process_direct_buy(auction, highest_bid ,request):
+def process_direct_buy(auction,request):
     highest_bid = auction.bids.order_by('-amount').first()
     if highest_bid and highest_bid.amount >= auction.buy_now_price:
         winning_price = highest_bid.amount
@@ -648,7 +566,7 @@ class PlaceBidView(FormView):
             if highest_bid and highest_bid.amount is not None:
                 if highest_bid.amount >= auction.buy_now_price:
 
-                    process_direct_buy(auction, highest_bid.amount, request)
+                    process_direct_buy(auction, request)
                     return HttpResponseRedirect(reverse('auction_detail', kwargs={'id': auction_id}))
 
         messages.success(request, "Your bid was placed.")
@@ -715,7 +633,7 @@ class SellerConfirmView(View):
             purchase = Purchase.objects.get(id=purchase_id)
         except Purchase.DoesNotExist:
             messages.error(request, "Purchase not found.")
-            return redirect('auction_detail', id=purchase.auction.id)
+            return redirect('index')
 
         if purchase.auction.seller.profile != request.user.profile:
             messages.error(request, "You are not authorized to confirm the sale.")
@@ -795,7 +713,10 @@ class ReviewCreateView(FormView):
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         purchase_id = self.request.GET.get('purchase')
-        context['purchase'] = Purchase.objects.get(pk=purchase_id)
+        try:
+            context['purchase'] = Purchase.objects.get(pk=purchase_id)
+        except Purchase.DoesNotExist:
+            context['purchase'] = None
         return context
 
     def dispatch(self, request, *args, **kwargs):
@@ -806,7 +727,11 @@ class ReviewCreateView(FormView):
     def form_valid(self, form):
         cleaned_data = form.cleaned_data
         purchase_id = self.request.GET.get('purchase')
-        purchase = Purchase.objects.get(pk=purchase_id)
+        try:
+            purchase = Purchase.objects.get(pk=purchase_id)
+        except Purchase.DoesNotExist:
+            messages.error(self.request, "Purchase not found.")
+            return redirect('index')
 
         # conditions, who is writting the review
         if self.request.user.profile == purchase.buyer:
@@ -888,11 +813,8 @@ class BuyNowView(View):
 
 
         # Process Buy Now purchase if conditions are met
-        process_direct_buy(auction, auction.buy_now_price, request)
+        process_direct_buy(auction, request)
         return HttpResponseRedirect(reverse('auction_detail', kwargs={'id': auction_id}))
-
-        messages.success(request, "You have successfully purchased this auction!")
-        return redirect('auction_detail', id=auction.id)
 
 
 class ProfileDetailView(DetailView):
