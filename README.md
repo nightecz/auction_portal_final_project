@@ -109,4 +109,4 @@ jakub.hazda@gmail.com
 mprudic@gmail.com
 
 ## License
-Distributed under the Unlicence Licence.
+This project is licensed under the MIT License.
